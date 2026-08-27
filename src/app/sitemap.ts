@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { collections, blogPosts } from '@/lib/data'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://marvvn.com'
+  const baseUrl = 'https://marvvn.online'
 
   let products: { handle: string }[] = []
   try {

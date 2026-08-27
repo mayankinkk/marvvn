@@ -25,7 +25,7 @@ export default function TermsPage() {
             <section>
               <h2 className="text-lg font-medium text-marvvn-black mb-3">1. Acceptance of Terms</h2>
               <p>
-                By accessing and using the MARVVN website (marvvn.com), you agree to
+                By accessing and using the MARVVN website (marvvn.online), you agree to
                 be bound by these Terms & Conditions. If you do not agree, please do not use our website.
               </p>
             </section>

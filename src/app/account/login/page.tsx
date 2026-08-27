@@ -101,7 +101,7 @@ export default function LoginPage() {
 
           <div className="mt-8 p-4 bg-marvvn-gray-50 text-center text-sm text-marvvn-gray-500">
             <p className="font-medium text-marvvn-gray-700 mb-1">Demo Credentials</p>
-            <p>Email: demo@marvvn.com</p>
+            <p>Email: demo@marvvn.online</p>
             <p>Password: demo123</p>
           </div>
         </div>

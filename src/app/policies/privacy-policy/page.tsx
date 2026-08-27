@@ -76,7 +76,7 @@ export default function PrivacyPolicyPage() {
               <h2 className="text-lg font-medium text-marvvn-black mb-3">6. Your Rights</h2>
               <p>
                 You have the right to access, correct, or delete your personal information. 
-                To exercise these rights, contact us at support@marvvn.com.
+                To exercise these rights, contact us at support@marvvn.online.
               </p>
             </section>
 
@@ -100,7 +100,7 @@ export default function PrivacyPolicyPage() {
             <section>
               <h2 className="text-lg font-medium text-marvvn-black mb-3">9. Contact Us</h2>
               <p>
-                For privacy-related inquiries, contact us at support@marvvn.com or 
+                For privacy-related inquiries, contact us at support@marvvn.online or 
                 write to us at MARVVN, Mumbai, Maharashtra, India.
               </p>
             </section>
