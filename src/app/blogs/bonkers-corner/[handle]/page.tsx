@@ -2,6 +2,7 @@
 
 import { use } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { blogPosts } from '@/lib/data'
@@ -37,11 +38,13 @@ export default function BlogPostPage({ params }: { params: Promise<{ handle: str
         </nav>
 
         <article className="max-w-3xl mx-auto">
-          <div className="aspect-[16/9] bg-marvvn-gray-50 overflow-hidden mb-6">
-            <img
+          <div className="aspect-[16/9] bg-marvvn-gray-50 overflow-hidden mb-6 relative">
+            <Image
               src={post.image}
               alt={post.title}
-              className="w-full h-full object-cover"
+              fill
+              sizes="(max-width: 768px) 100vw, 768px"
+              className="object-cover"
             />
           </div>
 
@@ -89,8 +92,8 @@ export default function BlogPostPage({ params }: { params: Promise<{ handle: str
                   href={`/blogs/bonkers-corner/${rp.handle}`}
                   className="group border hover:shadow-lg transition-shadow"
                 >
-                  <div className="aspect-[16/9] bg-marvvn-gray-50 overflow-hidden">
-                    <img src={rp.image} alt={rp.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <div className="aspect-[16/9] bg-marvvn-gray-50 overflow-hidden relative">
+                    <Image src={rp.image} alt={rp.title} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
                   </div>
                   <div className="p-4">
                     <p className="text-xs text-marvvn-gray-400 mb-2">{rp.date}</p>

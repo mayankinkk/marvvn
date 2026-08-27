@@ -3,66 +3,44 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { ChevronRight, SlidersHorizontal, X } from 'lucide-react'
+import { ChevronRight, SlidersHorizontal } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ProductGrid from '@/components/ProductGrid'
-import { products, collections } from '@/lib/data'
+import { collections } from '@/lib/data'
+import { useProducts } from '@/lib/hooks/useProducts'
 import { cn } from '@/lib/utils'
 
-const CATEGORY_MAP: Record<string, string> = {
-  'women': 'women',
-  'men': 'men',
-  'accessories': 'accessories',
-  'womens-new-arrivals': 'women',
-  'mens-new-arrivals': 'men',
-  'spiderman-women': 'women',
-  'red-bull-collection': 'all',
-}
-
-const TAG_MAP: Record<string, string[]> = {
-  'oversized-t-shirts': ['oversized'],
-  'oversized-t-shirt-men': ['oversized'],
-  'joggers': ['joggers'],
-  'bottoms': ['pants', 'joggers', 'sweatpants', 'jeans'],
-  'womens-bottoms': ['pants', 'joggers', 'sweatpants'],
-  'mens-bottoms': ['pants', 'joggers', 'jeans'],
-  'jackets': ['jacket', 'denim'],
-  'sweatshirts-hoodies': ['sweatshirt', 'hoodie'],
-  'caps': ['cap'],
-  'jeans': ['jeans'],
-}
-
-const COLLECTION_FILTERS: Record<string, (p: typeof products[0]) => boolean> = {
-  'new-arrivals': (p) => p.collection.includes('new-arrivals'),
-  'best-sellers': (p) => p.collection.includes('best-sellers'),
+const COLLECTION_FILTERS: Record<string, (p: any) => boolean> = {
+  'new-arrivals': (p) => p.collection?.includes('new-arrivals'),
+  'best-sellers': (p) => p.collection?.includes('best-sellers'),
   'women': (p) => p.category === 'women',
   'men': (p) => p.category === 'men',
   'accessories': (p) => p.category === 'accessories',
-  'womens-new-arrivals': (p) => p.category === 'women' && p.collection.includes('new-arrivals'),
-  'mens-new-arrivals': (p) => p.category === 'men' && p.collection.includes('new-arrivals'),
-  'oversized-t-shirts': (p) => p.tags.some(t => t.includes('oversized')),
-  'oversized-t-shirt-men': (p) => p.category === 'men' && p.tags.some(t => t.includes('oversized')),
-  'bottoms': (p) => ['pants', 'joggers', 'sweatpants', 'jeans'].some(t => p.tags.includes(t)),
-  'womens-bottoms': (p) => p.category === 'women' && ['pants', 'joggers', 'sweatpants'].some(t => p.tags.includes(t)),
-  'mens-bottoms': (p) => p.category === 'men' && ['pants', 'joggers', 'jeans'].some(t => p.tags.includes(t)),
-  'jackets': (p) => p.tags.some(t => t.includes('jacket') || t.includes('denim')),
-  'caps': (p) => p.tags.some(t => t.includes('cap')),
+  'womens-new-arrivals': (p) => p.category === 'women' && p.collection?.includes('new-arrivals'),
+  'mens-new-arrivals': (p) => p.category === 'men' && p.collection?.includes('new-arrivals'),
+  'oversized-t-shirts': (p) => p.tags?.some((t: string) => t.includes('oversized')),
+  'oversized-t-shirt-men': (p) => p.category === 'men' && p.tags?.some((t: string) => t.includes('oversized')),
+  'bottoms': (p) => ['pants', 'joggers', 'sweatpants', 'jeans'].some((t) => p.tags?.includes(t)),
+  'womens-bottoms': (p) => p.category === 'women' && ['pants', 'joggers', 'sweatpants'].some((t) => p.tags?.includes(t)),
+  'mens-bottoms': (p) => p.category === 'men' && ['pants', 'joggers', 'jeans'].some((t) => p.tags?.includes(t)),
+  'jackets': (p) => p.tags?.some((t: string) => t.includes('jacket') || t.includes('denim')),
+  'caps': (p) => p.tags?.some((t: string) => t.includes('cap')),
   'spiderman-women': (p) => p.category === 'women',
   'red-bull-collection': () => true,
-  'special-prices': (p) => !!p.compareAtPrice,
-  'signature-collection-app': (p) => p.collection.includes('new-arrivals'),
-  'acosta-collection-app': (p) => p.collection.includes('best-sellers'),
-  'anime-collection-app': (p) => p.tags.some(t => t.includes('anime') || t.includes('marvel')),
-  'sweatshirts-hoodies': (p) => p.tags.some(t => t.includes('sweatshirt') || t.includes('hoodie')),
+  'special-prices': (p) => !!p.compare_at_price || !!p.compareAtPrice,
+  'signature-collection-app': (p) => p.collection?.includes('new-arrivals'),
+  'acosta-collection-app': (p) => p.collection?.includes('best-sellers'),
+  'sweatshirts-hoodies': (p) => p.tags?.some((t: string) => t.includes('sweatshirt') || t.includes('hoodie')),
   'premium': (p) => p.price >= 1999,
-  'jeans': (p) => p.tags.some(t => t.includes('jeans')),
-  'joggers': (p) => p.tags.some(t => t.includes('joggers')),
+  'jeans': (p) => p.tags?.some((t: string) => t.includes('jeans')),
+  'joggers': (p) => p.tags?.some((t: string) => t.includes('joggers')),
 }
 
 export default function CollectionPage() {
   const params = useParams()
   const handle = params.handle as string
+  const { products } = useProducts()
   const [sortBy, setSortBy] = useState('newest')
   const [selectedSizes, setSelectedSizes] = useState<string[]>([])
   const [selectedColors, setSelectedColors] = useState<string[]>([])
@@ -82,10 +60,10 @@ export default function CollectionPage() {
     }
 
     if (selectedSizes.length > 0) {
-      result = result.filter((p) => p.sizes.some((s) => selectedSizes.includes(s)))
+      result = result.filter((p) => p.sizes?.some((s: string) => selectedSizes.includes(s)))
     }
     if (selectedColors.length > 0) {
-      result = result.filter((p) => p.colors.some((c) => selectedColors.includes(c)))
+      result = result.filter((p) => p.colors?.some((c: string) => selectedColors.includes(c)))
     }
     result = result.filter((p) => p.price >= priceRange[0] && p.price <= priceRange[1])
 
@@ -104,7 +82,7 @@ export default function CollectionPage() {
     }
 
     return result
-  }, [handle, sortBy, selectedSizes, selectedColors, priceRange])
+  }, [handle, sortBy, selectedSizes, selectedColors, priceRange, products])
 
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage)
   const paginatedProducts = filteredProducts.slice(
@@ -112,8 +90,8 @@ export default function CollectionPage() {
     currentPage * productsPerPage
   )
 
-  const allSizes = [...new Set(products.flatMap((p) => p.sizes))]
-  const allColors = [...new Set(products.flatMap((p) => p.colors))]
+  const allSizes = [...new Set(products.flatMap((p) => p.sizes || []))]
+  const allColors = [...new Set(products.flatMap((p) => p.colors || []))]
 
   const toggleSize = (size: string) => {
     setSelectedSizes((prev) =>
@@ -134,7 +112,6 @@ export default function CollectionPage() {
       <Header />
 
       <main className="container py-4 lg:py-8">
-        {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-xs text-marvvn-gray-500 mb-6">
           <Link href="/" className="hover:text-marvvn-black">Home</Link>
           <ChevronRight className="w-3 h-3" />
@@ -143,7 +120,6 @@ export default function CollectionPage() {
           </span>
         </nav>
 
-        {/* Header */}
         <div className="flex items-center justify-between mb-6 lg:mb-8">
           <div>
             <h1 className="text-2xl lg:text-3xl font-display font-medium capitalize">
@@ -158,7 +134,7 @@ export default function CollectionPage() {
             <button
               type="button"
               onClick={() => setShowFilters(!showFilters)}
-              className="lg:hidden flex items-center gap-2 px-4 py-2 border border-marvvn-gray-300 text-sm hover:border-marvvn-black transition-colors"
+              className="lg:hidden flex items-center gap-2 px-4 py-2 border border-marvvn-gray-300 text-sm hover:border-marvvn-black transition-colors cursor-pointer"
             >
               <SlidersHorizontal className="w-4 h-4" />
               Filters
@@ -177,12 +153,10 @@ export default function CollectionPage() {
         </div>
 
         <div className="flex gap-8">
-          {/* Sidebar Filters - Desktop */}
           <aside className={cn(
             'w-64 flex-shrink-0 space-y-6',
             showFilters ? 'block' : 'hidden lg:block'
           )}>
-            {/* Sizes */}
             <div>
               <h3 className="text-sm font-medium uppercase tracking-wider mb-3">Size</h3>
               <div className="flex flex-wrap gap-2">
@@ -192,7 +166,7 @@ export default function CollectionPage() {
                     type="button"
                     onClick={() => toggleSize(size)}
                     className={cn(
-                      'min-w-[40px] px-2 py-1.5 text-xs border transition-colors',
+                      'min-w-[40px] px-2 py-1.5 text-xs border transition-colors cursor-pointer',
                       selectedSizes.includes(size)
                         ? 'border-marvvn-black bg-marvvn-black text-white'
                         : 'border-marvvn-gray-300 hover:border-marvvn-black'
@@ -204,7 +178,6 @@ export default function CollectionPage() {
               </div>
             </div>
 
-            {/* Colors */}
             <div>
               <h3 className="text-sm font-medium uppercase tracking-wider mb-3">Color</h3>
               <div className="flex flex-wrap gap-2">
@@ -214,7 +187,7 @@ export default function CollectionPage() {
                     type="button"
                     onClick={() => toggleColor(color)}
                     className={cn(
-                      'px-3 py-1.5 text-xs border transition-colors',
+                      'px-3 py-1.5 text-xs border transition-colors cursor-pointer',
                       selectedColors.includes(color)
                         ? 'border-marvvn-black bg-marvvn-black text-white'
                         : 'border-marvvn-gray-300 hover:border-marvvn-black'
@@ -226,7 +199,6 @@ export default function CollectionPage() {
               </div>
             </div>
 
-            {/* Price */}
             <div>
               <h3 className="text-sm font-medium uppercase tracking-wider mb-3">Price</h3>
               <div className="space-y-2">
@@ -245,7 +217,6 @@ export default function CollectionPage() {
               </div>
             </div>
 
-            {/* Clear Filters */}
             {(selectedSizes.length > 0 || selectedColors.length > 0 || priceRange[1] < 5000) && (
               <button
                 type="button"
@@ -255,27 +226,25 @@ export default function CollectionPage() {
                   setPriceRange([0, 5000])
                   setCurrentPage(1)
                 }}
-                className="text-sm text-marvvn-gray-500 underline underline-offset-4 hover:text-marvvn-black transition-colors"
+                className="text-sm text-marvvn-gray-500 underline underline-offset-4 hover:text-marvvn-black transition-colors cursor-pointer"
               >
                 Clear All Filters
               </button>
             )}
           </aside>
 
-          {/* Products */}
           <div className="flex-1">
             {filteredProducts.length > 0 ? (
               <>
                 <ProductGrid products={paginatedProducts} columns={4} />
 
-                {/* Pagination */}
                 {totalPages > 1 && (
                   <div className="flex items-center justify-center gap-2 mt-8">
                     <button
                       type="button"
                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
-                      className="px-3 py-2 text-sm border border-marvvn-gray-300 hover:border-marvvn-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      className="px-3 py-2 text-sm border border-marvvn-gray-300 hover:border-marvvn-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
                     >
                       Previous
                     </button>
@@ -285,7 +254,7 @@ export default function CollectionPage() {
                         type="button"
                         onClick={() => setCurrentPage(page)}
                         className={cn(
-                          'w-10 h-10 text-sm border transition-colors',
+                          'w-10 h-10 text-sm border transition-colors cursor-pointer',
                           currentPage === page
                             ? 'border-marvvn-black bg-marvvn-black text-white'
                             : 'border-marvvn-gray-300 hover:border-marvvn-black'
@@ -298,7 +267,7 @@ export default function CollectionPage() {
                       type="button"
                       onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                       disabled={currentPage === totalPages}
-                      className="px-3 py-2 text-sm border border-marvvn-gray-300 hover:border-marvvn-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      className="px-3 py-2 text-sm border border-marvvn-gray-300 hover:border-marvvn-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
                     >
                       Next
                     </button>
@@ -316,7 +285,7 @@ export default function CollectionPage() {
                     setPriceRange([0, 5000])
                     setCurrentPage(1)
                   }}
-                  className="btn-primary"
+                  className="btn-primary cursor-pointer"
                 >
                   Clear Filters
                 </button>

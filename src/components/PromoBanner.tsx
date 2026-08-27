@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { ChevronRight } from 'lucide-react'
 
 interface PromoBannerProps {
@@ -18,15 +19,19 @@ export default function PromoBanner({ desktopImage, mobileImage, tagline, title,
     <section className="relative w-full overflow-hidden group">
       <Link href={ctaLink}>
         <div className="relative aspect-[16/7] md:aspect-[16/6] lg:aspect-[16/5]">
-          <img
+          <Image
             src={desktopImage}
             alt={title}
-            className="hidden md:block w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            fill
+            sizes="100vw"
+            className="hidden md:block object-cover group-hover:scale-105 transition-transform duration-700"
           />
-          <img
+          <Image
             src={mobileImage}
             alt={title}
-            className="md:hidden w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            fill
+            sizes="100vw"
+            className="md:hidden object-cover group-hover:scale-105 transition-transform duration-700"
           />
           <div className="absolute inset-0 bg-black/20" />
           <div className={`absolute inset-0 flex items-center ${reverse ? 'justify-end' : 'justify-start'}`}>

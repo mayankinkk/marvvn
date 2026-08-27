@@ -20,6 +20,7 @@ interface CartStore {
   totalItems: () => number
   totalPrice: () => number
   finalPrice: () => number
+  loadFromServer: () => Promise<void>
 }
 
 const PROMO_CODES: Record<string, number> = {
@@ -27,6 +28,22 @@ const PROMO_CODES: Record<string, number> = {
   'WELCOME10': 10,
   'MARVVN15': 15,
   'FLAT20': 20,
+}
+
+async function syncToServer(items: CartItem[]) {
+  try {
+    const serializable = items.map((item) => ({
+      productId: item.product.id,
+      quantity: item.quantity,
+      size: item.size,
+      color: item.color,
+    }))
+    await fetch('/api/cart', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items: serializable }),
+    })
+  } catch {}
 }
 
 export const useCartStore = create<CartStore>()(
@@ -38,33 +55,31 @@ export const useCartStore = create<CartStore>()(
       discount: 0,
 
       addItem: (product, size, color) => {
-        set((state) => {
-          const existingItem = state.items.find(
-            (item) => item.product.id === product.id && item.size === size && item.color === color
+        const existing = get().items.find(
+          (item) => item.product.id === product.id && item.size === size && item.color === color
+        )
+
+        let newItems: CartItem[]
+        if (existing) {
+          newItems = get().items.map((item) =>
+            item.product.id === product.id && item.size === size && item.color === color
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
           )
+        } else {
+          newItems = [...get().items, { product, quantity: 1, size, color }]
+        }
 
-          if (existingItem) {
-            return {
-              items: state.items.map((item) =>
-                item.product.id === product.id && item.size === size && item.color === color
-                  ? { ...item, quantity: item.quantity + 1 }
-                  : item
-              ),
-            }
-          }
-
-          return {
-            items: [...state.items, { product, quantity: 1, size, color }],
-          }
-        })
+        set({ items: newItems })
+        syncToServer(newItems)
       },
 
       removeItem: (productId, size, color) => {
-        set((state) => ({
-          items: state.items.filter(
-            (item) => !(item.product.id === productId && item.size === size && item.color === color)
-          ),
-        }))
+        const newItems = get().items.filter(
+          (item) => !(item.product.id === productId && item.size === size && item.color === color)
+        )
+        set({ items: newItems })
+        syncToServer(newItems)
       },
 
       updateQuantity: (productId, size, color, quantity) => {
@@ -73,16 +88,19 @@ export const useCartStore = create<CartStore>()(
           return
         }
 
-        set((state) => ({
-          items: state.items.map((item) =>
-            item.product.id === productId && item.size === size && item.color === color
-              ? { ...item, quantity }
-              : item
-          ),
-        }))
+        const newItems = get().items.map((item) =>
+          item.product.id === productId && item.size === size && item.color === color
+            ? { ...item, quantity }
+            : item
+        )
+        set({ items: newItems })
+        syncToServer(newItems)
       },
 
-      clearCart: () => set({ items: [], promoCode: '', discount: 0 }),
+      clearCart: () => {
+        set({ items: [], promoCode: '', discount: 0 })
+        syncToServer([])
+      },
 
       toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
 
@@ -111,6 +129,35 @@ export const useCartStore = create<CartStore>()(
         const total = get().totalPrice()
         const discount = get().discount
         return total - (total * discount) / 100
+      },
+
+      loadFromServer: async () => {
+        try {
+          const res = await fetch('/api/cart')
+          if (!res.ok) return
+          const data = await res.json()
+          if (data.cart && data.cart.length > 0) {
+            const { useProducts } = await import('./hooks/useProducts')
+            // We need products data to hydrate cart items
+            const productRes = await fetch('/api/products')
+            const productData = await productRes.json()
+            const allProducts = productData.products || []
+
+            const items: CartItem[] = data.cart.map((ci: any) => {
+              const product = allProducts.find((p: any) => p.id === ci.product_id)
+              return product ? {
+                product,
+                quantity: ci.quantity,
+                size: ci.size || '',
+                color: ci.color || '',
+              } : null
+            }).filter(Boolean)
+
+            if (items.length > 0) {
+              set({ items })
+            }
+          }
+        } catch {}
       },
     }),
     {

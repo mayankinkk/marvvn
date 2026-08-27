@@ -2,13 +2,14 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useCartStore } from '@/lib/store'
 import { useAuthStore } from '@/lib/auth-store'
 import { formatPrice } from '@/lib/utils'
-import { ChevronRight, CreditCard, Truck, Check, Tag, X } from 'lucide-react'
+import { ChevronRight, CreditCard, Truck, Check, Tag, X, Loader2 } from 'lucide-react'
 
 type Step = 'shipping' | 'payment' | 'review'
 
@@ -19,6 +20,8 @@ export default function CheckoutPage() {
   const [step, setStep] = useState<Step>('shipping')
   const [promoInput, setPromoInput] = useState('')
   const [promoError, setPromoError] = useState('')
+  const [isPlacing, setIsPlacing] = useState(false)
+  const [orderError, setOrderError] = useState('')
 
   const [shipping, setShipping] = useState({
     firstName: user?.name?.split(' ')[0] || '',
@@ -51,9 +54,53 @@ export default function CheckoutPage() {
     }
   }
 
-  const handlePlaceOrder = () => {
-    clearCart()
-    router.push('/checkout/success')
+  const handlePlaceOrder = async () => {
+    setIsPlacing(true)
+    setOrderError('')
+
+    try {
+      const shippingCost = totalPrice() >= 1499 ? 0 : 99
+      const total = finalPrice() + shippingCost
+
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: items.map((item) => ({
+            productId: item.product.id,
+            quantity: item.quantity,
+            size: item.size,
+            color: item.color,
+            price: item.product.price,
+          })),
+          total,
+          discount: discount || 0,
+          promoCode: promoCode || null,
+          shippingAddress: {
+            firstName: shipping.firstName,
+            lastName: shipping.lastName,
+            email: shipping.email,
+            phone: shipping.phone,
+            address: shipping.address,
+            city: shipping.city,
+            state: shipping.state,
+            pincode: shipping.pincode,
+          },
+          paymentMethod: payment.method,
+        }),
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'Failed to place order')
+      }
+
+      clearCart()
+      router.push('/checkout/success')
+    } catch (err: any) {
+      setOrderError(err.message || 'Something went wrong. Please try again.')
+      setIsPlacing(false)
+    }
   }
 
   if (items.length === 0) {
@@ -87,7 +134,6 @@ export default function CheckoutPage() {
 
         <h1 className="text-2xl lg:text-3xl font-display font-medium mb-8">Checkout</h1>
 
-        {/* Steps */}
         <div className="flex items-center justify-center gap-4 mb-8">
           {([
             { key: 'shipping', label: 'Shipping', icon: Truck },
@@ -114,8 +160,13 @@ export default function CheckoutPage() {
           ))}
         </div>
 
+        {orderError && (
+          <div className="bg-red-50 border border-red-200 p-4 mb-6 text-sm text-red-700">
+            {orderError}
+          </div>
+        )}
+
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Form */}
           <div className="lg:col-span-2">
             {step === 'shipping' && (
               <div className="bg-white border p-6">
@@ -205,7 +256,7 @@ export default function CheckoutPage() {
                 <button
                   type="button"
                   onClick={() => setStep('payment')}
-                  className="w-full btn-primary mt-6 py-3"
+                  className="w-full btn-primary mt-6 py-3 cursor-pointer"
                 >
                   Continue to Payment
                 </button>
@@ -292,10 +343,10 @@ export default function CheckoutPage() {
                   )}
                 </div>
                 <div className="flex gap-3 mt-6">
-                  <button type="button" onClick={() => setStep('shipping')} className="btn-secondary flex-1 py-3">
+                  <button type="button" onClick={() => setStep('shipping')} className="btn-secondary flex-1 py-3 cursor-pointer">
                     Back
                   </button>
-                  <button type="button" onClick={() => setStep('review')} className="btn-primary flex-1 py-3">
+                  <button type="button" onClick={() => setStep('review')} className="btn-primary flex-1 py-3 cursor-pointer">
                     Review Order
                   </button>
                 </div>
@@ -327,8 +378,8 @@ export default function CheckoutPage() {
                 <div className="space-y-3 mb-6">
                   {items.map((item) => (
                     <div key={`${item.product.id}-${item.size}-${item.color}`} className="flex gap-3 items-center">
-                      <div className="w-16 h-20 bg-marvvn-gray-100 flex-shrink-0">
-                        <img src={item.product.images[0]} alt={item.product.title} className="w-full h-full object-cover" />
+                      <div className="w-16 h-20 bg-marvvn-gray-100 flex-shrink-0 relative overflow-hidden">
+                        <Image src={item.product.images?.[0] || '/placeholder.png'} alt={item.product.title} fill sizes="64px" className="object-cover" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{item.product.title}</p>
@@ -340,18 +391,29 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="flex gap-3">
-                  <button type="button" onClick={() => setStep('payment')} className="btn-secondary flex-1 py-3">
+                  <button type="button" onClick={() => setStep('payment')} className="btn-secondary flex-1 py-3 cursor-pointer">
                     Back
                   </button>
-                  <button type="button" onClick={handlePlaceOrder} className="btn-primary flex-1 py-3">
-                    Place Order
+                  <button
+                    type="button"
+                    onClick={handlePlaceOrder}
+                    disabled={isPlacing}
+                    className="btn-primary flex-1 py-3 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {isPlacing ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Placing Order...
+                      </>
+                    ) : (
+                      'Place Order'
+                    )}
                   </button>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Summary */}
           <div className="lg:col-span-1">
             <div className="bg-white border p-6 sticky top-24">
               <h2 className="font-medium text-lg mb-4">Order Summary</h2>
@@ -391,7 +453,6 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Promo Code */}
               <div className="mt-4 pt-4 border-t">
                 {promoCode ? (
                   <div className="flex items-center justify-between px-3 py-2 bg-marvvn-gray-50 border border-marvvn-gray-200">
@@ -399,7 +460,7 @@ export default function CheckoutPage() {
                       <Tag className="w-4 h-4 text-green-600" />
                       <span className="font-medium">{promoCode}</span>
                     </div>
-                    <button type="button" onClick={removePromoCode} className="text-marvvn-gray-400 hover:text-marvvn-red">
+                    <button type="button" onClick={removePromoCode} className="text-marvvn-gray-400 hover:text-marvvn-red cursor-pointer">
                       <X className="w-4 h-4" />
                     </button>
                   </div>
@@ -412,7 +473,7 @@ export default function CheckoutPage() {
                       onChange={(e) => { setPromoInput(e.target.value); setPromoError('') }}
                       className="flex-1 px-3 py-2 text-sm border border-marvvn-gray-300 focus:outline-none focus:border-marvvn-black"
                     />
-                    <button type="button" onClick={handleApplyPromo} className="px-3 py-2 text-sm font-medium border border-marvvn-gray-300 hover:border-marvvn-black transition-colors">
+                    <button type="button" onClick={handleApplyPromo} className="px-3 py-2 text-sm font-medium border border-marvvn-gray-300 hover:border-marvvn-black transition-colors cursor-pointer">
                       Apply
                     </button>
                   </div>

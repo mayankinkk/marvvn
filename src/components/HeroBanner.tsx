@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -59,21 +60,21 @@ export default function HeroBanner() {
               index === current ? 'opacity-100 z-10' : 'opacity-0 z-0'
             )}
           >
-            {/* Desktop Image */}
-            <img
+            <Image
               src={slide.desktopImage}
               alt={slide.title}
-              className="hidden md:block w-full h-full object-cover"
+              fill
+              sizes="100vw"
+              className="hidden md:block object-cover"
             />
-            {/* Mobile Image */}
-            <img
+            <Image
               src={slide.mobileImage}
               alt={slide.title}
-              className="md:hidden w-full h-full object-cover"
+              fill
+              sizes="100vw"
+              className="md:hidden object-cover"
             />
-            {/* Overlay */}
             <div className="absolute inset-0 bg-black/20" />
-            {/* Content */}
             <div className="absolute inset-0 flex items-center">
               <div className="container">
                 <div className="max-w-xl">
@@ -97,7 +98,6 @@ export default function HeroBanner() {
         ))}
       </div>
 
-      {/* Dots */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
         {slides.map((_, index) => (
           <button
@@ -105,7 +105,7 @@ export default function HeroBanner() {
             type="button"
             onClick={() => setCurrent(index)}
             className={cn(
-              'w-2 h-2 rounded-full transition-all duration-300',
+              'w-2 h-2 rounded-full transition-all duration-300 cursor-pointer',
               index === current ? 'w-6 bg-white' : 'bg-white/50'
             )}
             aria-label={`Go to slide ${index + 1}`}
@@ -113,11 +113,10 @@ export default function HeroBanner() {
         ))}
       </div>
 
-      {/* Arrows */}
       <button
         type="button"
         onClick={() => setCurrent((prev) => (prev - 1 + slides.length) % slides.length)}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center transition-colors hidden md:flex"
+        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center transition-colors hidden md:flex cursor-pointer"
         aria-label="Previous slide"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -127,7 +126,7 @@ export default function HeroBanner() {
       <button
         type="button"
         onClick={() => setCurrent((prev) => (prev + 1) % slides.length)}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center transition-colors hidden md:flex"
+        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center transition-colors hidden md:flex cursor-pointer"
         aria-label="Next slide"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

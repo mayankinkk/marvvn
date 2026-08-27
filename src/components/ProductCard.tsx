@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { Heart, ShoppingBag } from 'lucide-react'
 import { Product } from '@/lib/types'
 import { formatPrice, calculateDiscount, cn } from '@/lib/utils'
@@ -14,7 +15,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false)
-  const [selectedSize, setSelectedSize] = useState(product.sizes[0] || '')
+  const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || '')
   const { addItem, toggleCart } = useCartStore()
   const { toggleItem, isInWishlist } = useWishlistStore()
   const discount = product.compareAtPrice ? calculateDiscount(product.compareAtPrice, product.price) : 0
@@ -23,7 +24,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    addItem(product, selectedSize, product.colors[0])
+    addItem(product, selectedSize, product.colors?.[0] || '')
     toggleCart()
   }
 
@@ -40,13 +41,14 @@ export default function ProductCard({ product }: ProductCardProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Image */}
       <div className="relative overflow-hidden bg-marvvn-gray-50 aspect-[3/4]">
-        <img
-          src={product.images[0]}
+        <Image
+          src={product.images?.[0] || '/placeholder.png'}
           alt={product.title}
+          fill
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           className={cn(
-            'w-full h-full object-cover transition-transform duration-500',
+            'object-cover transition-transform duration-500',
             isHovered && 'scale-105'
           )}
         />
@@ -60,7 +62,6 @@ export default function ProductCard({ product }: ProductCardProps) {
           <span className="product-badge bg-marvvn-gold">Bestseller</span>
         )}
 
-        {/* Quick Actions */}
         <div className={cn(
           'absolute bottom-0 left-0 right-0 p-3 transition-all duration-300',
           isHovered ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
@@ -68,25 +69,23 @@ export default function ProductCard({ product }: ProductCardProps) {
           <button
             type="button"
             onClick={handleAddToCart}
-            className="w-full btn-primary flex items-center justify-center gap-2 py-2.5"
+            className="w-full btn-primary flex items-center justify-center gap-2 py-2.5 cursor-pointer"
           >
             <ShoppingBag className="w-4 h-4" />
             Add To Cart
           </button>
         </div>
 
-        {/* Wishlist */}
         <button
           type="button"
           onClick={handleToggleWishlist}
-          className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-sm hover:bg-marvvn-gray-50 transition-colors opacity-0 group-hover:opacity-100"
+          className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-sm hover:bg-marvvn-gray-50 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
           aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
         >
           <Heart className={cn('w-4 h-4', inWishlist && 'fill-marvvn-red text-marvvn-red')} />
         </button>
       </div>
 
-      {/* Info */}
       <div className="mt-3 space-y-1">
         <h3 className="text-sm font-medium truncate">{product.title}</h3>
         <div className="flex items-center gap-2">

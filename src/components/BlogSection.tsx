@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { ChevronRight } from 'lucide-react'
 import { blogPosts } from '@/lib/data'
 
@@ -22,11 +23,13 @@ export default function BlogSection() {
         <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
           {blogPosts.map((post) => (
             <Link key={post.id} href={`/blogs/bonkers-corner/${post.handle}`} className="group">
-              <div className="aspect-[16/9] bg-marvvn-gray-100 mb-4 overflow-hidden">
-                <img
+              <div className="aspect-[16/9] bg-marvvn-gray-100 mb-4 overflow-hidden relative">
+                <Image
                   src={post.image}
                   alt={post.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
               <p className="text-xs text-marvvn-gray-500 mb-2">{post.date}</p>

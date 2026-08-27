@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { Minus, Plus, X, ShoppingBag, ArrowRight, ChevronRight, Tag } from 'lucide-react'
 import { useState } from 'react'
 import Header from '@/components/Header'
@@ -61,11 +62,13 @@ export default function CartPage() {
                 {items.map((item) => (
                   <div key={`${item.product.id}-${item.size}-${item.color}`} className="py-6 grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
                     <div className="md:col-span-6 flex gap-4">
-                      <div className="w-20 h-24 bg-marvvn-gray-50 flex-shrink-0">
-                        <img
-                          src={item.product.images[0]}
+                      <div className="w-20 h-24 bg-marvvn-gray-50 flex-shrink-0 relative overflow-hidden">
+                        <Image
+                          src={item.product.images?.[0] || '/placeholder.png'}
                           alt={item.product.title}
-                          className="w-full h-full object-cover"
+                          fill
+                          sizes="80px"
+                          className="object-cover"
                         />
                       </div>
                       <div>

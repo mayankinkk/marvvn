@@ -1,8 +1,18 @@
 import { MetadataRoute } from 'next'
-import { products, collections, blogPosts } from '@/lib/data'
+import { createClient } from '@/lib/supabase/server'
+import { collections, blogPosts } from '@/lib/data'
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://bonkerscorner.com'
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const baseUrl = 'https://marvvn.com'
+
+  let products: { handle: string }[] = []
+  try {
+    const supabase = createClient()
+    const { data } = await supabase.from('products').select('handle')
+    products = data || []
+  } catch {
+    products = []
+  }
 
   const home = {
     url: baseUrl,

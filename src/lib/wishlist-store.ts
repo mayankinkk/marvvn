@@ -12,6 +12,18 @@ interface WishlistStore {
   isInWishlist: (productId: string) => boolean
   totalItems: () => number
   clearWishlist: () => void
+  loadFromServer: () => Promise<void>
+}
+
+async function syncToServer(items: Product[]) {
+  try {
+    const productIds = items.map((item) => item.id)
+    await fetch('/api/wishlist', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productIds }),
+    })
+  } catch {}
 }
 
 export const useWishlistStore = create<WishlistStore>()(
@@ -21,14 +33,16 @@ export const useWishlistStore = create<WishlistStore>()(
 
       addItem: (product) => {
         if (!get().isInWishlist(product.id)) {
-          set((state) => ({ items: [...state.items, product] }))
+          const newItems = [...get().items, product]
+          set({ items: newItems })
+          syncToServer(newItems)
         }
       },
 
       removeItem: (productId) => {
-        set((state) => ({
-          items: state.items.filter((item) => item.id !== productId),
-        }))
+        const newItems = get().items.filter((item) => item.id !== productId)
+        set({ items: newItems })
+        syncToServer(newItems)
       },
 
       toggleItem: (product) => {
@@ -45,7 +59,31 @@ export const useWishlistStore = create<WishlistStore>()(
 
       totalItems: () => get().items.length,
 
-      clearWishlist: () => set({ items: [] }),
+      clearWishlist: () => {
+        set({ items: [] })
+        syncToServer([])
+      },
+
+      loadFromServer: async () => {
+        try {
+          const res = await fetch('/api/wishlist')
+          if (!res.ok) return
+          const data = await res.json()
+          if (data.wishlist && data.wishlist.length > 0) {
+            const productRes = await fetch('/api/products')
+            const productData = await productRes.json()
+            const allProducts = productData.products || []
+
+            const items: Product[] = data.wishlist
+              .map((wi: any) => allProducts.find((p: any) => p.id === wi.product_id))
+              .filter(Boolean)
+
+            if (items.length > 0) {
+              set({ items })
+            }
+          }
+        } catch {}
+      },
     }),
     {
       name: 'marvvn-wishlist',

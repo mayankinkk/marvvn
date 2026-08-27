@@ -5,13 +5,14 @@ import { useSearchParams, useRouter } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ProductGrid from '@/components/ProductGrid'
-import { products } from '@/lib/data'
+import { useProducts } from '@/lib/hooks/useProducts'
 
 export default function SearchContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const initialQuery = searchParams.get('q') || ''
   const [query, setQuery] = useState(initialQuery)
+  const { products } = useProducts()
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -29,11 +30,11 @@ export default function SearchContent() {
     return products.filter(
       (p) =>
         p.title.toLowerCase().includes(query.toLowerCase()) ||
-        p.description.toLowerCase().includes(query.toLowerCase()) ||
-        p.tags.some((t) => t.toLowerCase().includes(query.toLowerCase())) ||
-        p.category.toLowerCase().includes(query.toLowerCase())
+        p.description?.toLowerCase().includes(query.toLowerCase()) ||
+        p.tags?.some((t) => t.toLowerCase().includes(query.toLowerCase())) ||
+        p.category?.toLowerCase().includes(query.toLowerCase())
     )
-  }, [query])
+  }, [query, products])
 
   return (
     <div className="min-h-screen">

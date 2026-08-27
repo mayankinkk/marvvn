@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import Header from '@/components/Header'
 import HeroBanner from '@/components/HeroBanner'
 import PromoBanner from '@/components/PromoBanner'
@@ -12,26 +13,25 @@ import AboutSection from '@/components/AboutSection'
 import BlogSection from '@/components/BlogSection'
 import ReviewsSection from '@/components/ReviewsSection'
 import Footer from '@/components/Footer'
-import { products } from '@/lib/data'
-
-const newArrivals = products.filter(p => p.collection.includes('new-arrivals')).slice(0, 12)
-const bestSellers = products.filter(p => p.collection.includes('best-sellers')).slice(0, 8)
-const womenProducts = products.filter(p => p.category === 'women').slice(0, 12)
-const menProducts = products.filter(p => p.category === 'men').slice(0, 12)
+import { useProducts } from '@/lib/hooks/useProducts'
 
 export default function Home() {
+  const { products, loading } = useProducts()
+
+  const newArrivals = useMemo(() => products.filter(p => p.collection.includes('new-arrivals')).slice(0, 12), [products])
+  const bestSellers = useMemo(() => products.filter(p => p.collection.includes('best-sellers')).slice(0, 8), [products])
+  const womenProducts = useMemo(() => products.filter(p => p.category === 'women').slice(0, 12), [products])
+  const menProducts = useMemo(() => products.filter(p => p.category === 'men').slice(0, 12), [products])
+
   return (
     <div className="min-h-screen">
       <Header />
 
       <main>
-        {/* Hero Banner */}
         <HeroBanner />
 
-        {/* Shop by Gender */}
         <ShopByGender />
 
-        {/* Freestyle Collection Banner */}
         <section className="py-4 lg:py-6">
           <div className="container">
             <PromoBanner
@@ -45,7 +45,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Spider-Man Collection */}
         <section className="py-4 lg:py-6">
           <div className="container">
             <PromoBanner
@@ -59,7 +58,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Red Bull Collection */}
         <section className="py-4 lg:py-6">
           <div className="container">
             <PromoBanner
@@ -73,7 +71,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* New In */}
         <section className="py-8 lg:py-16">
           <div className="container">
             <SectionHeader
@@ -82,11 +79,10 @@ export default function Home() {
               ctaText="Shop New Arrivals"
               ctaLink="/collections/new-arrivals"
             />
-            <CollectionSlider products={newArrivals} title="New In" />
+            {!loading && <CollectionSlider products={newArrivals} title="New In" />}
           </div>
         </section>
 
-        {/* Women's Second Banner */}
         <section className="py-4 lg:py-6">
           <div className="container">
             <PromoBanner
@@ -101,7 +97,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Best Sellers */}
         <section className="py-8 lg:py-16">
           <div className="container">
             <SectionHeader
@@ -110,11 +105,10 @@ export default function Home() {
               ctaText="Shop Bestseller"
               ctaLink="/collections/best-sellers"
             />
-            <ProductGrid products={bestSellers} columns={4} />
+            {!loading && <ProductGrid products={bestSellers} columns={4} />}
           </div>
         </section>
 
-        {/* Shop Women */}
         <section className="py-8 lg:py-16">
           <div className="container">
             <SectionHeader
@@ -123,11 +117,10 @@ export default function Home() {
               ctaText="Shop Women"
               ctaLink="/collections/women"
             />
-            <ProductGrid products={womenProducts} columns={4} />
+            {!loading && <ProductGrid products={womenProducts} columns={4} />}
           </div>
         </section>
 
-        {/* Men's Second Banner */}
         <section className="py-4 lg:py-6">
           <div className="container">
             <PromoBanner
@@ -141,7 +134,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Shop Men */}
         <section className="py-8 lg:py-16">
           <div className="container">
             <SectionHeader
@@ -150,31 +142,23 @@ export default function Home() {
               ctaText="Shop Mens"
               ctaLink="/collections/mens"
             />
-            <ProductGrid products={menProducts} columns={4} />
+            {!loading && <ProductGrid products={menProducts} columns={4} />}
           </div>
         </section>
 
-        {/* Reviews */}
         <ReviewsSection />
-
-        {/* Features Bar */}
         <FeaturesBar />
-
-        {/* About Section */}
         <AboutSection />
-
-        {/* Blog Section */}
         <BlogSection />
       </main>
 
       <Footer />
 
-      {/* WhatsApp Float */}
       <a
         href="https://wa.me/918655700724?text=Hi"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#25D366] rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
+        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#25D366] rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform cursor-pointer"
         aria-label="Chat on WhatsApp"
       >
         <svg className="w-7 h-7 text-white" viewBox="0 0 24 24" fill="currentColor">

@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Search, X, ArrowRight } from 'lucide-react'
-import { products } from '@/lib/data'
+import { useProducts } from '@/lib/hooks/useProducts'
 import { formatPrice } from '@/lib/utils'
 
 interface SearchModalProps {
@@ -13,6 +14,7 @@ interface SearchModalProps {
 
 export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const [query, setQuery] = useState('')
+  const { products } = useProducts()
   const [results, setResults] = useState<typeof products>([])
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -33,11 +35,11 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     const filtered = products.filter(
       (p) =>
         p.title.toLowerCase().includes(query.toLowerCase()) ||
-        p.tags.some((t) => t.toLowerCase().includes(query.toLowerCase())) ||
-        p.category.toLowerCase().includes(query.toLowerCase())
+        p.tags?.some((t) => t.toLowerCase().includes(query.toLowerCase())) ||
+        p.category?.toLowerCase().includes(query.toLowerCase())
     )
     setResults(filtered.slice(0, 8))
-  }, [query])
+  }, [query, products])
 
   if (!isOpen) return null
 
@@ -59,7 +61,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="p-2 hover:bg-marvvn-gray-50 rounded-full transition-colors"
+              className="p-2 hover:bg-marvvn-gray-50 rounded-full transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -75,11 +77,13 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                     onClick={onClose}
                     className="group"
                   >
-                    <div className="aspect-[3/4] bg-marvvn-gray-50 mb-2 overflow-hidden">
-                      <img
-                        src={product.images[0]}
+                    <div className="aspect-[3/4] bg-marvvn-gray-50 mb-2 overflow-hidden relative">
+                      <Image
+                        src={product.images?.[0] || '/placeholder.png'}
                         alt={product.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        fill
+                        sizes="(max-width: 768px) 50vw, 25vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
                     <h4 className="text-sm font-medium truncate group-hover:text-marvvn-gray-600 transition-colors">
@@ -116,7 +120,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                     key={term}
                     type="button"
                     onClick={() => setQuery(term)}
-                    className="px-3 py-1.5 text-sm border border-marvvn-gray-300 hover:border-marvvn-black transition-colors"
+                    className="px-3 py-1.5 text-sm border border-marvvn-gray-300 hover:border-marvvn-black transition-colors cursor-pointer"
                   >
                     {term}
                   </button>
