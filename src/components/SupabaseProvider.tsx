@@ -24,6 +24,16 @@ export function SupabaseProvider({ children }: { children: ReactNode }) {
     }
   }, [isAuthenticated, loadCartFromServer, loadWishlistFromServer])
 
+  // Sync maintenance mode cookie for middleware
+  useEffect(() => {
+    fetch('/api/settings')
+      .then((res) => res.json())
+      .then((settings) => {
+        document.cookie = `store_maintenance=${settings.maintenance_mode || 'false'}; path=/; max-age=300`
+      })
+      .catch(() => {})
+  }, [])
+
   return <>{children}</>
 }
 

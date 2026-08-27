@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 import { SupabaseProvider } from '@/components/SupabaseProvider'
+import { SettingsProvider } from '@/components/SettingsProvider'
 import './globals.css'
 
 const inter = Inter({
@@ -44,13 +45,12 @@ export default function RootLayout({
               '@context': 'https://schema.org',
               '@type': 'Organization',
               name: 'MARVVN',
-              url: 'https://bonkerscorner.com',
-              logo: 'https://bonkerscorner.com/logo.png',
+              url: 'https://marvvn.online',
+              logo: 'https://marvvn.online/logo.png',
               sameAs: [
                 'https://www.instagram.com/bonkers.corner/',
                 'https://www.facebook.com/TeamBonkerscorner',
                 'https://x.com/BonkersCornerX',
-                'https://www.youtube.com/@bonkerscorner',
               ],
               contactPoint: {
                 '@type': 'ContactPoint',
@@ -63,9 +63,11 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.variable} ${playfair.variable} font-sans`}>
-        <SupabaseProvider>
-          {children}
-        </SupabaseProvider>
+        <SettingsProvider>
+          <SupabaseProvider>
+            {children}
+          </SupabaseProvider>
+        </SettingsProvider>
       </body>
     </html>
   )

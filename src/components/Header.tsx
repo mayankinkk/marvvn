@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 import { useCartStore } from '@/lib/store'
 import { useWishlistStore } from '@/lib/wishlist-store'
 import { useAuthStore } from '@/lib/auth-store'
+import { useSettings } from '@/components/SettingsProvider'
 import { womenMegaMenu, menMegaMenu, accessoriesMegaMenu } from '@/lib/mega-menu-data'
 import CartDrawer from './CartDrawer'
 import SearchModal from './SearchModal'
@@ -34,6 +35,7 @@ export default function Header() {
   const { toggleCart, totalItems } = useCartStore()
   const { totalItems: wishlistCount } = useWishlistStore()
   const { isAuthenticated, user, logout } = useAuthStore()
+  const settings = useSettings()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -105,9 +107,13 @@ export default function Header() {
 
             {/* Logo */}
             <Link href="/" className="relative z-10">
-              <span className="text-2xl lg:text-3xl font-display font-bold tracking-tight">
-                MARVVN
-              </span>
+              {settings.logo_url ? (
+                <img src={settings.logo_url} alt={settings.store_name || 'MARVVN'} className="h-8 lg:h-10" />
+              ) : (
+                <span className="text-2xl lg:text-3xl font-display font-bold tracking-tight">
+                  {settings.store_name || 'MARVVN'}
+                </span>
+              )}
             </Link>
 
             {/* Desktop Navigation */}
@@ -272,7 +278,7 @@ export default function Header() {
         mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
       )}>
         <div className="flex items-center justify-between p-4 border-b">
-          <span className="text-xl font-display font-bold">MARVVN</span>
+          <span className="text-xl font-display font-bold">{settings.store_name || 'MARVVN'}</span>
           <button type="button" onClick={() => setMobileMenuOpen(false)} aria-label="Close menu">
             <X className="w-6 h-6" />
           </button>

@@ -8,6 +8,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useCartStore } from '@/lib/store'
 import { useAuthStore } from '@/lib/auth-store'
+import { useSettings } from '@/components/SettingsProvider'
 import { formatPrice } from '@/lib/utils'
 import { ChevronRight, CreditCard, Truck, Check, Tag, X, Loader2 } from 'lucide-react'
 
@@ -16,7 +17,11 @@ type Step = 'shipping' | 'payment' | 'review'
 export default function CheckoutPage() {
   const { items, totalPrice, finalPrice, promoCode, discount, applyPromoCode, removePromoCode, clearCart } = useCartStore()
   const { user, isAuthenticated } = useAuthStore()
+  const settings = useSettings()
   const router = useRouter()
+
+  const freeShippingThreshold = Number(settings.free_shipping_threshold) || 999
+  const shippingFee = Number(settings.shipping_fee) || 99
   const [step, setStep] = useState<Step>('shipping')
   const [promoInput, setPromoInput] = useState('')
   const [promoError, setPromoError] = useState('')
@@ -59,7 +64,7 @@ export default function CheckoutPage() {
     setOrderError('')
 
     try {
-      const shippingCost = totalPrice() >= 1499 ? 0 : 99
+      const shippingCost = totalPrice() >= freeShippingThreshold ? 0 : shippingFee
       const total = finalPrice() + shippingCost
 
       const response = await fetch('/api/orders', {
@@ -116,7 +121,7 @@ export default function CheckoutPage() {
     )
   }
 
-  const shippingCost = totalPrice() >= 1499 ? 0 : 99
+  const shippingCost = totalPrice() >= freeShippingThreshold ? 0 : shippingFee
   const total = finalPrice() + shippingCost
 
   return (
