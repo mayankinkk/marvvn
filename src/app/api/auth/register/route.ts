@@ -19,7 +19,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 400 })
   }
 
-  await admin.from('profiles').upsert({ id: data.user.id, name, email })
+  const profileUpsert = await admin.from('profiles').upsert(
+    { id: data.user.id, name, email },
+    { onConflict: 'id' }
+  )
+
+  if (profileUpsert.error) {
+    console.error('Profile upsert error:', profileUpsert.error)
+  }
 
   const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
 
