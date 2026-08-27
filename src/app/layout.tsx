@@ -14,16 +14,16 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: {
-    default: 'MARVNN | Unisex Luxury Streetwear Clothing Brand',
-    template: '%s | MARVNN',
+    default: 'MARVVN | Unisex Luxury Streetwear Clothing Brand',
+    template: '%s | MARVVN',
   },
   description: 'Luxury streetwear clothing brand for men and women. Shop oversized t-shirts, joggers, hoodies, and more. Made in India.',
-  keywords: ['streetwear', 'oversized t-shirts', 'joggers', 'hoodies', 'marvnn', 'luxury streetwear', 'indian fashion'],
+  keywords: ['streetwear', 'oversized t-shirts', 'joggers', 'hoodies', 'marvvn', 'luxury streetwear', 'indian fashion'],
   openGraph: {
     type: 'website',
     locale: 'en_IN',
-    siteName: 'MARVNN',
-    title: 'MARVNN | Unisex Luxury Streetwear Clothing Brand',
+    siteName: 'MARVVN',
+    title: 'MARVVN | Unisex Luxury Streetwear Clothing Brand',
     description: 'Luxury streetwear clothing brand for men and women. Shop oversized t-shirts, joggers, hoodies, and more.',
   },
 }
@@ -42,7 +42,7 @@ export default function RootLayout({
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'Organization',
-              name: 'MARVNN',
+              name: 'MARVVN',
               url: 'https://bonkerscorner.com',
               logo: 'https://bonkerscorner.com/logo.png',
               sameAs: [

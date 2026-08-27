@@ -41,7 +41,7 @@ export default function CollectionSlider({ products, title }: CollectionSliderPr
       <button
         type="button"
         onClick={() => scroll('left')}
-        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-10 h-10 bg-white border shadow-md rounded-full items-center justify-center transition-all opacity-0 group-hover:opacity-100 hidden md:flex hover:bg-marvnn-gray-50"
+        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 w-10 h-10 bg-white border shadow-md rounded-full items-center justify-center transition-all opacity-0 group-hover:opacity-100 hidden md:flex hover:bg-marvvn-gray-50"
         aria-label="Scroll left"
       >
         <ChevronLeft className="w-5 h-5" />
@@ -49,7 +49,7 @@ export default function CollectionSlider({ products, title }: CollectionSliderPr
       <button
         type="button"
         onClick={() => scroll('right')}
-        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-10 h-10 bg-white border shadow-md rounded-full items-center justify-center transition-all opacity-0 group-hover:opacity-100 hidden md:flex hover:bg-marvnn-gray-50"
+        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 w-10 h-10 bg-white border shadow-md rounded-full items-center justify-center transition-all opacity-0 group-hover:opacity-100 hidden md:flex hover:bg-marvvn-gray-50"
         aria-label="Scroll right"
       >
         <ChevronRight className="w-5 h-5" />

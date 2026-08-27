@@ -31,7 +31,7 @@ const faqCategories = [
     items: [
       { q: 'How do I find my size?', a: 'Check our size guide on each product page. Our oversized tees run large — if you\'re between sizes, we recommend sizing down for a regular fit.' },
       { q: 'Are your products genuine?', a: 'Absolutely! 100% of our products are genuine and designed in-house. We use premium fabrics and quality construction.' },
-      { q: 'How do I care for my MARVNN clothes?', a: 'Machine wash cold with similar colors. Tumble dry low. Do not bleach or iron on print. Turn inside out before washing to preserve the design.' },
+      { q: 'How do I care for my MARVVN clothes?', a: 'Machine wash cold with similar colors. Tumble dry low. Do not bleach or iron on print. Turn inside out before washing to preserve the design.' },
     ]
   },
   {
@@ -51,10 +51,10 @@ export default function FAQPage() {
     <div className="min-h-screen">
       <Header />
       <main className="container py-8 lg:py-12">
-        <nav className="flex items-center gap-2 text-xs text-marvnn-gray-500 mb-6">
-          <Link href="/" className="hover:text-marvnn-black">Home</Link>
+        <nav className="flex items-center gap-2 text-xs text-marvvn-gray-500 mb-6">
+          <Link href="/" className="hover:text-marvvn-black">Home</Link>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-marvnn-black">FAQ</span>
+          <span className="text-marvvn-black">FAQ</span>
         </nav>
 
         <h1 className="text-2xl lg:text-3xl font-display font-medium mb-8">Frequently Asked Questions</h1>
@@ -78,7 +78,7 @@ export default function FAQPage() {
                         <ChevronDown className={cn('w-4 h-4 flex-shrink-0 transition-transform', isOpen && 'rotate-180')} />
                       </button>
                       {isOpen && (
-                        <p className="pb-4 text-sm text-marvnn-gray-600 leading-relaxed">{item.a}</p>
+                        <p className="pb-4 text-sm text-marvvn-gray-600 leading-relaxed">{item.a}</p>
                       )}
                     </div>
                   )
@@ -89,7 +89,7 @@ export default function FAQPage() {
         </div>
 
         <div className="max-w-3xl mt-12 border p-6 text-center">
-          <p className="text-sm text-marvnn-gray-600 mb-4">
+          <p className="text-sm text-marvvn-gray-600 mb-4">
             Still have questions? We&apos;re here to help!
           </p>
           <Link href="/pages/get-in-touch" className="btn-primary">

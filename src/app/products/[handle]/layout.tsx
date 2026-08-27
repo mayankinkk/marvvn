@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ handle: s
     return { title: 'Product Not Found' }
   }
   return {
-    title: `${product.title} | MARVNN`,
+    title: `${product.title} | MARVVN`,
     description: product.description,
   }
 }

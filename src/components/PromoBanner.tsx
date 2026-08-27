@@ -40,7 +40,7 @@ export default function PromoBanner({ desktopImage, mobileImage, tagline, title,
                 <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-4 md:mb-6">
                   {title}
                 </h2>
-                <span className="inline-flex items-center gap-2 text-white border-b-2 border-white pb-1 hover:text-marvnn-gray-200 hover:border-marvnn-gray-200 transition-colors text-sm md:text-base uppercase tracking-wider font-medium">
+                <span className="inline-flex items-center gap-2 text-white border-b-2 border-white pb-1 hover:text-marvvn-gray-200 hover:border-marvvn-gray-200 transition-colors text-sm md:text-base uppercase tracking-wider font-medium">
                   {ctaText}
                   <ChevronRight className="w-4 h-4" />
                 </span>

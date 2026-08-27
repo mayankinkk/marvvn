@@ -7,7 +7,7 @@ export default function SearchPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-10 h-10 border-2 border-marvnn-black border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-2 border-marvvn-black border-t-transparent rounded-full animate-spin" />
       </div>
     }>
       <SearchContent />

@@ -34,7 +34,7 @@ export const womenMegaMenu: MegaMenuSection = {
         { label: 'Delulu Collection', href: '/collections/womens-delulu-collection' },
         { label: 'The Lifting Club', href: '/collections/the-lifting-club-women' },
         { label: 'Sigilism Collection', href: '/collections/womens-sigilism-collection' },
-        { label: 'MARVNN SkyClub', href: '/collections/bonkers-skyclub-women' },
+        { label: 'MARVVN SkyClub', href: '/collections/bonkers-skyclub-women' },
         { label: 'Polyamide', href: '/collections/polyamide-collection' },
         { label: 'Seamless', href: '/collections/seamless' },
       ],

@@ -18,20 +18,20 @@ export default function CheckoutSuccessPage() {
           </div>
 
           <h1 className="text-2xl lg:text-3xl font-display font-medium mb-4">Order Confirmed!</h1>
-          <p className="text-marvnn-gray-500 mb-2">Thank you for your purchase</p>
-          <p className="text-sm text-marvnn-gray-400 mb-8">
-            Order ID: <span className="font-mono font-medium text-marvnn-black">{orderId}</span>
+          <p className="text-marvvn-gray-500 mb-2">Thank you for your purchase</p>
+          <p className="text-sm text-marvvn-gray-400 mb-8">
+            Order ID: <span className="font-mono font-medium text-marvvn-black">{orderId}</span>
           </p>
 
           <div className="border p-6 mb-8 text-left">
             <div className="flex items-center gap-3 mb-4">
-              <Package className="w-5 h-5 text-marvnn-gray-400" />
+              <Package className="w-5 h-5 text-marvvn-gray-400" />
               <div>
                 <p className="text-sm font-medium">Estimated Delivery</p>
-                <p className="text-sm text-marvnn-gray-500">3-5 business days</p>
+                <p className="text-sm text-marvvn-gray-500">3-5 business days</p>
               </div>
             </div>
-            <p className="text-sm text-marvnn-gray-500">
+            <p className="text-sm text-marvvn-gray-500">
               A confirmation has been sent to your email. You can track your order from your account.
             </p>
           </div>

@@ -41,7 +41,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Image */}
-      <div className="relative overflow-hidden bg-marvnn-gray-50 aspect-[3/4]">
+      <div className="relative overflow-hidden bg-marvvn-gray-50 aspect-[3/4]">
         <img
           src={product.images[0]}
           alt={product.title}
@@ -54,10 +54,10 @@ export default function ProductCard({ product }: ProductCardProps) {
           <span className="product-badge">Save {discount}%</span>
         )}
         {product.badge === 'new' && (
-          <span className="product-badge bg-marvnn-black">New</span>
+          <span className="product-badge bg-marvvn-black">New</span>
         )}
         {product.badge === 'bestseller' && (
-          <span className="product-badge bg-marvnn-gold">Bestseller</span>
+          <span className="product-badge bg-marvvn-gold">Bestseller</span>
         )}
 
         {/* Quick Actions */}
@@ -79,10 +79,10 @@ export default function ProductCard({ product }: ProductCardProps) {
         <button
           type="button"
           onClick={handleToggleWishlist}
-          className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-sm hover:bg-marvnn-gray-50 transition-colors opacity-0 group-hover:opacity-100"
+          className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-sm hover:bg-marvvn-gray-50 transition-colors opacity-0 group-hover:opacity-100"
           aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
         >
-          <Heart className={cn('w-4 h-4', inWishlist && 'fill-marvnn-red text-marvnn-red')} />
+          <Heart className={cn('w-4 h-4', inWishlist && 'fill-marvvn-red text-marvvn-red')} />
         </button>
       </div>
 
@@ -91,13 +91,13 @@ export default function ProductCard({ product }: ProductCardProps) {
         <h3 className="text-sm font-medium truncate">{product.title}</h3>
         <div className="flex items-center gap-2">
           {product.compareAtPrice && (
-            <span className="text-sm text-marvnn-gray-400 line-through">
+            <span className="text-sm text-marvvn-gray-400 line-through">
               {formatPrice(product.compareAtPrice)}
             </span>
           )}
           <span className={cn(
             'text-sm font-medium',
-            product.compareAtPrice ? 'text-marvnn-red' : ''
+            product.compareAtPrice ? 'text-marvvn-red' : ''
           )}>
             {formatPrice(product.price)}
           </span>

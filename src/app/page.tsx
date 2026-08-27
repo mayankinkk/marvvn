@@ -66,7 +66,7 @@ export default function Home() {
               desktopImage="https://www.bonkerscorner.com/cdn/shop/files/reb_bull_website_1_1920x700.jpg?v=1784620202"
               mobileImage="https://www.bonkerscorner.com/cdn/shop/files/reb_bull_mobile_1a0cee28-664f-421f-b1fd-94f5c9ec4118_750x1334.jpg?v=1784619880"
               tagline="MATCHDAY UNIFORM"
-              title="RED BULL X MARVNN"
+              title="RED BULL X MARVVN"
               ctaText="Shop Now"
               ctaLink="/collections/red-bull-collection"
             />

@@ -43,10 +43,10 @@ export default function SitemapPage() {
     <div className="min-h-screen">
       <Header />
       <main className="container py-8 lg:py-12">
-        <nav className="flex items-center gap-2 text-xs text-marvnn-gray-500 mb-6">
-          <Link href="/" className="hover:text-marvnn-black">Home</Link>
+        <nav className="flex items-center gap-2 text-xs text-marvvn-gray-500 mb-6">
+          <Link href="/" className="hover:text-marvvn-black">Home</Link>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-marvnn-black">Sitemap</span>
+          <span className="text-marvvn-black">Sitemap</span>
         </nav>
 
         <h1 className="text-2xl lg:text-3xl font-display font-medium mb-8">HTML Sitemap</h1>
@@ -58,7 +58,7 @@ export default function SitemapPage() {
               <ul className="space-y-2">
                 {section.links.map((link) => (
                   <li key={link.label}>
-                    <Link href={link.href} className="text-sm text-marvnn-gray-600 hover:text-marvnn-black transition-colors">
+                    <Link href={link.href} className="text-sm text-marvvn-gray-600 hover:text-marvvn-black transition-colors">
                       {link.label}
                     </Link>
                   </li>

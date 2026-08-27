@@ -9,11 +9,11 @@
   }
 
   * {
-    @apply border-marvnn-gray-200;
+    @apply border-marvvn-gray-200;
   }
 
   body {
-    @apply bg-white text-marvnn-black antialiased;
+    @apply bg-white text-marvvn-black antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
@@ -28,15 +28,15 @@
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white bg-marvnn-black border border-marvnn-black hover:bg-marvnn-gray-800 hover:border-marvnn-gray-800 transition-colors duration-200;
+    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white bg-marvvn-black border border-marvvn-black hover:bg-marvvn-gray-800 hover:border-marvvn-gray-800 transition-colors duration-200;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-marvnn-black bg-transparent border border-marvnn-gray-300 hover:bg-marvnn-gray-50 transition-colors duration-200;
+    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-marvvn-black bg-transparent border border-marvvn-gray-300 hover:bg-marvvn-gray-50 transition-colors duration-200;
   }
 
   .btn-outline {
-    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-marvnn-black bg-transparent border border-marvnn-black hover:bg-marvnn-black hover:text-white transition-colors duration-200;
+    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-marvvn-black bg-transparent border border-marvvn-black hover:bg-marvvn-black hover:text-white transition-colors duration-200;
   }
 
   .section-title {
@@ -44,7 +44,7 @@
   }
 
   .section-subtitle {
-    @apply text-base md:text-lg text-marvnn-gray-600 max-w-2xl;
+    @apply text-base md:text-lg text-marvvn-gray-600 max-w-2xl;
   }
 
   .product-card {
@@ -56,11 +56,11 @@
   }
 
   .product-badge {
-    @apply absolute top-3 left-3 z-10 px-2 py-1 text-xs font-medium text-white bg-marvnn-red rounded;
+    @apply absolute top-3 left-3 z-10 px-2 py-1 text-xs font-medium text-white bg-marvvn-red rounded;
   }
 
   .input-field {
-    @apply w-full px-4 py-3 text-marvnn-black bg-white border border-marvnn-gray-300 placeholder-marvnn-gray-400 focus:outline-none focus:border-marvnn-black focus:ring-1 focus:ring-marvnn-black transition-colors;
+    @apply w-full px-4 py-3 text-marvvn-black bg-white border border-marvvn-gray-300 placeholder-marvvn-gray-400 focus:outline-none focus:border-marvvn-black focus:ring-1 focus:ring-marvvn-black transition-colors;
   }
 
   .link-underline {

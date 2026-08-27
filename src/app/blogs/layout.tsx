@@ -1,8 +1,8 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Blogs | MARVNN',
-  description: 'Read the latest fashion tips, styling guides, and updates from MARVNN.',
+  title: 'Blogs | MARVVN',
+  description: 'Read the latest fashion tips, styling guides, and updates from MARVVN.',
 }
 
 export default function BlogLayout({ children }: { children: React.ReactNode }) {

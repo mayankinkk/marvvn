@@ -27,7 +27,7 @@ export default function LoginPage() {
       if (success) {
         router.push('/account')
       } else {
-        setError('Invalid email or password. Try demo@marvnn.com / demo123')
+        setError('Invalid email or password. Try demo@marvvn.com / demo123')
       }
       setLoading(false)
     }, 500)
@@ -37,15 +37,15 @@ export default function LoginPage() {
     <div className="min-h-screen">
       <Header />
       <main className="container py-8 lg:py-16">
-        <nav className="flex items-center gap-2 text-xs text-marvnn-gray-500 mb-8">
-          <Link href="/" className="hover:text-marvnn-black">Home</Link>
+        <nav className="flex items-center gap-2 text-xs text-marvvn-gray-500 mb-8">
+          <Link href="/" className="hover:text-marvvn-black">Home</Link>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-marvnn-black">Login</span>
+          <span className="text-marvvn-black">Login</span>
         </nav>
 
         <div className="max-w-md mx-auto">
           <h1 className="text-2xl lg:text-3xl font-display font-medium text-center mb-2">Welcome Back</h1>
-          <p className="text-sm text-marvnn-gray-500 text-center mb-8">Sign in to your account</p>
+          <p className="text-sm text-marvvn-gray-500 text-center mb-8">Sign in to your account</p>
 
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 text-sm text-red-700">
@@ -77,7 +77,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-marvnn-gray-400 hover:text-marvnn-black"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-marvvn-gray-400 hover:text-marvvn-black"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -93,17 +93,17 @@ export default function LoginPage() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-marvnn-gray-500">
+            <p className="text-sm text-marvvn-gray-500">
               Don&apos;t have an account?{' '}
-              <Link href="/account/register" className="text-marvnn-black font-medium hover:underline">
+              <Link href="/account/register" className="text-marvvn-black font-medium hover:underline">
                 Create one
               </Link>
             </p>
           </div>
 
-          <div className="mt-8 p-4 bg-marvnn-gray-50 text-center text-sm text-marvnn-gray-500">
-            <p className="font-medium text-marvnn-gray-700 mb-1">Demo Credentials</p>
-            <p>Email: demo@marvnn.com</p>
+          <div className="mt-8 p-4 bg-marvvn-gray-50 text-center text-sm text-marvvn-gray-500">
+            <p className="font-medium text-marvvn-gray-700 mb-1">Demo Credentials</p>
+            <p>Email: demo@marvvn.com</p>
             <p>Password: demo123</p>
           </div>
         </div>

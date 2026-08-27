@@ -26,10 +26,10 @@ export default function AccountPage() {
     <div className="min-h-screen">
       <Header />
       <main className="container py-8 lg:py-12">
-        <nav className="flex items-center gap-2 text-xs text-marvnn-gray-500 mb-6">
-          <Link href="/" className="hover:text-marvnn-black">Home</Link>
+        <nav className="flex items-center gap-2 text-xs text-marvvn-gray-500 mb-6">
+          <Link href="/" className="hover:text-marvvn-black">Home</Link>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-marvnn-black">My Account</span>
+          <span className="text-marvvn-black">My Account</span>
         </nav>
 
         <h1 className="text-2xl lg:text-3xl font-display font-medium mb-8">My Account</h1>
@@ -39,28 +39,28 @@ export default function AccountPage() {
           <div className="space-y-2">
             <div className="border p-4">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-marvnn-gray-100 rounded-full flex items-center justify-center">
-                  <User className="w-6 h-6 text-marvnn-gray-500" />
+                <div className="w-12 h-12 bg-marvvn-gray-100 rounded-full flex items-center justify-center">
+                  <User className="w-6 h-6 text-marvvn-gray-500" />
                 </div>
                 <div>
                   <p className="font-medium text-sm">{user?.name}</p>
-                  <p className="text-xs text-marvnn-gray-500">{user?.email}</p>
+                  <p className="text-xs text-marvvn-gray-500">{user?.email}</p>
                 </div>
               </div>
               <nav className="space-y-1">
-                <Link href="/account" className="block px-3 py-2 text-sm bg-marvnn-gray-50 font-medium">
+                <Link href="/account" className="block px-3 py-2 text-sm bg-marvvn-gray-50 font-medium">
                   Dashboard
                 </Link>
-                <Link href="/account/orders" className="block px-3 py-2 text-sm hover:bg-marvnn-gray-50 transition-colors">
+                <Link href="/account/orders" className="block px-3 py-2 text-sm hover:bg-marvvn-gray-50 transition-colors">
                   Orders
                 </Link>
-                <Link href="/wishlist" className="block px-3 py-2 text-sm hover:bg-marvnn-gray-50 transition-colors">
+                <Link href="/wishlist" className="block px-3 py-2 text-sm hover:bg-marvvn-gray-50 transition-colors">
                   Wishlist
                 </Link>
                 <button
                   type="button"
                   onClick={() => { logout(); router.push('/') }}
-                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-marvnn-red hover:bg-red-50 transition-colors"
+                  className="flex items-center gap-2 w-full px-3 py-2 text-sm text-marvvn-red hover:bg-red-50 transition-colors"
                 >
                   <LogOut className="w-4 h-4" /> Logout
                 </button>
@@ -74,16 +74,16 @@ export default function AccountPage() {
               <h2 className="font-medium mb-4">Account Details</h2>
               <div className="space-y-3 text-sm">
                 <div>
-                  <span className="text-marvnn-gray-500">Name:</span>
+                  <span className="text-marvvn-gray-500">Name:</span>
                   <span className="ml-2">{user?.name}</span>
                 </div>
                 <div>
-                  <span className="text-marvnn-gray-500">Email:</span>
+                  <span className="text-marvvn-gray-500">Email:</span>
                   <span className="ml-2">{user?.email}</span>
                 </div>
                 {user?.phone && (
                   <div>
-                    <span className="text-marvnn-gray-500">Phone:</span>
+                    <span className="text-marvvn-gray-500">Phone:</span>
                     <span className="ml-2">{user.phone}</span>
                   </div>
                 )}
@@ -93,12 +93,12 @@ export default function AccountPage() {
             <div className="border p-6">
               <h2 className="font-medium mb-4">Quick Actions</h2>
               <div className="grid grid-cols-2 gap-4">
-                <Link href="/account/orders" className="border p-4 hover:bg-marvnn-gray-50 transition-colors text-center">
-                  <Package className="w-6 h-6 mx-auto mb-2 text-marvnn-gray-400" />
+                <Link href="/account/orders" className="border p-4 hover:bg-marvvn-gray-50 transition-colors text-center">
+                  <Package className="w-6 h-6 mx-auto mb-2 text-marvvn-gray-400" />
                   <span className="text-sm font-medium">My Orders</span>
                 </Link>
-                <Link href="/wishlist" className="border p-4 hover:bg-marvnn-gray-50 transition-colors text-center">
-                  <Heart className="w-6 h-6 mx-auto mb-2 text-marvnn-gray-400" />
+                <Link href="/wishlist" className="border p-4 hover:bg-marvvn-gray-50 transition-colors text-center">
+                  <Heart className="w-6 h-6 mx-auto mb-2 text-marvvn-gray-400" />
                   <span className="text-sm font-medium">Wishlist</span>
                 </Link>
               </div>

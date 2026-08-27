@@ -57,14 +57,14 @@ export default function Footer() {
   }
 
   return (
-    <footer className="bg-marvnn-black text-white">
+    <footer className="bg-marvvn-black text-white">
       {/* Newsletter */}
       <div className="border-b border-white/10">
         <div className="container py-8 lg:py-12">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
             <div>
               <h3 className="text-lg font-medium mb-1">WE&apos;VE GOT YOU COVERED:</h3>
-              <p className="text-sm text-marvnn-gray-400">
+              <p className="text-sm text-marvvn-gray-400">
                 Beyond the Outfit: Be the first to know about new arrivals, sales & exclusive drops.
               </p>
             </div>
@@ -82,7 +82,7 @@ export default function Footer() {
                   className="flex-1 lg:w-72 px-4 py-3 bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:border-white/50"
                   required
                 />
-                <button type="submit" className="px-4 py-3 bg-white text-marvnn-black hover:bg-marvnn-gray-100 transition-colors">
+                <button type="submit" className="px-4 py-3 bg-white text-marvvn-black hover:bg-marvvn-gray-100 transition-colors">
                   <Send className="w-5 h-5" />
                 </button>
               </form>
@@ -96,8 +96,8 @@ export default function Footer() {
         <div className="container py-8 lg:py-12">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
             <div>
-              <h3 className="text-lg font-medium mb-1">experience the MARVNN app</h3>
-              <p className="text-sm text-marvnn-gray-400">Scan the QR code to download the app</p>
+              <h3 className="text-lg font-medium mb-1">experience the MARVVN app</h3>
+              <p className="text-sm text-marvvn-gray-400">Scan the QR code to download the app</p>
             </div>
             <div className="flex items-center gap-4">
               <img
@@ -124,7 +124,7 @@ export default function Footer() {
             <ul className="space-y-2">
               {shopLinks.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="text-sm text-marvnn-gray-400 hover:text-white transition-colors">
+                  <Link href={link.href} className="text-sm text-marvvn-gray-400 hover:text-white transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -138,7 +138,7 @@ export default function Footer() {
             <ul className="space-y-2">
               {trendingLinks.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="text-sm text-marvnn-gray-400 hover:text-white transition-colors">
+                  <Link href={link.href} className="text-sm text-marvvn-gray-400 hover:text-white transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -152,7 +152,7 @@ export default function Footer() {
             <ul className="space-y-2">
               {infoLinks.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="text-sm text-marvnn-gray-400 hover:text-white transition-colors">
+                  <Link href={link.href} className="text-sm text-marvvn-gray-400 hover:text-white transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -166,7 +166,7 @@ export default function Footer() {
             <ul className="space-y-2">
               {exploreLinks.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="text-sm text-marvnn-gray-400 hover:text-white transition-colors">
+                  <Link href={link.href} className="text-sm text-marvvn-gray-400 hover:text-white transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -180,17 +180,17 @@ export default function Footer() {
             <ul className="space-y-3">
               <li className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <span className="text-sm text-marvnn-gray-400">India</span>
+                <span className="text-sm text-marvvn-gray-400">India</span>
               </li>
               <li className="flex items-center gap-2">
                 <Phone className="w-4 h-4 flex-shrink-0" />
-                <a href="tel:+918655700724" className="text-sm text-marvnn-gray-400 hover:text-white transition-colors">
+                <a href="tel:+918655700724" className="text-sm text-marvvn-gray-400 hover:text-white transition-colors">
                   (+91) 8655700724
                 </a>
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="w-4 h-4 flex-shrink-0" />
-                <a href="mailto:support@bonkerscorner.com" className="text-sm text-marvnn-gray-400 hover:text-white transition-colors">
+                <a href="mailto:support@bonkerscorner.com" className="text-sm text-marvvn-gray-400 hover:text-white transition-colors">
                   support@bonkerscorner.com
                 </a>
               </li>
@@ -204,7 +204,7 @@ export default function Footer() {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-marvnn-black transition-all"
+                  className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center hover:bg-white hover:text-marvvn-black transition-all"
                   aria-label={social.label}
                 >
                   <social.icon className="w-4 h-4" />
@@ -219,9 +219,9 @@ export default function Footer() {
       <div className="border-t border-white/10">
         <div className="container py-6 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-display font-bold">MARVNN</span>
+            <span className="text-xl font-display font-bold">MARVVN</span>
           </div>
-          <p className="text-sm text-marvnn-gray-400">© 2026 MARVNN</p>
+          <p className="text-sm text-marvvn-gray-400">© 2026 MARVVN</p>
         </div>
       </div>
     </footer>

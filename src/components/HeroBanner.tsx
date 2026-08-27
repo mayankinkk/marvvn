@@ -26,7 +26,7 @@ const slides = [
     desktopImage: 'https://www.bonkerscorner.com/cdn/shop/files/reb_bull_website_1_1920x700.jpg?v=1784620202',
     mobileImage: 'https://www.bonkerscorner.com/cdn/shop/files/reb_bull_mobile_1a0cee28-664f-421f-b1fd-94f5c9ec4118_750x1334.jpg?v=1784619880',
     tagline: 'MATCHDAY UNIFORM',
-    title: 'RED BULL X MARVNN',
+    title: 'RED BULL X MARVVN',
     ctaText: 'Shop Now',
     ctaLink: '/collections/red-bull-collection',
   },
@@ -85,7 +85,7 @@ export default function HeroBanner() {
                   </h2>
                   <Link
                     href={slide.ctaLink}
-                    className="inline-flex items-center gap-2 text-white border-b-2 border-white pb-1 hover:text-marvnn-gray-200 hover:border-marvnn-gray-200 transition-colors text-sm md:text-base uppercase tracking-wider font-medium"
+                    className="inline-flex items-center gap-2 text-white border-b-2 border-white pb-1 hover:text-marvvn-gray-200 hover:border-marvvn-gray-200 transition-colors text-sm md:text-base uppercase tracking-wider font-medium"
                   >
                     {slide.ctaText}
                     <ChevronRight className="w-4 h-4" />
