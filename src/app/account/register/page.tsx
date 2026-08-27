@@ -27,15 +27,13 @@ export default function RegisterPage() {
     }
     setLoading(true)
 
-    setTimeout(() => {
-      const success = register(name, email, password)
-      if (success) {
-        router.push('/account')
-      } else {
-        setError('An account with this email already exists')
-      }
-      setLoading(false)
-    }, 500)
+    const success = await register(name, email, password)
+    if (success) {
+      router.push('/account')
+    } else {
+      setError('An account with this email already exists')
+    }
+    setLoading(false)
   }
 
   return (

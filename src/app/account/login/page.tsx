@@ -22,15 +22,13 @@ export default function LoginPage() {
     setError('')
     setLoading(true)
 
-    setTimeout(() => {
-      const success = login(email, password)
-      if (success) {
-        router.push('/account')
-      } else {
-        setError('Invalid email or password. Try demo@marvvn.com / demo123')
-      }
-      setLoading(false)
-    }, 500)
+    const success = await login(email, password)
+    if (success) {
+      router.push('/account')
+    } else {
+      setError('Invalid email or password.')
+    }
+    setLoading(false)
   }
 
   return (

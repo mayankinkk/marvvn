@@ -9,16 +9,16 @@ import { useAuthStore } from '@/lib/auth-store'
 import { ChevronRight, Package } from 'lucide-react'
 
 export default function OrdersPage() {
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated, loading } = useAuthStore()
   const router = useRouter()
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!loading && !isAuthenticated) {
       router.push('/account/login')
     }
-  }, [isAuthenticated, router])
+  }, [isAuthenticated, loading, router])
 
-  if (!isAuthenticated) {
+  if (loading || !isAuthenticated) {
     return null
   }
 

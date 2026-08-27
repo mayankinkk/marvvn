@@ -163,7 +163,7 @@ export default function Header() {
                           </Link>
                           <button
                             type="button"
-                            onClick={() => { logout(); setUserMenuOpen(false) }}
+                            onClick={async () => { await logout(); setUserMenuOpen(false) }}
                             className="flex items-center gap-2 text-sm text-marvvn-red hover:text-marvvn-red/80"
                           >
                             <LogOut className="w-4 h-4" /> Logout
@@ -328,7 +328,7 @@ export default function Header() {
                   <Link href="/account" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
                     My Account
                   </Link>
-                  <button type="button" onClick={() => { logout(); setMobileMenuOpen(false) }} className="text-sm text-marvvn-red">
+                  <button type="button" onClick={async () => { await logout(); setMobileMenuOpen(false) }} className="text-sm text-marvvn-red">
                     Logout
                   </button>
                 </>

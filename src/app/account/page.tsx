@@ -9,16 +9,16 @@ import { useAuthStore } from '@/lib/auth-store'
 import { ChevronRight, User, Package, Heart, LogOut } from 'lucide-react'
 
 export default function AccountPage() {
-  const { user, isAuthenticated, logout } = useAuthStore()
+  const { user, isAuthenticated, loading, logout } = useAuthStore()
   const router = useRouter()
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!loading && !isAuthenticated) {
       router.push('/account/login')
     }
-  }, [isAuthenticated, router])
+  }, [isAuthenticated, loading, router])
 
-  if (!isAuthenticated) {
+  if (loading || !isAuthenticated) {
     return null
   }
 
@@ -59,7 +59,7 @@ export default function AccountPage() {
                 </Link>
                 <button
                   type="button"
-                  onClick={() => { logout(); router.push('/') }}
+                  onClick={async () => { await logout(); router.push('/') }}
                   className="flex items-center gap-2 w-full px-3 py-2 text-sm text-marvvn-red hover:bg-red-50 transition-colors"
                 >
                   <LogOut className="w-4 h-4" /> Logout
