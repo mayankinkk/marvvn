@@ -62,7 +62,7 @@ const COLLECTION_FILTERS: Record<string, (p: typeof products[0]) => boolean> = {
 
 export default function CollectionPage() {
   const params = useParams()
-  const handle = handle as string
+  const handle = params.handle as string
   const [sortBy, setSortBy] = useState('newest')
   const [selectedSizes, setSelectedSizes] = useState<string[]>([])
   const [selectedColors, setSelectedColors] = useState<string[]>([])

@@ -44,7 +44,7 @@
   }
 
   .product-card {
-    @apply group relative overflow-hidden transition-all duration-300;
+    @apply relative overflow-hidden transition-all duration-300;
   }
 
   .product-image {

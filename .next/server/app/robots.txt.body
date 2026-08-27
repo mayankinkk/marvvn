@@ -1,0 +1,7 @@
+User-Agent: *
+Allow: /
+Disallow: /account/
+Disallow: /checkout/
+Disallow: /api/
+
+Sitemap: https://bonkerscorner.com/sitemap.xml
