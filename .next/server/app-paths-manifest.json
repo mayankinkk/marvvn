@@ -1,27 +1,3 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/account/page": "app/account/page.js",
-  "/account/orders/page": "app/account/orders/page.js",
-  "/account/register/page": "app/account/register/page.js",
-  "/account/login/page": "app/account/login/page.js",
-  "/cart/page": "app/cart/page.js",
-  "/checkout/success/page": "app/checkout/success/page.js",
-  "/page": "app/page.js",
-  "/pages/about-us/page": "app/pages/about-us/page.js",
-  "/pages/faq/page": "app/pages/faq/page.js",
-  "/pages/get-in-touch/page": "app/pages/get-in-touch/page.js",
-  "/pages/html-sitemap/page": "app/pages/html-sitemap/page.js",
-  "/checkout/page": "app/checkout/page.js",
-  "/pages/return-exchange-policy/page": "app/pages/return-exchange-policy/page.js",
-  "/pages/store-locator/page": "app/pages/store-locator/page.js",
-  "/pages/terms-and-conditions/page": "app/pages/terms-and-conditions/page.js",
-  "/policies/privacy-policy/page": "app/policies/privacy-policy/page.js",
-  "/robots.txt/route": "app/robots.txt/route.js",
-  "/search/page": "app/search/page.js",
-  "/wishlist/page": "app/wishlist/page.js",
-  "/sitemap.xml/route": "app/sitemap.xml/route.js",
-  "/blogs/bonkers-corner/[handle]/page": "app/blogs/bonkers-corner/[handle]/page.js",
-  "/blogs/bonkers-corner/page": "app/blogs/bonkers-corner/page.js",
-  "/collections/[handle]/page": "app/collections/[handle]/page.js",
-  "/products/[handle]/page": "app/products/[handle]/page.js"
+  "/page": "app/page.js"
 }
