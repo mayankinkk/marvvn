@@ -4,6 +4,7 @@ import { useState, useEffect, use } from 'react'
 import Link from 'next/link'
 import { ArrowLeft, Save } from 'lucide-react'
 import { formatPrice } from '@/lib/utils'
+import Image from 'next/image'
 
 const statusOptions = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']
 const paymentOptions = ['pending', 'paid', 'failed', 'refunded']
@@ -91,10 +92,13 @@ export default function AdminOrderDetailPage({ params }: { params: Promise<{ id:
               {order.order_items?.map((item: any) => (
                 <div key={item.id} className="flex gap-4 items-center py-3 border-b last:border-0">
                   <div className="w-16 h-20 bg-marvvn-gray-100 flex-shrink-0 overflow-hidden">
-                    <img
+                    <Image
                       src={item.products?.images?.[0] || '/placeholder.png'}
                       alt={item.products?.title || ''}
+                      width={64}
+                      height={80}
                       className="w-full h-full object-cover"
+                      unoptimized
                     />
                   </div>
                   <div className="flex-1">

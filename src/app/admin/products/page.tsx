@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Plus, Edit, Trash2, Search } from 'lucide-react'
 import { formatPrice } from '@/lib/utils'
 import { Product } from '@/lib/types'
+import Image from 'next/image'
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -86,7 +87,7 @@ export default function AdminProductsPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-14 bg-marvvn-gray-100 flex-shrink-0 overflow-hidden">
-                        <img src={product.images?.[0]} alt="" className="w-full h-full object-cover" />
+                        <Image src={product.images?.[0] || '/placeholder.png'} alt="" width={48} height={56} className="w-full h-full object-cover" unoptimized />
                       </div>
                       <div>
                         <p className="font-medium truncate max-w-[200px]">{product.title}</p>
