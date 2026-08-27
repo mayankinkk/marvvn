@@ -25,7 +25,7 @@ interface CartStore {
 const PROMO_CODES: Record<string, number> = {
   'SHARKTANK10': 10,
   'WELCOME10': 10,
-  'BONKERS15': 15,
+  'MARVNN15': 15,
   'FLAT20': 20,
 }
 
@@ -114,7 +114,7 @@ export const useCartStore = create<CartStore>()(
       },
     }),
     {
-      name: 'bonkers-cart',
+      name: 'marvnn-cart',
       partialize: (state) => ({
         items: state.items,
         promoCode: state.promoCode,

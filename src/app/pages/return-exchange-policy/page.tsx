@@ -10,26 +10,26 @@ export default function ReturnExchangePolicyPage() {
     <div className="min-h-screen">
       <Header />
       <main className="container py-8 lg:py-12">
-        <nav className="flex items-center gap-2 text-xs text-bonkers-gray-500 mb-6">
-          <Link href="/" className="hover:text-bonkers-black">Home</Link>
+        <nav className="flex items-center gap-2 text-xs text-marvnn-gray-500 mb-6">
+          <Link href="/" className="hover:text-marvnn-black">Home</Link>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-bonkers-black">Return & Exchange Policy</span>
+          <span className="text-marvnn-black">Return & Exchange Policy</span>
         </nav>
 
         <div className="max-w-3xl">
           <h1 className="text-2xl lg:text-3xl font-display font-medium mb-8">Return & Exchange Policy</h1>
 
-          <div className="space-y-6 text-sm text-bonkers-gray-600 leading-relaxed">
+          <div className="space-y-6 text-sm text-marvnn-gray-600 leading-relaxed">
             <section>
-              <h2 className="text-lg font-medium text-bonkers-black mb-3">7-Day Easy Returns</h2>
+              <h2 className="text-lg font-medium text-marvnn-black mb-3">7-Day Easy Returns</h2>
               <p>
-                We want you to love your Bonkers Corner purchase. If you&apos;re not completely satisfied, 
+                We want you to love your MARVNN purchase. If you&apos;re not completely satisfied,
                 you can return or exchange your item within 7 days of delivery.
               </p>
             </section>
 
             <section>
-              <h2 className="text-lg font-medium text-bonkers-black mb-3">Eligibility</h2>
+              <h2 className="text-lg font-medium text-marvnn-black mb-3">Eligibility</h2>
               <ul className="list-disc pl-5 space-y-2">
                 <li>Items must be unworn, unwashed, and in original condition</li>
                 <li>All tags must be attached</li>
@@ -40,7 +40,7 @@ export default function ReturnExchangePolicyPage() {
             </section>
 
             <section>
-              <h2 className="text-lg font-medium text-bonkers-black mb-3">How to Initiate a Return</h2>
+              <h2 className="text-lg font-medium text-marvnn-black mb-3">How to Initiate a Return</h2>
               <ol className="list-decimal pl-5 space-y-2">
                 <li>Log in to your account and go to &quot;Orders&quot;</li>
                 <li>Select the order containing the item you want to return</li>
@@ -51,7 +51,7 @@ export default function ReturnExchangePolicyPage() {
             </section>
 
             <section>
-              <h2 className="text-lg font-medium text-bonkers-black mb-3">Refund Process</h2>
+              <h2 className="text-lg font-medium text-marvnn-black mb-3">Refund Process</h2>
               <p>
                 Once we receive and inspect the returned item, your refund will be processed within 
                 5-7 business days. The refund will be credited to your original payment method.
@@ -65,7 +65,7 @@ export default function ReturnExchangePolicyPage() {
             </section>
 
             <section>
-              <h2 className="text-lg font-medium text-bonkers-black mb-3">Exchanges</h2>
+              <h2 className="text-lg font-medium text-marvnn-black mb-3">Exchanges</h2>
               <p>
                 Want a different size or color? We&apos;re happy to exchange your item. Exchanges are 
                 subject to availability. If the desired variant is out of stock, we&apos;ll process 
@@ -74,7 +74,7 @@ export default function ReturnExchangePolicyPage() {
             </section>
 
             <section>
-              <h2 className="text-lg font-medium text-bonkers-black mb-3">Damaged or Defective Items</h2>
+              <h2 className="text-lg font-medium text-marvnn-black mb-3">Damaged or Defective Items</h2>
               <p>
                 If you received a damaged or defective item, please contact us within 48 hours of 
                 delivery at support@bonkerscorner.com with photos of the damage. We&apos;ll arrange 

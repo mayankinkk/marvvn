@@ -14,10 +14,10 @@ export default function WishlistPage() {
     <div className="min-h-screen">
       <Header />
       <main className="container py-8 lg:py-12">
-        <nav className="flex items-center gap-2 text-xs text-bonkers-gray-500 mb-6">
-          <Link href="/" className="hover:text-bonkers-black">Home</Link>
+        <nav className="flex items-center gap-2 text-xs text-marvnn-gray-500 mb-6">
+          <Link href="/" className="hover:text-marvnn-black">Home</Link>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-bonkers-black">Wishlist</span>
+          <span className="text-marvnn-black">Wishlist</span>
         </nav>
 
         <div className="flex items-center justify-between mb-8">
@@ -25,7 +25,7 @@ export default function WishlistPage() {
           {items.length > 0 && (
             <button
               onClick={clearWishlist}
-              className="text-sm text-bonkers-gray-400 hover:text-bonkers-red transition-colors"
+              className="text-sm text-marvnn-gray-400 hover:text-marvnn-red transition-colors"
             >
               Clear All
             </button>
@@ -34,8 +34,8 @@ export default function WishlistPage() {
 
         {items.length === 0 ? (
           <div className="text-center py-16">
-            <Heart className="w-16 h-16 text-bonkers-gray-300 mx-auto mb-4" />
-            <p className="text-bonkers-gray-500 mb-6">Your wishlist is empty</p>
+            <Heart className="w-16 h-16 text-marvnn-gray-300 mx-auto mb-4" />
+            <p className="text-marvnn-gray-500 mb-6">Your wishlist is empty</p>
             <Link href="/collections/new-arrivals" className="btn-primary">
               Discover Products
             </Link>

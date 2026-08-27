@@ -280,11 +280,11 @@ export const blogPosts: BlogPost[] = [
   {
     id: '1',
     handle: 'gift-ideas-for-raksha-bandhan',
-    title: 'Gift Ideas for Raksha Bandhan: Celebrate Your Sibling Bond in Bonkers Style',
+    title: 'Gift Ideas for Raksha Bandhan: Celebrate Your Sibling Bond in MARVNN Style',
     excerpt: 'Raksha Bandhan just got better. Explore stylish gift ideas for your sibling, from oversized T-shirts and cargos to co-ords, bags and accessories.',
     image: 'https://www.bonkerscorner.com/cdn/shop/articles/RakshaBandhan_jpg_800x.jpg?v=1787397892',
     date: 'August 22 2026',
-    author: 'Bonkers Corner',
+    author: 'MARVNN',
     tags: ['gifting', 'raksha-bandhan', 'style'],
   },
   {
@@ -294,7 +294,7 @@ export const blogPosts: BlogPost[] = [
     excerpt: 'Cargo pants are doing the heavy lifting literally. From oversized streetwear fits to polished everyday looks, discover easy ways to style cargos.',
     image: 'https://www.bonkerscorner.com/cdn/shop/articles/Style_Cargo_Pants_Blog_Banner_1__page-0001_b1147022-e607-424c-8a2c-c52238a08590_800x.jpg?v=1786600971',
     date: 'August 13 2026',
-    author: 'Bonkers Corner',
+    author: 'MARVNN',
     tags: ['cargo', 'styling', 'menswear'],
   },
   {
@@ -304,7 +304,7 @@ export const blogPosts: BlogPost[] = [
     excerpt: 'Your ticket is booked now complete the mission! Explore Spider-Man movie outfit ideas that will have every Marvel fan turning heads.',
     image: 'https://www.bonkerscorner.com/cdn/shop/articles/WhatsApp_Image_2026-07-24_at_3.26.16_PM_800x.jpg?v=1785138333',
     date: 'July 25 2026',
-    author: 'Bonkers Corner',
+    author: 'MARVNN',
     tags: ['marvel', 'spiderman', 'outfit'],
   },
 ]

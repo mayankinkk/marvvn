@@ -61,7 +61,7 @@ export default function CheckoutPage() {
       <div className="min-h-screen">
         <Header />
         <main className="container py-16 text-center">
-          <p className="text-bonkers-gray-500 mb-6">Your cart is empty</p>
+          <p className="text-marvnn-gray-500 mb-6">Your cart is empty</p>
           <Link href="/collections/new-arrivals" className="btn-primary">Start Shopping</Link>
         </main>
         <Footer />
@@ -73,16 +73,16 @@ export default function CheckoutPage() {
   const total = finalPrice() + shippingCost
 
   return (
-    <div className="min-h-screen bg-bonkers-gray-50">
+    <div className="min-h-screen bg-marvnn-gray-50">
       <Header />
 
       <main className="container py-8 lg:py-12">
-        <nav className="flex items-center gap-2 text-xs text-bonkers-gray-500 mb-6">
-          <Link href="/" className="hover:text-bonkers-black">Home</Link>
+        <nav className="flex items-center gap-2 text-xs text-marvnn-gray-500 mb-6">
+          <Link href="/" className="hover:text-marvnn-black">Home</Link>
           <ChevronRight className="w-3 h-3" />
-          <Link href="/cart" className="hover:text-bonkers-black">Cart</Link>
+          <Link href="/cart" className="hover:text-marvnn-black">Cart</Link>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-bonkers-black">Checkout</span>
+          <span className="text-marvnn-black">Checkout</span>
         </nav>
 
         <h1 className="text-2xl lg:text-3xl font-display font-medium mb-8">Checkout</h1>
@@ -96,9 +96,9 @@ export default function CheckoutPage() {
           ] as const).map((s, i) => (
             <div key={s.key} className="flex items-center gap-2">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                step === s.key ? 'bg-bonkers-black text-white' :
+                step === s.key ? 'bg-marvnn-black text-white' :
                 ['shipping', 'payment', 'review'].indexOf(step) > i ? 'bg-green-600 text-white' :
-                'bg-bonkers-gray-200 text-bonkers-gray-500'
+                'bg-marvnn-gray-200 text-marvnn-gray-500'
               }`}>
                 {['shipping', 'payment', 'review'].indexOf(step) > i ? (
                   <Check className="w-4 h-4" />
@@ -106,10 +106,10 @@ export default function CheckoutPage() {
                   i + 1
                 )}
               </div>
-              <span className={`text-sm hidden sm:block ${step === s.key ? 'font-medium' : 'text-bonkers-gray-500'}`}>
+              <span className={`text-sm hidden sm:block ${step === s.key ? 'font-medium' : 'text-marvnn-gray-500'}`}>
                 {s.label}
               </span>
-              {i < 2 && <div className="w-12 h-px bg-bonkers-gray-300 mx-2" />}
+              {i < 2 && <div className="w-12 h-px bg-marvnn-gray-300 mx-2" />}
             </div>
           ))}
         </div>
@@ -220,21 +220,21 @@ export default function CheckoutPage() {
                     { value: 'upi', label: 'UPI Payment' },
                     { value: 'card', label: 'Credit/Debit Card' },
                   ].map((m) => (
-                    <label key={m.value} className="flex items-center gap-3 p-3 border cursor-pointer hover:bg-bonkers-gray-50 transition-colors">
+                    <label key={m.value} className="flex items-center gap-3 p-3 border cursor-pointer hover:bg-marvnn-gray-50 transition-colors">
                       <input
                         type="radio"
                         name="payment"
                         value={m.value}
                         checked={payment.method === m.value}
                         onChange={(e) => setPayment({ ...payment, method: e.target.value as typeof payment.method })}
-                        className="accent-bonkers-black"
+                        className="accent-marvnn-black"
                       />
                       <span className="text-sm">{m.label}</span>
                     </label>
                   ))}
 
                   {payment.method === 'card' && (
-                    <div className="grid grid-cols-2 gap-4 mt-4 p-4 bg-bonkers-gray-50">
+                    <div className="grid grid-cols-2 gap-4 mt-4 p-4 bg-marvnn-gray-50">
                       <div className="col-span-2">
                         <label className="block text-sm font-medium mb-1">Card Number</label>
                         <input
@@ -278,7 +278,7 @@ export default function CheckoutPage() {
                   )}
 
                   {payment.method === 'upi' && (
-                    <div className="p-4 bg-bonkers-gray-50">
+                    <div className="p-4 bg-marvnn-gray-50">
                       <label className="block text-sm font-medium mb-1">UPI ID</label>
                       <input
                         type="text"
@@ -306,18 +306,18 @@ export default function CheckoutPage() {
                 <h2 className="font-medium text-lg mb-6">Review Your Order</h2>
 
                 <div className="space-y-4 mb-6">
-                  <div className="p-4 bg-bonkers-gray-50">
+                  <div className="p-4 bg-marvnn-gray-50">
                     <h3 className="text-sm font-medium mb-2">Shipping Address</h3>
-                    <p className="text-sm text-bonkers-gray-600">
+                    <p className="text-sm text-marvnn-gray-600">
                       {shipping.firstName} {shipping.lastName}<br />
                       {shipping.address}<br />
                       {shipping.city}, {shipping.state} {shipping.pincode}<br />
                       {shipping.phone}
                     </p>
                   </div>
-                  <div className="p-4 bg-bonkers-gray-50">
+                  <div className="p-4 bg-marvnn-gray-50">
                     <h3 className="text-sm font-medium mb-2">Payment Method</h3>
-                    <p className="text-sm text-bonkers-gray-600 capitalize">
+                    <p className="text-sm text-marvnn-gray-600 capitalize">
                       {payment.method === 'cod' ? 'Cash on Delivery' : payment.method === 'upi' ? `UPI: ${payment.upiId}` : `Card ending in ${payment.cardNumber.slice(-4)}`}
                     </p>
                   </div>
@@ -326,12 +326,12 @@ export default function CheckoutPage() {
                 <div className="space-y-3 mb-6">
                   {items.map((item) => (
                     <div key={`${item.product.id}-${item.size}-${item.color}`} className="flex gap-3 items-center">
-                      <div className="w-16 h-20 bg-bonkers-gray-100 flex-shrink-0">
+                      <div className="w-16 h-20 bg-marvnn-gray-100 flex-shrink-0">
                         <img src={item.product.images[0]} alt={item.product.title} className="w-full h-full object-cover" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{item.product.title}</p>
-                        <p className="text-xs text-bonkers-gray-500">{item.size} / {item.color} × {item.quantity}</p>
+                        <p className="text-xs text-marvnn-gray-500">{item.size} / {item.color} × {item.quantity}</p>
                       </div>
                       <span className="text-sm font-medium">{formatPrice(item.product.price * item.quantity)}</span>
                     </div>
@@ -358,7 +358,7 @@ export default function CheckoutPage() {
               <div className="space-y-2 text-sm max-h-48 overflow-y-auto mb-4">
                 {items.map((item) => (
                   <div key={`${item.product.id}-${item.size}-${item.color}`} className="flex justify-between">
-                    <span className="text-bonkers-gray-600 truncate mr-2">
+                    <span className="text-marvnn-gray-600 truncate mr-2">
                       {item.product.title} × {item.quantity}
                     </span>
                     <span className="flex-shrink-0">{formatPrice(item.product.price * item.quantity)}</span>
@@ -368,7 +368,7 @@ export default function CheckoutPage() {
 
               <div className="border-t pt-3 space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-bonkers-gray-600">Subtotal</span>
+                  <span className="text-marvnn-gray-600">Subtotal</span>
                   <span>{formatPrice(totalPrice())}</span>
                 </div>
 
@@ -380,7 +380,7 @@ export default function CheckoutPage() {
                 )}
 
                 <div className="flex justify-between">
-                  <span className="text-bonkers-gray-600">Shipping</span>
+                  <span className="text-marvnn-gray-600">Shipping</span>
                   <span>{shippingCost === 0 ? 'Free' : formatPrice(shippingCost)}</span>
                 </div>
 
@@ -393,12 +393,12 @@ export default function CheckoutPage() {
               {/* Promo Code */}
               <div className="mt-4 pt-4 border-t">
                 {promoCode ? (
-                  <div className="flex items-center justify-between px-3 py-2 bg-bonkers-gray-50 border border-bonkers-gray-200">
+                  <div className="flex items-center justify-between px-3 py-2 bg-marvnn-gray-50 border border-marvnn-gray-200">
                     <div className="flex items-center gap-2 text-sm">
                       <Tag className="w-4 h-4 text-green-600" />
                       <span className="font-medium">{promoCode}</span>
                     </div>
-                    <button onClick={removePromoCode} className="text-bonkers-gray-400 hover:text-bonkers-red">
+                    <button onClick={removePromoCode} className="text-marvnn-gray-400 hover:text-marvnn-red">
                       <X className="w-4 h-4" />
                     </button>
                   </div>
@@ -409,14 +409,14 @@ export default function CheckoutPage() {
                       placeholder="Promo code"
                       value={promoInput}
                       onChange={(e) => { setPromoInput(e.target.value); setPromoError('') }}
-                      className="flex-1 px-3 py-2 text-sm border border-bonkers-gray-300 focus:outline-none focus:border-bonkers-black"
+                      className="flex-1 px-3 py-2 text-sm border border-marvnn-gray-300 focus:outline-none focus:border-marvnn-black"
                     />
-                    <button onClick={handleApplyPromo} className="px-3 py-2 text-sm font-medium border border-bonkers-gray-300 hover:border-bonkers-black transition-colors">
+                    <button onClick={handleApplyPromo} className="px-3 py-2 text-sm font-medium border border-marvnn-gray-300 hover:border-marvnn-black transition-colors">
                       Apply
                     </button>
                   </div>
                 )}
-                {promoError && <p className="text-xs text-bonkers-red mt-1">{promoError}</p>}
+                {promoError && <p className="text-xs text-marvnn-red mt-1">{promoError}</p>}
               </div>
             </div>
           </div>

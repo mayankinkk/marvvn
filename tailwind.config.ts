@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bonkers: {
+        marvnn: {
           black: '#000000',
           white: '#FFFFFF',
           gray: {

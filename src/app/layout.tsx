@@ -14,16 +14,16 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Bonkers Corner | Unisex Luxury Streetwear Clothing Brand',
-    template: '%s | Bonkers Corner',
+    default: 'MARVNN | Unisex Luxury Streetwear Clothing Brand',
+    template: '%s | MARVNN',
   },
   description: 'Luxury streetwear clothing brand for men and women. Shop oversized t-shirts, joggers, hoodies, and more. Made in India.',
-  keywords: ['streetwear', 'oversized t-shirts', 'joggers', 'hoodies', 'bonkers corner', 'luxury streetwear', 'indian fashion'],
+  keywords: ['streetwear', 'oversized t-shirts', 'joggers', 'hoodies', 'marvnn', 'luxury streetwear', 'indian fashion'],
   openGraph: {
     type: 'website',
     locale: 'en_IN',
-    siteName: 'Bonkers Corner',
-    title: 'Bonkers Corner | Unisex Luxury Streetwear Clothing Brand',
+    siteName: 'MARVNN',
+    title: 'MARVNN | Unisex Luxury Streetwear Clothing Brand',
     description: 'Luxury streetwear clothing brand for men and women. Shop oversized t-shirts, joggers, hoodies, and more.',
   },
 }
@@ -42,7 +42,7 @@ export default function RootLayout({
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'Organization',
-              name: 'Bonkers Corner',
+              name: 'MARVNN',
               url: 'https://bonkerscorner.com',
               logo: 'https://bonkerscorner.com/logo.png',
               sameAs: [

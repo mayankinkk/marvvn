@@ -11,10 +11,10 @@ export default function BlogListingPage() {
     <div className="min-h-screen">
       <Header />
       <main className="container py-8 lg:py-12">
-        <nav className="flex items-center gap-2 text-xs text-bonkers-gray-500 mb-6">
-          <Link href="/" className="hover:text-bonkers-black">Home</Link>
+        <nav className="flex items-center gap-2 text-xs text-marvnn-gray-500 mb-6">
+          <Link href="/" className="hover:text-marvnn-black">Home</Link>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-bonkers-black">Blogs</span>
+          <span className="text-marvnn-black">Blogs</span>
         </nav>
 
         <h1 className="text-2xl lg:text-3xl font-display font-medium mb-8">Our Blog</h1>
@@ -26,7 +26,7 @@ export default function BlogListingPage() {
               href={`/blogs/bonkers-corner/${post.handle}`}
               className="group border hover:shadow-lg transition-shadow"
             >
-              <div className="aspect-[16/9] bg-bonkers-gray-50 overflow-hidden">
+              <div className="aspect-[16/9] bg-marvnn-gray-50 overflow-hidden">
                 <img
                   src={post.image}
                   alt={post.title}
@@ -34,11 +34,11 @@ export default function BlogListingPage() {
                 />
               </div>
               <div className="p-4">
-                <p className="text-xs text-bonkers-gray-400 mb-2">{post.date}</p>
-                <h2 className="text-sm font-medium group-hover:text-bonkers-gray-600 transition-colors line-clamp-2 mb-2">
+                <p className="text-xs text-marvnn-gray-400 mb-2">{post.date}</p>
+                <h2 className="text-sm font-medium group-hover:text-marvnn-gray-600 transition-colors line-clamp-2 mb-2">
                   {post.title}
                 </h2>
-                <p className="text-xs text-bonkers-gray-500 line-clamp-2">{post.excerpt}</p>
+                <p className="text-xs text-marvnn-gray-500 line-clamp-2">{post.excerpt}</p>
               </div>
             </Link>
           ))}

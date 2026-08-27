@@ -20,9 +20,9 @@ interface AuthStore {
 }
 
 const MOCK_USERS: Record<string, { password: string; user: User }> = {
-  'demo@bonkers.com': {
+  'demo@marvnn.com': {
     password: 'demo123',
-    user: { id: '1', name: 'Demo User', email: 'demo@bonkers.com', phone: '+91 98765 43210' },
+    user: { id: '1', name: 'Demo User', email: 'demo@marvnn.com', phone: '+91 98765 43210' },
   },
 }
 
@@ -65,7 +65,7 @@ export const useAuthStore = create<AuthStore>()(
       },
     }),
     {
-      name: 'bonkers-auth',
+      name: 'marvnn-auth',
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,

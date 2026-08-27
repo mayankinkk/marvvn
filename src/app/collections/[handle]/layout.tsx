@@ -12,8 +12,8 @@ export async function generateMetadata({ params }: { params: Promise<{ handle: s
   const collection = collections.find((c) => c.handle === handle)
   const title = collection?.title || handle.replace(/-/g, ' ')
   return {
-    title: `${title} | Bonkers Corner`,
-    description: collection?.description || `Shop ${title} at Bonkers Corner`,
+    title: `${title} | MARVNN`,
+    description: collection?.description || `Shop ${title} at MARVNN`,
   }
 }
 

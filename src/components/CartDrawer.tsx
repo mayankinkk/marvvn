@@ -47,7 +47,7 @@ export default function CartDrawer() {
             </div>
             <button
               onClick={() => setCartOpen(false)}
-              className="p-2 hover:bg-bonkers-gray-50 rounded-full transition-colors"
+              className="p-2 hover:bg-marvnn-gray-50 rounded-full transition-colors"
               aria-label="Close cart"
             >
               <X className="w-5 h-5" />
@@ -58,8 +58,8 @@ export default function CartDrawer() {
           <div className="flex-1 overflow-y-auto p-4">
             {items.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center">
-                <ShoppingBag className="w-12 h-12 text-bonkers-gray-300 mb-4" />
-                <p className="text-bonkers-gray-500 mb-4">Your cart is currently empty.</p>
+                <ShoppingBag className="w-12 h-12 text-marvnn-gray-300 mb-4" />
+                <p className="text-marvnn-gray-500 mb-4">Your cart is currently empty.</p>
                 <Link
                   href="/collections/new-arrivals"
                   className="btn-primary"
@@ -72,7 +72,7 @@ export default function CartDrawer() {
               <div className="space-y-4">
                 {items.map((item) => (
                   <div key={`${item.product.id}-${item.size}-${item.color}`} className="flex gap-4 pb-4 border-b">
-                    <div className="w-20 h-24 bg-bonkers-gray-100 flex-shrink-0">
+                    <div className="w-20 h-24 bg-marvnn-gray-100 flex-shrink-0">
                       <img
                         src={item.product.images[0]}
                         alt={item.product.title}
@@ -81,21 +81,21 @@ export default function CartDrawer() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="text-sm font-medium truncate">{item.product.title}</h3>
-                      <p className="text-xs text-bonkers-gray-500 mt-0.5">
+                      <p className="text-xs text-marvnn-gray-500 mt-0.5">
                         {item.size} / {item.color}
                       </p>
                       <p className="text-sm font-medium mt-1">{formatPrice(item.product.price)}</p>
                       <div className="flex items-center gap-2 mt-2">
                         <button
                           onClick={() => updateQuantity(item.product.id, item.size, item.color, item.quantity - 1)}
-                          className="w-8 h-8 flex items-center justify-center border rounded hover:bg-bonkers-gray-50"
+                          className="w-8 h-8 flex items-center justify-center border rounded hover:bg-marvnn-gray-50"
                         >
                           <Minus className="w-3 h-3" />
                         </button>
                         <span className="text-sm w-6 text-center">{item.quantity}</span>
                         <button
                           onClick={() => updateQuantity(item.product.id, item.size, item.color, item.quantity + 1)}
-                          className="w-8 h-8 flex items-center justify-center border rounded hover:bg-bonkers-gray-50"
+                          className="w-8 h-8 flex items-center justify-center border rounded hover:bg-marvnn-gray-50"
                         >
                           <Plus className="w-3 h-3" />
                         </button>
@@ -103,9 +103,9 @@ export default function CartDrawer() {
                     </div>
                     <button
                       onClick={() => removeItem(item.product.id, item.size, item.color)}
-                      className="p-1 hover:bg-bonkers-gray-50 rounded transition-colors self-start"
+                      className="p-1 hover:bg-marvnn-gray-50 rounded transition-colors self-start"
                     >
-                      <X className="w-4 h-4 text-bonkers-gray-400" />
+                      <X className="w-4 h-4 text-marvnn-gray-400" />
                     </button>
                   </div>
                 ))}
@@ -119,13 +119,13 @@ export default function CartDrawer() {
               {/* Promo Code */}
               <div>
                 {promoCode ? (
-                  <div className="flex items-center justify-between px-3 py-2 bg-bonkers-gray-50 border border-bonkers-gray-200">
+                  <div className="flex items-center justify-between px-3 py-2 bg-marvnn-gray-50 border border-marvnn-gray-200">
                     <div className="flex items-center gap-2 text-sm">
                       <Tag className="w-4 h-4 text-green-600" />
                       <span className="font-medium">{promoCode}</span>
                       <span className="text-green-600 text-xs">(-{discount}%)</span>
                     </div>
-                    <button onClick={removePromoCode} className="text-bonkers-gray-400 hover:text-bonkers-red">
+                    <button onClick={removePromoCode} className="text-marvnn-gray-400 hover:text-marvnn-red">
                       <X className="w-4 h-4" />
                     </button>
                   </div>
@@ -136,18 +136,18 @@ export default function CartDrawer() {
                       placeholder="Promo code"
                       value={promoInput}
                       onChange={(e) => { setPromoInput(e.target.value); setPromoError('') }}
-                      className="flex-1 px-3 py-2 text-sm border border-bonkers-gray-300 focus:outline-none focus:border-bonkers-black"
+                      className="flex-1 px-3 py-2 text-sm border border-marvnn-gray-300 focus:outline-none focus:border-marvnn-black"
                     />
-                    <button onClick={handleApplyPromo} className="px-4 py-2 text-sm font-medium border border-bonkers-gray-300 hover:border-bonkers-black transition-colors">
+                    <button onClick={handleApplyPromo} className="px-4 py-2 text-sm font-medium border border-marvnn-gray-300 hover:border-marvnn-black transition-colors">
                       Apply
                     </button>
                   </div>
                 )}
-                {promoError && <p className="text-xs text-bonkers-red mt-1">{promoError}</p>}
+                {promoError && <p className="text-xs text-marvnn-red mt-1">{promoError}</p>}
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm text-bonkers-gray-600">Subtotal</span>
+                <span className="text-sm text-marvnn-gray-600">Subtotal</span>
                 <span className="font-medium">{formatPrice(totalPrice())}</span>
               </div>
               {discount > 0 && (
@@ -156,7 +156,7 @@ export default function CartDrawer() {
                   <span className="text-sm">-{formatPrice(totalPrice() - finalPrice())}</span>
                 </div>
               )}
-              <p className="text-xs text-bonkers-gray-500">
+              <p className="text-xs text-marvnn-gray-500">
                 Shipping, taxes calculated at checkout.
               </p>
               <Link

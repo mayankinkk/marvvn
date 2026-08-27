@@ -8,12 +8,12 @@ export default function BlogSection() {
       <div className="container">
         <div className="flex items-end justify-between mb-8 lg:mb-12">
           <div>
-            <p className="text-sm text-bonkers-gray-500 uppercase tracking-wider mb-2">Latest News</p>
+            <p className="text-sm text-marvnn-gray-500 uppercase tracking-wider mb-2">Latest News</p>
             <h2 className="section-title">Hot off the press: All the latest news in fashion</h2>
           </div>
           <Link
             href="/blogs/bonkers-corner"
-            className="hidden md:inline-flex items-center gap-1 text-sm font-medium hover:text-bonkers-gray-600 transition-colors"
+            className="hidden md:inline-flex items-center gap-1 text-sm font-medium hover:text-marvnn-gray-600 transition-colors"
           >
             View all posts <ChevronRight className="w-4 h-4" />
           </Link>
@@ -22,21 +22,21 @@ export default function BlogSection() {
         <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
           {blogPosts.map((post) => (
             <Link key={post.id} href={`/blogs/bonkers-corner/${post.handle}`} className="group">
-              <div className="aspect-[16/9] bg-bonkers-gray-100 mb-4 overflow-hidden">
+              <div className="aspect-[16/9] bg-marvnn-gray-100 mb-4 overflow-hidden">
                 <img
                   src={post.image}
                   alt={post.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
-              <p className="text-xs text-bonkers-gray-500 mb-2">{post.date}</p>
-              <h3 className="text-base font-medium mb-2 group-hover:text-bonkers-gray-600 transition-colors line-clamp-2">
+              <p className="text-xs text-marvnn-gray-500 mb-2">{post.date}</p>
+              <h3 className="text-base font-medium mb-2 group-hover:text-marvnn-gray-600 transition-colors line-clamp-2">
                 {post.title}
               </h3>
-              <p className="text-sm text-bonkers-gray-500 line-clamp-2 mb-3">
+              <p className="text-sm text-marvnn-gray-500 line-clamp-2 mb-3">
                 {post.excerpt}
               </p>
-              <span className="text-sm font-medium underline underline-offset-4 hover:text-bonkers-gray-600 transition-colors">
+              <span className="text-sm font-medium underline underline-offset-4 hover:text-marvnn-gray-600 transition-colors">
                 Read more
               </span>
             </Link>

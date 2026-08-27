@@ -14,7 +14,7 @@ export default function SectionHeader({ subtitle, title, description, ctaText, c
   return (
     <div className={`mb-6 lg:mb-10 ${center ? 'text-center' : ''}`}>
       {subtitle && (
-        <p className="text-xs md:text-sm text-bonkers-gray-500 uppercase tracking-wider mb-2">{subtitle}</p>
+        <p className="text-xs md:text-sm text-marvnn-gray-500 uppercase tracking-wider mb-2">{subtitle}</p>
       )}
       <h2 className="section-title">{title}</h2>
       {description && (
@@ -23,7 +23,7 @@ export default function SectionHeader({ subtitle, title, description, ctaText, c
       {ctaText && ctaLink && (
         <Link
           href={ctaLink}
-          className={`inline-flex items-center gap-1 text-sm font-medium mt-4 hover:text-bonkers-gray-600 transition-colors ${center ? 'justify-center' : ''}`}
+          className={`inline-flex items-center gap-1 text-sm font-medium mt-4 hover:text-marvnn-gray-600 transition-colors ${center ? 'justify-center' : ''}`}
         >
           {ctaText} <ChevronRight className="w-4 h-4" />
         </Link>

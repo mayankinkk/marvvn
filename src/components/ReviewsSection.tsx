@@ -16,24 +16,24 @@ const reviews = [
   {
     id: 3,
     name: 'Ansh Jadli',
-    text: 'Change your name to quality.com I swear i lovedddddddd the quality so so so much Thanks Bonkers Corner',
+    text: 'Change your name to quality.com I swear i lovedddddddd the quality so so so much Thanks MARVNN',
     rating: 5,
   },
 ]
 
 export default function ReviewsSection() {
   return (
-    <section className="py-12 lg:py-20 bg-bonkers-gray-50">
+    <section className="py-12 lg:py-20 bg-marvnn-gray-50">
       <div className="container">
         <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
           {reviews.map((review) => (
             <div key={review.id} className="bg-white p-6 lg:p-8">
               <div className="flex items-center gap-1 mb-4">
                 {Array.from({ length: review.rating }).map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-bonkers-gold text-bonkers-gold" />
+                  <Star key={i} className="w-4 h-4 fill-marvnn-gold text-marvnn-gold" />
                 ))}
               </div>
-              <p className="text-sm text-bonkers-gray-600 mb-4 italic">&quot;{review.text}&quot;</p>
+              <p className="text-sm text-marvnn-gray-600 mb-4 italic">&quot;{review.text}&quot;</p>
               <p className="text-sm font-medium">{review.name}</p>
             </div>
           ))}

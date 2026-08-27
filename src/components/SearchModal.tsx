@@ -47,18 +47,18 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
       <div className="absolute top-0 left-0 right-0 bg-white shadow-lg animate-slide-down">
         <div className="container py-4">
           <div className="flex items-center gap-4">
-            <Search className="w-5 h-5 text-bonkers-gray-400 flex-shrink-0" />
+            <Search className="w-5 h-5 text-marvnn-gray-400 flex-shrink-0" />
             <input
               ref={inputRef}
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search bonkerscorner"
+              placeholder="Search MARVNN"
               className="flex-1 text-lg focus:outline-none"
             />
             <button
               onClick={onClose}
-              className="p-2 hover:bg-bonkers-gray-50 rounded-full transition-colors"
+              className="p-2 hover:bg-marvnn-gray-50 rounded-full transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -74,17 +74,17 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                     onClick={onClose}
                     className="group"
                   >
-                    <div className="aspect-[3/4] bg-bonkers-gray-50 mb-2 overflow-hidden">
+                    <div className="aspect-[3/4] bg-marvnn-gray-50 mb-2 overflow-hidden">
                       <img
                         src={product.images[0]}
                         alt={product.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
-                    <h4 className="text-sm font-medium truncate group-hover:text-bonkers-gray-600 transition-colors">
+                    <h4 className="text-sm font-medium truncate group-hover:text-marvnn-gray-600 transition-colors">
                       {product.title}
                     </h4>
-                    <p className="text-sm text-bonkers-gray-500">{formatPrice(product.price)}</p>
+                    <p className="text-sm text-marvnn-gray-500">{formatPrice(product.price)}</p>
                   </Link>
                 ))}
               </div>
@@ -92,7 +92,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                 <Link
                   href={`/search?q=${encodeURIComponent(query)}`}
                   onClick={onClose}
-                  className="flex items-center justify-center gap-2 mt-6 py-3 text-sm font-medium border border-bonkers-gray-300 hover:border-bonkers-black transition-colors"
+                  className="flex items-center justify-center gap-2 mt-6 py-3 text-sm font-medium border border-marvnn-gray-300 hover:border-marvnn-black transition-colors"
                 >
                   View all results <ArrowRight className="w-4 h-4" />
                 </Link>
@@ -102,19 +102,19 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
 
           {query.length >= 2 && results.length === 0 && (
             <div className="mt-4 border-t pt-8 text-center">
-              <p className="text-bonkers-gray-500">No results found for &quot;{query}&quot;</p>
+              <p className="text-marvnn-gray-500">No results found for &quot;{query}&quot;</p>
             </div>
           )}
 
           {query.length < 2 && (
             <div className="mt-4 border-t pt-4">
-              <p className="text-xs text-bonkers-gray-400 uppercase tracking-wider mb-3">Popular Searches</p>
+              <p className="text-xs text-marvnn-gray-400 uppercase tracking-wider mb-3">Popular Searches</p>
               <div className="flex flex-wrap gap-2">
                 {['Oversized T-Shirt', 'Joggers', 'Marvel', 'Cargos', 'Caps'].map((term) => (
                   <button
                     key={term}
                     onClick={() => setQuery(term)}
-                    className="px-3 py-1.5 text-sm border border-bonkers-gray-300 hover:border-bonkers-black transition-colors"
+                    className="px-3 py-1.5 text-sm border border-marvnn-gray-300 hover:border-marvnn-black transition-colors"
                   >
                     {term}
                   </button>

@@ -56,20 +56,20 @@ export default function SearchContent() {
         {query.length >= 2 ? (
           results.length > 0 ? (
             <>
-              <p className="text-sm text-bonkers-gray-500 mb-6">
+              <p className="text-sm text-marvnn-gray-500 mb-6">
                 {results.length} result{results.length !== 1 ? 's' : ''} for &quot;{query}&quot;
               </p>
               <ProductGrid products={results} columns={4} />
             </>
           ) : (
             <div className="text-center py-16">
-              <p className="text-bonkers-gray-500 text-lg mb-2">No results found for &quot;{query}&quot;</p>
-              <p className="text-sm text-bonkers-gray-400">Try searching with different keywords</p>
+              <p className="text-marvnn-gray-500 text-lg mb-2">No results found for &quot;{query}&quot;</p>
+              <p className="text-sm text-marvnn-gray-400">Try searching with different keywords</p>
             </div>
           )
         ) : (
           <div className="text-center py-16">
-            <p className="text-bonkers-gray-400">Type at least 2 characters to search</p>
+            <p className="text-marvnn-gray-400">Type at least 2 characters to search</p>
           </div>
         )}
       </main>

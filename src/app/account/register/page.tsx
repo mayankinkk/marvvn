@@ -42,15 +42,15 @@ export default function RegisterPage() {
     <div className="min-h-screen">
       <Header />
       <main className="container py-8 lg:py-16">
-        <nav className="flex items-center gap-2 text-xs text-bonkers-gray-500 mb-8">
-          <Link href="/" className="hover:text-bonkers-black">Home</Link>
+        <nav className="flex items-center gap-2 text-xs text-marvnn-gray-500 mb-8">
+          <Link href="/" className="hover:text-marvnn-black">Home</Link>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-bonkers-black">Register</span>
+          <span className="text-marvnn-black">Register</span>
         </nav>
 
         <div className="max-w-md mx-auto">
           <h1 className="text-2xl lg:text-3xl font-display font-medium text-center mb-2">Create Account</h1>
-          <p className="text-sm text-bonkers-gray-500 text-center mb-8">Join the Bonkers Corner community</p>
+          <p className="text-sm text-marvnn-gray-500 text-center mb-8">Join the MARVNN community</p>
 
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 text-sm text-red-700">
@@ -93,7 +93,7 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-bonkers-gray-400 hover:text-bonkers-black"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-marvnn-gray-400 hover:text-marvnn-black"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -109,9 +109,9 @@ export default function RegisterPage() {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-sm text-bonkers-gray-500">
+            <p className="text-sm text-marvnn-gray-500">
               Already have an account?{' '}
-              <Link href="/account/login" className="text-bonkers-black font-medium hover:underline">
+              <Link href="/account/login" className="text-marvnn-black font-medium hover:underline">
                 Sign in
               </Link>
             </p>

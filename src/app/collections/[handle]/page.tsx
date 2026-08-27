@@ -135,10 +135,10 @@ export default function CollectionPage() {
 
       <main className="container py-4 lg:py-8">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-xs text-bonkers-gray-500 mb-6">
-          <Link href="/" className="hover:text-bonkers-black">Home</Link>
+        <nav className="flex items-center gap-2 text-xs text-marvnn-gray-500 mb-6">
+          <Link href="/" className="hover:text-marvnn-black">Home</Link>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-bonkers-black capitalize">
+          <span className="text-marvnn-black capitalize">
             {collection?.title || handle.replace(/-/g, ' ')}
           </span>
         </nav>
@@ -150,14 +150,14 @@ export default function CollectionPage() {
               {collection?.title || handle.replace(/-/g, ' ')}
             </h1>
             {collection?.description && (
-              <p className="text-sm text-bonkers-gray-500 mt-1">{collection.description}</p>
+              <p className="text-sm text-marvnn-gray-500 mt-1">{collection.description}</p>
             )}
-            <p className="text-sm text-bonkers-gray-400 mt-1">{filteredProducts.length} products</p>
+            <p className="text-sm text-marvnn-gray-400 mt-1">{filteredProducts.length} products</p>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="lg:hidden flex items-center gap-2 px-4 py-2 border border-bonkers-gray-300 text-sm hover:border-bonkers-black transition-colors"
+              className="lg:hidden flex items-center gap-2 px-4 py-2 border border-marvnn-gray-300 text-sm hover:border-marvnn-black transition-colors"
             >
               <SlidersHorizontal className="w-4 h-4" />
               Filters
@@ -165,7 +165,7 @@ export default function CollectionPage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2 border border-bonkers-gray-300 text-sm focus:outline-none focus:border-bonkers-black"
+              className="px-4 py-2 border border-marvnn-gray-300 text-sm focus:outline-none focus:border-marvnn-black"
             >
               <option value="newest">Sort by: Newest</option>
               <option value="price-low">Sort by: Price Low to High</option>
@@ -192,8 +192,8 @@ export default function CollectionPage() {
                     className={cn(
                       'min-w-[40px] px-2 py-1.5 text-xs border transition-colors',
                       selectedSizes.includes(size)
-                        ? 'border-bonkers-black bg-bonkers-black text-white'
-                        : 'border-bonkers-gray-300 hover:border-bonkers-black'
+                        ? 'border-marvnn-black bg-marvnn-black text-white'
+                        : 'border-marvnn-gray-300 hover:border-marvnn-black'
                     )}
                   >
                     {size}
@@ -213,8 +213,8 @@ export default function CollectionPage() {
                     className={cn(
                       'px-3 py-1.5 text-xs border transition-colors',
                       selectedColors.includes(color)
-                        ? 'border-bonkers-black bg-bonkers-black text-white'
-                        : 'border-bonkers-gray-300 hover:border-bonkers-black'
+                        ? 'border-marvnn-black bg-marvnn-black text-white'
+                        : 'border-marvnn-gray-300 hover:border-marvnn-black'
                     )}
                   >
                     {color}
@@ -235,7 +235,7 @@ export default function CollectionPage() {
                   onChange={(e) => { setPriceRange([0, Number(e.target.value)]); setCurrentPage(1) }}
                   className="w-full"
                 />
-                <div className="flex items-center justify-between text-xs text-bonkers-gray-500">
+                <div className="flex items-center justify-between text-xs text-marvnn-gray-500">
                   <span>₹0</span>
                   <span>₹{priceRange[1].toLocaleString()}</span>
                 </div>
@@ -251,7 +251,7 @@ export default function CollectionPage() {
                   setPriceRange([0, 5000])
                   setCurrentPage(1)
                 }}
-                className="text-sm text-bonkers-gray-500 underline underline-offset-4 hover:text-bonkers-black transition-colors"
+                className="text-sm text-marvnn-gray-500 underline underline-offset-4 hover:text-marvnn-black transition-colors"
               >
                 Clear All Filters
               </button>
@@ -270,7 +270,7 @@ export default function CollectionPage() {
                     <button
                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
-                      className="px-3 py-2 text-sm border border-bonkers-gray-300 hover:border-bonkers-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      className="px-3 py-2 text-sm border border-marvnn-gray-300 hover:border-marvnn-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     >
                       Previous
                     </button>
@@ -281,8 +281,8 @@ export default function CollectionPage() {
                         className={cn(
                           'w-10 h-10 text-sm border transition-colors',
                           currentPage === page
-                            ? 'border-bonkers-black bg-bonkers-black text-white'
-                            : 'border-bonkers-gray-300 hover:border-bonkers-black'
+                            ? 'border-marvnn-black bg-marvnn-black text-white'
+                            : 'border-marvnn-gray-300 hover:border-marvnn-black'
                         )}
                       >
                         {page}
@@ -291,7 +291,7 @@ export default function CollectionPage() {
                     <button
                       onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                       disabled={currentPage === totalPages}
-                      className="px-3 py-2 text-sm border border-bonkers-gray-300 hover:border-bonkers-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      className="px-3 py-2 text-sm border border-marvnn-gray-300 hover:border-marvnn-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                     >
                       Next
                     </button>
@@ -300,7 +300,7 @@ export default function CollectionPage() {
               </>
             ) : (
               <div className="text-center py-16">
-                <p className="text-bonkers-gray-500 mb-4">No products found matching your filters.</p>
+                <p className="text-marvnn-gray-500 mb-4">No products found matching your filters.</p>
                 <button
                   onClick={() => {
                     setSelectedSizes([])

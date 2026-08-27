@@ -30,18 +30,18 @@ export default function CartPage() {
 
       <main className="container py-8 lg:py-12">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-xs text-bonkers-gray-500 mb-6">
-          <Link href="/" className="hover:text-bonkers-black">Home</Link>
+        <nav className="flex items-center gap-2 text-xs text-marvnn-gray-500 mb-6">
+          <Link href="/" className="hover:text-marvnn-black">Home</Link>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-bonkers-black">Cart</span>
+          <span className="text-marvnn-black">Cart</span>
         </nav>
 
         <h1 className="text-2xl lg:text-3xl font-display font-medium mb-8">Shopping Cart</h1>
 
         {items.length === 0 ? (
           <div className="text-center py-16">
-            <ShoppingBag className="w-16 h-16 text-bonkers-gray-300 mx-auto mb-4" />
-            <p className="text-bonkers-gray-500 mb-6">Your cart is currently empty.</p>
+            <ShoppingBag className="w-16 h-16 text-marvnn-gray-300 mx-auto mb-4" />
+            <p className="text-marvnn-gray-500 mb-6">Your cart is currently empty.</p>
             <Link href="/collections/new-arrivals" className="btn-primary">
               Start Shopping
             </Link>
@@ -50,7 +50,7 @@ export default function CartPage() {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Items */}
             <div className="lg:col-span-2">
-              <div className="border-b pb-2 mb-4 hidden md:grid grid-cols-12 gap-4 text-xs font-medium uppercase tracking-wider text-bonkers-gray-500">
+              <div className="border-b pb-2 mb-4 hidden md:grid grid-cols-12 gap-4 text-xs font-medium uppercase tracking-wider text-marvnn-gray-500">
                 <div className="col-span-6">Product</div>
                 <div className="col-span-2 text-center">Price</div>
                 <div className="col-span-2 text-center">Quantity</div>
@@ -61,7 +61,7 @@ export default function CartPage() {
                 {items.map((item) => (
                   <div key={`${item.product.id}-${item.size}-${item.color}`} className="py-6 grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
                     <div className="md:col-span-6 flex gap-4">
-                      <div className="w-20 h-24 bg-bonkers-gray-50 flex-shrink-0">
+                      <div className="w-20 h-24 bg-marvnn-gray-50 flex-shrink-0">
                         <img
                           src={item.product.images[0]}
                           alt={item.product.title}
@@ -71,16 +71,16 @@ export default function CartPage() {
                       <div>
                         <Link
                           href={`/products/${item.product.handle}`}
-                          className="text-sm font-medium hover:text-bonkers-gray-600 transition-colors"
+                          className="text-sm font-medium hover:text-marvnn-gray-600 transition-colors"
                         >
                           {item.product.title}
                         </Link>
-                        <p className="text-xs text-bonkers-gray-500 mt-1">
+                        <p className="text-xs text-marvnn-gray-500 mt-1">
                           {item.size} / {item.color}
                         </p>
                         <button
                           onClick={() => removeItem(item.product.id, item.size, item.color)}
-                          className="text-xs text-bonkers-gray-400 hover:text-bonkers-red mt-2 flex items-center gap-1"
+                          className="text-xs text-marvnn-gray-400 hover:text-marvnn-red mt-2 flex items-center gap-1"
                         >
                           <X className="w-3 h-3" /> Remove
                         </button>
@@ -92,14 +92,14 @@ export default function CartPage() {
                     <div className="md:col-span-2 flex items-center justify-center gap-2">
                       <button
                         onClick={() => updateQuantity(item.product.id, item.size, item.color, item.quantity - 1)}
-                        className="w-8 h-8 flex items-center justify-center border hover:bg-bonkers-gray-50"
+                        className="w-8 h-8 flex items-center justify-center border hover:bg-marvnn-gray-50"
                       >
                         <Minus className="w-3 h-3" />
                       </button>
                       <span className="w-8 text-center text-sm">{item.quantity}</span>
                       <button
                         onClick={() => updateQuantity(item.product.id, item.size, item.color, item.quantity + 1)}
-                        className="w-8 h-8 flex items-center justify-center border hover:bg-bonkers-gray-50"
+                        className="w-8 h-8 flex items-center justify-center border hover:bg-marvnn-gray-50"
                       >
                         <Plus className="w-3 h-3" />
                       </button>
@@ -117,7 +117,7 @@ export default function CartPage() {
                 </Link>
                 <button
                   onClick={clearCart}
-                  className="text-sm text-bonkers-gray-400 hover:text-bonkers-red transition-colors"
+                  className="text-sm text-marvnn-gray-400 hover:text-marvnn-red transition-colors"
                 >
                   Clear Cart
                 </button>
@@ -130,20 +130,20 @@ export default function CartPage() {
                 <h2 className="font-medium text-lg mb-6">Order Summary</h2>
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-bonkers-gray-600">Subtotal ({totalItems()} items)</span>
+                    <span className="text-marvnn-gray-600">Subtotal ({totalItems()} items)</span>
                     <span>{formatPrice(totalPrice())}</span>
                   </div>
 
                   {/* Promo Code */}
                   <div className="pt-2">
                     {promoCode ? (
-                      <div className="flex items-center justify-between px-3 py-2 bg-bonkers-gray-50 border border-bonkers-gray-200">
+                      <div className="flex items-center justify-between px-3 py-2 bg-marvnn-gray-50 border border-marvnn-gray-200">
                         <div className="flex items-center gap-2 text-sm">
                           <Tag className="w-4 h-4 text-green-600" />
                           <span className="font-medium">{promoCode}</span>
                           <span className="text-green-600 text-xs">(-{discount}%)</span>
                         </div>
-                        <button onClick={removePromoCode} className="text-bonkers-gray-400 hover:text-bonkers-red">
+                        <button onClick={removePromoCode} className="text-marvnn-gray-400 hover:text-marvnn-red">
                           <X className="w-4 h-4" />
                         </button>
                       </div>
@@ -154,14 +154,14 @@ export default function CartPage() {
                           placeholder="Promo code"
                           value={promoInput}
                           onChange={(e) => { setPromoInput(e.target.value); setPromoError('') }}
-                          className="flex-1 px-3 py-2 text-sm border border-bonkers-gray-300 focus:outline-none focus:border-bonkers-black"
+                          className="flex-1 px-3 py-2 text-sm border border-marvnn-gray-300 focus:outline-none focus:border-marvnn-black"
                         />
-                        <button onClick={handleApplyPromo} className="px-3 py-2 text-sm font-medium border border-bonkers-gray-300 hover:border-bonkers-black transition-colors">
+                        <button onClick={handleApplyPromo} className="px-3 py-2 text-sm font-medium border border-marvnn-gray-300 hover:border-marvnn-black transition-colors">
                           Apply
                         </button>
                       </div>
                     )}
-                    {promoError && <p className="text-xs text-bonkers-red mt-1">{promoError}</p>}
+                    {promoError && <p className="text-xs text-marvnn-red mt-1">{promoError}</p>}
                   </div>
 
                   {discount > 0 && (
@@ -172,8 +172,8 @@ export default function CartPage() {
                   )}
 
                   <div className="flex justify-between">
-                    <span className="text-bonkers-gray-600">Shipping</span>
-                    <span className="text-bonkers-gray-400">Calculated at checkout</span>
+                    <span className="text-marvnn-gray-600">Shipping</span>
+                    <span className="text-marvnn-gray-400">Calculated at checkout</span>
                   </div>
                 </div>
                 <div className="border-t mt-4 pt-4 flex justify-between font-medium">
@@ -186,7 +186,7 @@ export default function CartPage() {
                 >
                   Checkout <ArrowRight className="w-4 h-4" />
                 </Link>
-                <p className="text-xs text-bonkers-gray-400 mt-4 text-center">
+                <p className="text-xs text-marvnn-gray-400 mt-4 text-center">
                   Try code SHARKTANK10 for 10% off!
                 </p>
               </div>

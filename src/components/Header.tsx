@@ -46,7 +46,7 @@ export default function Header() {
   return (
     <>
       {/* Announcement Bar */}
-      <div className="bg-bonkers-black text-white py-2 overflow-hidden">
+      <div className="bg-marvnn-black text-white py-2 overflow-hidden">
         <div className="animate-marquee whitespace-nowrap text-sm font-medium">
           <span className="inline-block px-8">
             Extra 10% OFF | Use code SHARKTANK10 | Min. cart ₹500 🛒 &nbsp;&nbsp;🦈 AS SEEN ON SHARK TANK 🦈
@@ -68,10 +68,10 @@ export default function Header() {
         )}
       >
         {/* Top Nav */}
-        <div className="hidden lg:block border-b border-bonkers-gray-100">
-          <div className="container flex items-center justify-between py-2 text-xs text-bonkers-gray-500">
+        <div className="hidden lg:block border-b border-marvnn-gray-100">
+          <div className="container flex items-center justify-between py-2 text-xs text-marvnn-gray-500">
             <div className="flex items-center gap-4">
-              <Link href="/pages/store-locator" className="flex items-center gap-1 hover:text-bonkers-black transition-colors">
+              <Link href="/pages/store-locator" className="flex items-center gap-1 hover:text-marvnn-black transition-colors">
                 <MapPin className="w-3 h-3" />
                 Store Locator
               </Link>
@@ -81,7 +81,7 @@ export default function Header() {
                 <Link
                   key={link.label}
                   href={link.href}
-                  className="hover:text-bonkers-black transition-colors"
+                  className="hover:text-marvnn-black transition-colors"
                 >
                   {link.label}
                 </Link>
@@ -105,10 +105,7 @@ export default function Header() {
             {/* Logo */}
             <Link href="/" className="relative z-10">
               <span className="text-2xl lg:text-3xl font-display font-bold tracking-tight">
-                BONKERS
-              </span>
-              <span className="text-2xl lg:text-3xl font-display font-light tracking-tight">
-                CORNER
+                MARVNN
               </span>
             </Link>
 
@@ -124,7 +121,7 @@ export default function Header() {
                   <Link
                     href={link.href}
                     className={cn(
-                      'text-sm font-medium uppercase tracking-wider hover:text-bonkers-gray-600 transition-colors flex items-center gap-1'
+                      'text-sm font-medium uppercase tracking-wider hover:text-marvnn-gray-600 transition-colors flex items-center gap-1'
                     )}
                   >
                     {link.label}
@@ -136,35 +133,35 @@ export default function Header() {
 
             {/* Right Actions */}
             <div className="flex items-center gap-1 lg:gap-3">
-              <button className="p-2 hover:bg-bonkers-gray-50 rounded-full transition-colors" onClick={() => setSearchOpen(true)} aria-label="Search">
+              <button className="p-2 hover:bg-marvnn-gray-50 rounded-full transition-colors" onClick={() => setSearchOpen(true)} aria-label="Search">
                 <Search className="w-5 h-5" />
               </button>
 
               {/* Account */}
               <div className="relative hidden lg:block">
                 <button
-                  className="p-2 hover:bg-bonkers-gray-50 rounded-full transition-colors"
+                  className="p-2 hover:bg-marvnn-gray-50 rounded-full transition-colors"
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   aria-label="Account"
                 >
                   <User className="w-5 h-5" />
                 </button>
                 {userMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-bonkers-gray-200 shadow-lg z-50">
+                  <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-marvnn-gray-200 shadow-lg z-50">
                     {isAuthenticated ? (
                       <div className="p-4">
                         <p className="text-sm font-medium">{user?.name}</p>
-                        <p className="text-xs text-bonkers-gray-500 mt-0.5">{user?.email}</p>
+                        <p className="text-xs text-marvnn-gray-500 mt-0.5">{user?.email}</p>
                         <div className="border-t mt-3 pt-3 space-y-2">
-                          <Link href="/account" className="block text-sm hover:text-bonkers-gray-600" onClick={() => setUserMenuOpen(false)}>
+                          <Link href="/account" className="block text-sm hover:text-marvnn-gray-600" onClick={() => setUserMenuOpen(false)}>
                             My Account
                           </Link>
-                          <Link href="/account/orders" className="block text-sm hover:text-bonkers-gray-600" onClick={() => setUserMenuOpen(false)}>
+                          <Link href="/account/orders" className="block text-sm hover:text-marvnn-gray-600" onClick={() => setUserMenuOpen(false)}>
                             Orders
                           </Link>
                           <button
                             onClick={() => { logout(); setUserMenuOpen(false) }}
-                            className="flex items-center gap-2 text-sm text-bonkers-red hover:text-bonkers-red/80"
+                            className="flex items-center gap-2 text-sm text-marvnn-red hover:text-marvnn-red/80"
                           >
                             <LogOut className="w-4 h-4" /> Logout
                           </button>
@@ -185,23 +182,23 @@ export default function Header() {
               </div>
 
               {/* Wishlist */}
-              <Link href="/wishlist" className="p-2 hover:bg-bonkers-gray-50 rounded-full transition-colors relative hidden lg:flex" aria-label="Wishlist">
+              <Link href="/wishlist" className="p-2 hover:bg-marvnn-gray-50 rounded-full transition-colors relative hidden lg:flex" aria-label="Wishlist">
                 <Heart className="w-5 h-5" />
                 {wishlistCount() > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-bonkers-red text-white text-xs font-medium rounded-full flex items-center justify-center">
+                  <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-marvnn-red text-white text-xs font-medium rounded-full flex items-center justify-center">
                     {wishlistCount()}
                   </span>
                 )}
               </Link>
 
               <button
-                className="p-2 hover:bg-bonkers-gray-50 rounded-full transition-colors relative"
+                className="p-2 hover:bg-marvnn-gray-50 rounded-full transition-colors relative"
                 onClick={toggleCart}
                 aria-label="Cart"
               >
                 <ShoppingBag className="w-5 h-5" />
                 {totalItems() > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-bonkers-black text-white text-xs font-medium rounded-full flex items-center justify-center">
+                  <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-marvnn-black text-white text-xs font-medium rounded-full flex items-center justify-center">
                     {totalItems()}
                   </span>
                 )}
@@ -215,7 +212,7 @@ export default function Header() {
           <div
             key={link.label}
             className={cn(
-              'absolute left-0 right-0 top-full bg-white border-t border-bonkers-gray-100 shadow-lg transition-all duration-300',
+              'absolute left-0 right-0 top-full bg-white border-t border-marvnn-gray-100 shadow-lg transition-all duration-300',
               activeMegaMenu === link.label ? 'opacity-100 visible' : 'opacity-0 invisible'
             )}
             onMouseEnter={() => setActiveMegaMenu(link.label)}
@@ -231,7 +228,7 @@ export default function Header() {
                         <li key={item.label}>
                           <Link
                             href={item.href}
-                            className="text-sm text-bonkers-gray-600 hover:text-bonkers-black transition-colors"
+                            className="text-sm text-marvnn-gray-600 hover:text-marvnn-black transition-colors"
                           >
                             {item.label}
                           </Link>
@@ -243,7 +240,7 @@ export default function Header() {
                 {link.megaMenu.featuredImage && (
                   <div className="relative group overflow-hidden">
                     <Link href={link.megaMenu.featuredImage.href}>
-                      <div className="aspect-[3/4] bg-bonkers-gray-100">
+                      <div className="aspect-[3/4] bg-marvnn-gray-100">
                         <img
                           src={link.megaMenu.featuredImage.src}
                           alt={link.megaMenu.featuredImage.alt}
@@ -271,7 +268,7 @@ export default function Header() {
         mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
       )}>
         <div className="flex items-center justify-between p-4 border-b">
-          <span className="text-xl font-display font-bold">BONKERS CORNER</span>
+          <span className="text-xl font-display font-bold">MARVNN</span>
           <button onClick={() => setMobileMenuOpen(false)} aria-label="Close menu">
             <X className="w-6 h-6" />
           </button>
@@ -293,13 +290,13 @@ export default function Header() {
                 <div className="pl-4 pb-4 space-y-4">
                   {link.megaMenu.columns.map((column) => (
                     <div key={column.title}>
-                      <h4 className="text-xs font-medium uppercase text-bonkers-gray-400 mb-2">{column.title}</h4>
+                      <h4 className="text-xs font-medium uppercase text-marvnn-gray-400 mb-2">{column.title}</h4>
                       <ul className="space-y-2">
                         {column.links.map((item) => (
                           <li key={item.label}>
                             <Link
                               href={item.href}
-                              className="text-sm text-bonkers-gray-600 hover:text-bonkers-black"
+                              className="text-sm text-marvnn-gray-600 hover:text-marvnn-black"
                               onClick={() => setMobileMenuOpen(false)}
                             >
                               {item.label}
@@ -326,7 +323,7 @@ export default function Header() {
                   <Link href="/account" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
                     My Account
                   </Link>
-                  <button onClick={() => { logout(); setMobileMenuOpen(false) }} className="text-sm text-bonkers-red">
+                  <button onClick={() => { logout(); setMobileMenuOpen(false) }} className="text-sm text-marvnn-red">
                     Logout
                   </button>
                 </>
