@@ -24,6 +24,7 @@ export default function WishlistPage() {
           <h1 className="text-2xl lg:text-3xl font-display font-medium">Wishlist ({items.length})</h1>
           {items.length > 0 && (
             <button
+              type="button"
               onClick={clearWishlist}
               className="text-sm text-marvnn-gray-400 hover:text-marvnn-red transition-colors"
             >

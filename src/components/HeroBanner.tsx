@@ -102,6 +102,7 @@ export default function HeroBanner() {
         {slides.map((_, index) => (
           <button
             key={index}
+            type="button"
             onClick={() => setCurrent(index)}
             className={cn(
               'w-2 h-2 rounded-full transition-all duration-300',
@@ -114,6 +115,7 @@ export default function HeroBanner() {
 
       {/* Arrows */}
       <button
+        type="button"
         onClick={() => setCurrent((prev) => (prev - 1 + slides.length) % slides.length)}
         className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center transition-colors hidden md:flex"
         aria-label="Previous slide"
@@ -123,6 +125,7 @@ export default function HeroBanner() {
         </svg>
       </button>
       <button
+        type="button"
         onClick={() => setCurrent((prev) => (prev + 1) % slides.length)}
         className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center transition-colors hidden md:flex"
         aria-label="Next slide"

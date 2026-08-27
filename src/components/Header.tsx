@@ -95,6 +95,7 @@ export default function Header() {
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Mobile Menu Button */}
             <button
+              type="button"
               className="lg:hidden p-2 -ml-2"
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Open menu"
@@ -133,13 +134,14 @@ export default function Header() {
 
             {/* Right Actions */}
             <div className="flex items-center gap-1 lg:gap-3">
-              <button className="p-2 hover:bg-marvnn-gray-50 rounded-full transition-colors" onClick={() => setSearchOpen(true)} aria-label="Search">
+              <button type="button" className="p-2 hover:bg-marvnn-gray-50 rounded-full transition-colors" onClick={() => setSearchOpen(true)} aria-label="Search">
                 <Search className="w-5 h-5" />
               </button>
 
               {/* Account */}
               <div className="relative hidden lg:block">
                 <button
+                  type="button"
                   className="p-2 hover:bg-marvnn-gray-50 rounded-full transition-colors"
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   aria-label="Account"
@@ -160,6 +162,7 @@ export default function Header() {
                             Orders
                           </Link>
                           <button
+                            type="button"
                             onClick={() => { logout(); setUserMenuOpen(false) }}
                             className="flex items-center gap-2 text-sm text-marvnn-red hover:text-marvnn-red/80"
                           >
@@ -192,6 +195,7 @@ export default function Header() {
               </Link>
 
               <button
+                type="button"
                 className="p-2 hover:bg-marvnn-gray-50 rounded-full transition-colors relative"
                 onClick={toggleCart}
                 aria-label="Cart"
@@ -269,7 +273,7 @@ export default function Header() {
       )}>
         <div className="flex items-center justify-between p-4 border-b">
           <span className="text-xl font-display font-bold">MARVNN</span>
-          <button onClick={() => setMobileMenuOpen(false)} aria-label="Close menu">
+          <button type="button" onClick={() => setMobileMenuOpen(false)} aria-label="Close menu">
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -277,6 +281,7 @@ export default function Header() {
           {navLinks.map((link) => (
             <div key={link.label} className="border-b">
               <button
+                type="button"
                 className="flex items-center justify-between w-full p-4 text-left font-medium uppercase text-sm tracking-wider"
                 onClick={() => setExpandedMobile(expandedMobile === link.label ? null : link.label)}
               >
@@ -323,7 +328,7 @@ export default function Header() {
                   <Link href="/account" className="block text-sm font-medium" onClick={() => setMobileMenuOpen(false)}>
                     My Account
                   </Link>
-                  <button onClick={() => { logout(); setMobileMenuOpen(false) }} className="text-sm text-marvnn-red">
+                  <button type="button" onClick={() => { logout(); setMobileMenuOpen(false) }} className="text-sm text-marvnn-red">
                     Logout
                   </button>
                 </>

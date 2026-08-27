@@ -81,6 +81,7 @@ export default function ProductPage() {
                 {product.images.map((image, index) => (
                   <button
                     key={index}
+                    type="button"
                     onClick={() => setActiveImage(index)}
                     className={cn(
                       'w-20 h-24 border-2 overflow-hidden',
@@ -127,6 +128,7 @@ export default function ProductPage() {
                 {product.sizes.map((size) => (
                   <button
                     key={size}
+                    type="button"
                     onClick={() => setSelectedSize(size)}
                     className={cn(
                       'min-w-[48px] px-3 py-2 text-sm border transition-colors',
@@ -148,6 +150,7 @@ export default function ProductPage() {
                 {product.colors.map((color) => (
                   <button
                     key={color}
+                    type="button"
                     onClick={() => setSelectedColor(color)}
                     className={cn(
                       'px-4 py-2 text-sm border transition-colors',
@@ -167,6 +170,7 @@ export default function ProductPage() {
               <h3 className="text-sm font-medium uppercase tracking-wider mb-3">Quantity</h3>
               <div className="flex items-center gap-3">
                 <button
+                  type="button"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   className="w-10 h-10 flex items-center justify-center border border-marvnn-gray-300 hover:border-marvnn-black transition-colors"
                 >
@@ -174,6 +178,7 @@ export default function ProductPage() {
                 </button>
                 <span className="w-10 text-center font-medium">{quantity}</span>
                 <button
+                  type="button"
                   onClick={() => setQuantity(quantity + 1)}
                   className="w-10 h-10 flex items-center justify-center border border-marvnn-gray-300 hover:border-marvnn-black transition-colors"
                 >
@@ -185,6 +190,7 @@ export default function ProductPage() {
             {/* Actions */}
             <div className="flex gap-3">
               <button
+                type="button"
                 onClick={handleAddToCart}
                 className="flex-1 btn-primary py-4 flex items-center justify-center gap-2 text-base"
               >
@@ -192,6 +198,7 @@ export default function ProductPage() {
                 Add To Cart
               </button>
               <button
+                type="button"
                 onClick={() => toggleItem(product)}
                 className={cn(
                   'w-14 h-14 flex items-center justify-center border transition-all',

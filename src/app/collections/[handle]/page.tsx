@@ -156,6 +156,7 @@ export default function CollectionPage() {
           </div>
           <div className="flex items-center gap-3">
             <button
+              type="button"
               onClick={() => setShowFilters(!showFilters)}
               className="lg:hidden flex items-center gap-2 px-4 py-2 border border-marvnn-gray-300 text-sm hover:border-marvnn-black transition-colors"
             >
@@ -188,6 +189,7 @@ export default function CollectionPage() {
                 {allSizes.map((size) => (
                   <button
                     key={size}
+                    type="button"
                     onClick={() => toggleSize(size)}
                     className={cn(
                       'min-w-[40px] px-2 py-1.5 text-xs border transition-colors',
@@ -209,6 +211,7 @@ export default function CollectionPage() {
                 {allColors.map((color) => (
                   <button
                     key={color}
+                    type="button"
                     onClick={() => toggleColor(color)}
                     className={cn(
                       'px-3 py-1.5 text-xs border transition-colors',
@@ -245,6 +248,7 @@ export default function CollectionPage() {
             {/* Clear Filters */}
             {(selectedSizes.length > 0 || selectedColors.length > 0 || priceRange[1] < 5000) && (
               <button
+                type="button"
                 onClick={() => {
                   setSelectedSizes([])
                   setSelectedColors([])
@@ -268,6 +272,7 @@ export default function CollectionPage() {
                 {totalPages > 1 && (
                   <div className="flex items-center justify-center gap-2 mt-8">
                     <button
+                      type="button"
                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
                       className="px-3 py-2 text-sm border border-marvnn-gray-300 hover:border-marvnn-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
@@ -277,6 +282,7 @@ export default function CollectionPage() {
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                       <button
                         key={page}
+                        type="button"
                         onClick={() => setCurrentPage(page)}
                         className={cn(
                           'w-10 h-10 text-sm border transition-colors',
@@ -289,6 +295,7 @@ export default function CollectionPage() {
                       </button>
                     ))}
                     <button
+                      type="button"
                       onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                       disabled={currentPage === totalPages}
                       className="px-3 py-2 text-sm border border-marvnn-gray-300 hover:border-marvnn-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
@@ -302,6 +309,7 @@ export default function CollectionPage() {
               <div className="text-center py-16">
                 <p className="text-marvnn-gray-500 mb-4">No products found matching your filters.</p>
                 <button
+                  type="button"
                   onClick={() => {
                     setSelectedSizes([])
                     setSelectedColors([])

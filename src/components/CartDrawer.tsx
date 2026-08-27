@@ -46,6 +46,7 @@ export default function CartDrawer() {
               <h2 className="font-medium">Cart ({totalItems()})</h2>
             </div>
             <button
+              type="button"
               onClick={() => setCartOpen(false)}
               className="p-2 hover:bg-marvnn-gray-50 rounded-full transition-colors"
               aria-label="Close cart"
@@ -87,6 +88,7 @@ export default function CartDrawer() {
                       <p className="text-sm font-medium mt-1">{formatPrice(item.product.price)}</p>
                       <div className="flex items-center gap-2 mt-2">
                         <button
+                          type="button"
                           onClick={() => updateQuantity(item.product.id, item.size, item.color, item.quantity - 1)}
                           className="w-8 h-8 flex items-center justify-center border rounded hover:bg-marvnn-gray-50"
                         >
@@ -94,6 +96,7 @@ export default function CartDrawer() {
                         </button>
                         <span className="text-sm w-6 text-center">{item.quantity}</span>
                         <button
+                          type="button"
                           onClick={() => updateQuantity(item.product.id, item.size, item.color, item.quantity + 1)}
                           className="w-8 h-8 flex items-center justify-center border rounded hover:bg-marvnn-gray-50"
                         >
@@ -102,6 +105,7 @@ export default function CartDrawer() {
                       </div>
                     </div>
                     <button
+                      type="button"
                       onClick={() => removeItem(item.product.id, item.size, item.color)}
                       className="p-1 hover:bg-marvnn-gray-50 rounded transition-colors self-start"
                     >
@@ -125,7 +129,7 @@ export default function CartDrawer() {
                       <span className="font-medium">{promoCode}</span>
                       <span className="text-green-600 text-xs">(-{discount}%)</span>
                     </div>
-                    <button onClick={removePromoCode} className="text-marvnn-gray-400 hover:text-marvnn-red">
+                    <button type="button" onClick={removePromoCode} className="text-marvnn-gray-400 hover:text-marvnn-red">
                       <X className="w-4 h-4" />
                     </button>
                   </div>
@@ -138,7 +142,7 @@ export default function CartDrawer() {
                       onChange={(e) => { setPromoInput(e.target.value); setPromoError('') }}
                       className="flex-1 px-3 py-2 text-sm border border-marvnn-gray-300 focus:outline-none focus:border-marvnn-black"
                     />
-                    <button onClick={handleApplyPromo} className="px-4 py-2 text-sm font-medium border border-marvnn-gray-300 hover:border-marvnn-black transition-colors">
+                    <button type="button" onClick={handleApplyPromo} className="px-4 py-2 text-sm font-medium border border-marvnn-gray-300 hover:border-marvnn-black transition-colors">
                       Apply
                     </button>
                   </div>

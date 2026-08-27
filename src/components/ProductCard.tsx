@@ -66,6 +66,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           isHovered ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
         )}>
           <button
+            type="button"
             onClick={handleAddToCart}
             className="w-full btn-primary flex items-center justify-center gap-2 py-2.5"
           >
@@ -76,6 +77,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* Wishlist */}
         <button
+          type="button"
           onClick={handleToggleWishlist}
           className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-sm hover:bg-marvnn-gray-50 transition-colors opacity-0 group-hover:opacity-100"
           aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}

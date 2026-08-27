@@ -203,6 +203,7 @@ export default function CheckoutPage() {
                   </div>
                 </div>
                 <button
+                  type="button"
                   onClick={() => setStep('payment')}
                   className="w-full btn-primary mt-6 py-3"
                 >
@@ -291,10 +292,10 @@ export default function CheckoutPage() {
                   )}
                 </div>
                 <div className="flex gap-3 mt-6">
-                  <button onClick={() => setStep('shipping')} className="btn-secondary flex-1 py-3">
+                  <button type="button" onClick={() => setStep('shipping')} className="btn-secondary flex-1 py-3">
                     Back
                   </button>
-                  <button onClick={() => setStep('review')} className="btn-primary flex-1 py-3">
+                  <button type="button" onClick={() => setStep('review')} className="btn-primary flex-1 py-3">
                     Review Order
                   </button>
                 </div>
@@ -339,10 +340,10 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="flex gap-3">
-                  <button onClick={() => setStep('payment')} className="btn-secondary flex-1 py-3">
+                  <button type="button" onClick={() => setStep('payment')} className="btn-secondary flex-1 py-3">
                     Back
                   </button>
-                  <button onClick={handlePlaceOrder} className="btn-primary flex-1 py-3">
+                  <button type="button" onClick={handlePlaceOrder} className="btn-primary flex-1 py-3">
                     Place Order
                   </button>
                 </div>
@@ -398,7 +399,7 @@ export default function CheckoutPage() {
                       <Tag className="w-4 h-4 text-green-600" />
                       <span className="font-medium">{promoCode}</span>
                     </div>
-                    <button onClick={removePromoCode} className="text-marvnn-gray-400 hover:text-marvnn-red">
+                    <button type="button" onClick={removePromoCode} className="text-marvnn-gray-400 hover:text-marvnn-red">
                       <X className="w-4 h-4" />
                     </button>
                   </div>
@@ -411,7 +412,7 @@ export default function CheckoutPage() {
                       onChange={(e) => { setPromoInput(e.target.value); setPromoError('') }}
                       className="flex-1 px-3 py-2 text-sm border border-marvnn-gray-300 focus:outline-none focus:border-marvnn-black"
                     />
-                    <button onClick={handleApplyPromo} className="px-3 py-2 text-sm font-medium border border-marvnn-gray-300 hover:border-marvnn-black transition-colors">
+                    <button type="button" onClick={handleApplyPromo} className="px-3 py-2 text-sm font-medium border border-marvnn-gray-300 hover:border-marvnn-black transition-colors">
                       Apply
                     </button>
                   </div>

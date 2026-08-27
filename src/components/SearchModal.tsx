@@ -57,6 +57,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
               className="flex-1 text-lg focus:outline-none"
             />
             <button
+              type="button"
               onClick={onClose}
               className="p-2 hover:bg-marvnn-gray-50 rounded-full transition-colors"
             >
@@ -113,6 +114,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
                 {['Oversized T-Shirt', 'Joggers', 'Marvel', 'Cargos', 'Caps'].map((term) => (
                   <button
                     key={term}
+                    type="button"
                     onClick={() => setQuery(term)}
                     className="px-3 py-1.5 text-sm border border-marvnn-gray-300 hover:border-marvnn-black transition-colors"
                   >

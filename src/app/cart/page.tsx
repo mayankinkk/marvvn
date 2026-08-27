@@ -79,6 +79,7 @@ export default function CartPage() {
                           {item.size} / {item.color}
                         </p>
                         <button
+                          type="button"
                           onClick={() => removeItem(item.product.id, item.size, item.color)}
                           className="text-xs text-marvnn-gray-400 hover:text-marvnn-red mt-2 flex items-center gap-1"
                         >
@@ -91,6 +92,7 @@ export default function CartPage() {
                     </div>
                     <div className="md:col-span-2 flex items-center justify-center gap-2">
                       <button
+                        type="button"
                         onClick={() => updateQuantity(item.product.id, item.size, item.color, item.quantity - 1)}
                         className="w-8 h-8 flex items-center justify-center border hover:bg-marvnn-gray-50"
                       >
@@ -98,6 +100,7 @@ export default function CartPage() {
                       </button>
                       <span className="w-8 text-center text-sm">{item.quantity}</span>
                       <button
+                        type="button"
                         onClick={() => updateQuantity(item.product.id, item.size, item.color, item.quantity + 1)}
                         className="w-8 h-8 flex items-center justify-center border hover:bg-marvnn-gray-50"
                       >
@@ -116,6 +119,7 @@ export default function CartPage() {
                   Continue Shopping
                 </Link>
                 <button
+                  type="button"
                   onClick={clearCart}
                   className="text-sm text-marvnn-gray-400 hover:text-marvnn-red transition-colors"
                 >
@@ -143,7 +147,7 @@ export default function CartPage() {
                           <span className="font-medium">{promoCode}</span>
                           <span className="text-green-600 text-xs">(-{discount}%)</span>
                         </div>
-                        <button onClick={removePromoCode} className="text-marvnn-gray-400 hover:text-marvnn-red">
+                        <button type="button" onClick={removePromoCode} className="text-marvnn-gray-400 hover:text-marvnn-red">
                           <X className="w-4 h-4" />
                         </button>
                       </div>
@@ -156,7 +160,7 @@ export default function CartPage() {
                           onChange={(e) => { setPromoInput(e.target.value); setPromoError('') }}
                           className="flex-1 px-3 py-2 text-sm border border-marvnn-gray-300 focus:outline-none focus:border-marvnn-black"
                         />
-                        <button onClick={handleApplyPromo} className="px-3 py-2 text-sm font-medium border border-marvnn-gray-300 hover:border-marvnn-black transition-colors">
+                        <button type="button" onClick={handleApplyPromo} className="px-3 py-2 text-sm font-medium border border-marvnn-gray-300 hover:border-marvnn-black transition-colors">
                           Apply
                         </button>
                       </div>

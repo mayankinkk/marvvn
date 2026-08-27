@@ -70,6 +70,7 @@ export default function FAQPage() {
                   return (
                     <div key={key}>
                       <button
+                        type="button"
                         onClick={() => setOpenIndex(isOpen ? null : key)}
                         className="flex items-center justify-between w-full py-4 text-left"
                       >

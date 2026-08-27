@@ -52,6 +52,7 @@ export default function AccountPage() {
                   Wishlist
                 </Link>
                 <button
+                  type="button"
                   onClick={() => { logout(); router.push('/') }}
                   className="flex items-center gap-2 w-full px-3 py-2 text-sm text-marvnn-red hover:bg-red-50 transition-colors"
                 >
