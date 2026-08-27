@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
@@ -11,8 +12,13 @@ export default function OrdersPage() {
   const { isAuthenticated } = useAuthStore()
   const router = useRouter()
 
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/account/login')
+    }
+  }, [isAuthenticated, router])
+
   if (!isAuthenticated) {
-    router.push('/account/login')
     return null
   }
 
