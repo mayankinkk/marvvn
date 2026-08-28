@@ -2,6 +2,7 @@
 
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { createClient } from '@/lib/supabase/client'
 
 interface User {
   id: string
@@ -119,6 +120,26 @@ export const useAuthStore = create<AuthStore>()(
               set({ user: data.user, isAuthenticated: true, loading: false })
               return
             }
+          }
+
+          // Server cookie session missing/expired — fall back to the client session.
+          // This keeps Google/Apple OAuth users (whose session lives in browser
+          // cookies) logged in even when the server round-trip hits a cookie issue.
+          const supabase = createClient()
+          const { data: sessionData } = await supabase.auth.getSession()
+          const su = sessionData?.session?.user
+          if (su) {
+            set({
+              user: {
+                id: su.id,
+                email: su.email || '',
+                name: su.user_metadata?.full_name || su.user_metadata?.name || su.user_metadata?.fullname || su.email?.split('@')[0] || '',
+                phone: su.user_metadata?.phone || '',
+              },
+              isAuthenticated: true,
+              loading: false,
+            })
+            return
           }
         } catch {}
         set({ user: null, isAuthenticated: false, loading: false })

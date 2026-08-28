@@ -139,7 +139,7 @@ export default function AccountPage() {
     setSaving(false)
   }
 
-  if (!authChecked || !isAuthenticated) return null
+  if (!isAuthenticated) return null
 
   const sidebarItems = [
     { id: 'dashboard' as Tab, label: 'Dashboard', icon: Home },
