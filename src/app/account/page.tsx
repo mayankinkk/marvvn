@@ -56,12 +56,17 @@ export default function AccountPage() {
   const [saving, setSaving] = useState(false)
   const [saveMsg, setSaveMsg] = useState('')
   const [notifications, setNotifications] = useState({ email: true, whatsapp: false })
+  const [authChecked, setAuthChecked] = useState(false)
 
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
+    fetchUser().finally(() => setAuthChecked(true))
+  }, [fetchUser])
+
+  useEffect(() => {
+    if (authChecked && !isAuthenticated) {
       router.push('/account/login')
     }
-  }, [isAuthenticated, loading, router])
+  }, [authChecked, isAuthenticated, router])
 
   useEffect(() => {
     if (user) {
@@ -134,7 +139,7 @@ export default function AccountPage() {
     setSaving(false)
   }
 
-  if (loading || !isAuthenticated) return null
+  if (!authChecked || !isAuthenticated) return null
 
   const sidebarItems = [
     { id: 'dashboard' as Tab, label: 'Dashboard', icon: Home },
