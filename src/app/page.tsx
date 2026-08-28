@@ -12,6 +12,7 @@ import FeaturesBar from '@/components/FeaturesBar'
 import AboutSection from '@/components/AboutSection'
 import BlogSection from '@/components/BlogSection'
 import ReviewsSection from '@/components/ReviewsSection'
+import InstagramFeed from '@/components/InstagramFeed'
 import RecentlyViewed from '@/components/RecentlyViewed'
 import Footer from '@/components/Footer'
 import { useProducts } from '@/lib/hooks/useProducts'
@@ -162,6 +163,7 @@ export default function Home() {
         <FeaturesBar />
         <AboutSection />
         <BlogSection />
+        <InstagramFeed />
         <RecentlyViewed />
       </main>
 

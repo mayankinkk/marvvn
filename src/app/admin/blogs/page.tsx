@@ -31,6 +31,7 @@ export default function AdminBlogsPage() {
     image: '',
     author: 'MARVVN',
     tags: '',
+    category: '',
     published: true,
   })
 
@@ -42,7 +43,7 @@ export default function AdminBlogsPage() {
   }, [])
 
   const resetForm = () => {
-    setForm({ handle: '', title: '', excerpt: '', content: '', image: '', author: 'MARVVN', tags: '', published: true })
+    setForm({ handle: '', title: '', excerpt: '', content: '', image: '', author: 'MARVVN', tags: '', category: '', published: true })
     setEditing(null)
   }
 
@@ -55,6 +56,7 @@ export default function AdminBlogsPage() {
       image: blog.image,
       author: blog.author,
       tags: blog.tags.join(', '),
+      category: (blog as any).category || '',
       published: blog.published,
     })
     setEditing(blog)
@@ -68,6 +70,7 @@ export default function AdminBlogsPage() {
     const payload = {
       ...form,
       tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
+      category: form.category || null,
     }
 
     try {
@@ -212,6 +215,21 @@ export default function AdminBlogsPage() {
                 className="input-field"
                 placeholder="fashion, style, tips"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Category</label>
+              <select
+                value={form.category}
+                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                className="input-field"
+              >
+                <option value="">Select category</option>
+                <option value="style-guide">Style Guide</option>
+                <option value="brand-story">Brand Story</option>
+                <option value="streetwear">Streetwear</option>
+                <option value="behind-the-scenes">Behind the Scenes</option>
+                <option value="collaborations">Collaborations</option>
+              </select>
             </div>
             <div className="flex items-center gap-2 pt-6">
               <input

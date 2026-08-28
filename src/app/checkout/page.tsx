@@ -58,6 +58,27 @@ export default function CheckoutPage() {
     }
   }, [payment.method])
 
+  // Track cart abandonment - send email if user leaves without completing
+  useEffect(() => {
+    if (items.length === 0) return
+    const email = shipping.email || user?.email
+    if (!email) return
+
+    const timer = setTimeout(() => {
+      fetch('/api/cart-abandonment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          items: items.map(i => ({ title: i.product.title, quantity: i.quantity, price: i.product.price, handle: i.product.handle })),
+          total: totalPrice,
+        }),
+      }).catch(() => {})
+    }, 60 * 60 * 1000) // 1 hour
+
+    return () => clearTimeout(timer)
+  }, [items, totalPrice, shipping.email, user?.email])
+
   const validateShipping = (): boolean => {
     const errors: Record<string, string> = {}
     if (!shipping.firstName.trim()) errors.firstName = 'Required'

@@ -12,7 +12,7 @@ const DEFAULTS: Record<string, string> = {
   tax_rate: '0',
   free_shipping_threshold: '999',
   shipping_fee: '99',
-  whatsapp_number: '',
+  whatsapp_number: '917578017237',
   instagram_url: '',
   facebook_url: '',
   twitter_url: '',

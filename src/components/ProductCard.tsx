@@ -2,11 +2,12 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Heart, ShoppingBag } from 'lucide-react'
+import { Heart, ShoppingBag, GitCompareArrows } from 'lucide-react'
 import { Product } from '@/lib/types'
 import { formatPrice, calculateDiscount, cn } from '@/lib/utils'
 import { useCartStore } from '@/lib/store'
 import { useWishlistStore } from '@/lib/wishlist-store'
+import { useCompare } from '@/lib/compare-context'
 import { useState } from 'react'
 
 interface ProductCardProps {
@@ -18,8 +19,10 @@ export default function ProductCard({ product }: ProductCardProps) {
   const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || '')
   const { addItem, toggleCart } = useCartStore()
   const { toggleItem, isInWishlist } = useWishlistStore()
+  const { items: compareItems, addItem: addToCompare, removeItem: removeFromCompare } = useCompare()
   const discount = product.compareAtPrice ? calculateDiscount(product.compareAtPrice, product.price) : 0
   const inWishlist = isInWishlist(product.id)
+  const inCompare = compareItems.some(p => p.handle === product.handle)
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -32,6 +35,26 @@ export default function ProductCard({ product }: ProductCardProps) {
     e.preventDefault()
     e.stopPropagation()
     toggleItem(product)
+  }
+
+  const handleToggleCompare = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (inCompare) {
+      removeFromCompare(product.handle)
+    } else {
+      addToCompare({
+        id: product.id,
+        title: product.title,
+        handle: product.handle,
+        price: product.price,
+        compare_at_price: product.compareAtPrice,
+        image_url: product.images?.[0] || '/placeholder.png',
+        description: product.description,
+        category: product.category,
+        sizes: product.sizes,
+      })
+    }
   }
 
   return (
@@ -83,6 +106,14 @@ export default function ProductCard({ product }: ProductCardProps) {
           aria-label={inWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
         >
           <Heart className={cn('w-4 h-4', inWishlist && 'fill-marvvn-red text-marvvn-red')} />
+        </button>
+        <button
+          type="button"
+          onClick={handleToggleCompare}
+          className="absolute top-3 right-12 p-2 bg-white rounded-full shadow-sm hover:bg-marvvn-gray-50 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+          aria-label={inCompare ? 'Remove from compare' : 'Add to compare'}
+        >
+          <GitCompareArrows className={cn('w-4 h-4', inCompare && 'text-marvvn-black fill-marvvn-black/20')} />
         </button>
       </div>
 

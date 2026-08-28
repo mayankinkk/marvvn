@@ -122,6 +122,63 @@ export async function sendOrderStatusUpdate(orderId: string, email: string, stat
   })
 }
 
+export async function sendCartAbandonmentEmail(email: string, items: { title: string; quantity: number; price: number; handle: string }[], total: number) {
+  const client = getResend()
+  if (!client) return
+
+  const itemsHtml = items.map(item =>
+    `<tr>
+      <td style="padding:8px;border-bottom:1px solid #eee">
+        <a href="https://marvvn.online/products/${item.handle}" style="color:#000;text-decoration:none">${item.title}</a>
+      </td>
+      <td style="padding:8px;border-bottom:1px solid #eee;text-align:center">${item.quantity}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;text-align:right">₹${item.price.toLocaleString()}</td>
+    </tr>`
+  ).join('')
+
+  await client.emails.send({
+    from: 'MARVVN <hello@marvvn.online>',
+    to: email,
+    subject: 'You left something behind!',
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px">
+        <div style="text-align:center;padding:20px 0;border-bottom:2px solid #000">
+          <h1 style="font-size:24px;letter-spacing:4px;margin:0">MARVVN</h1>
+        </div>
+        <div style="padding:20px 0;text-align:center">
+          <h2 style="color:#333">Still thinking it over?</h2>
+          <p style="color:#666">You left some great items in your cart. They are selling fast — grab them before they are gone!</p>
+        </div>
+        <table style="width:100%;border-collapse:collapse;margin:20px 0">
+          <thead>
+            <tr style="background:#f5f5f5">
+              <th style="padding:8px;text-align:left">Item</th>
+              <th style="padding:8px;text-align:center">Qty</th>
+              <th style="padding:8px;text-align:right">Price</th>
+            </tr>
+          </thead>
+          <tbody>${itemsHtml}</tbody>
+          <tfoot>
+            <tr>
+              <td colspan="2" style="padding:8px;text-align:right;font-weight:bold">Total</td>
+              <td style="padding:8px;text-align:right;font-weight:bold">₹${total.toLocaleString()}</td>
+            </tr>
+          </tfoot>
+        </table>
+        <div style="text-align:center;padding:20px 0">
+          <a href="https://marvvn.online/cart" style="display:inline-block;padding:14px 32px;background:#000;color:#fff;text-decoration:none;font-weight:bold">Complete Your Order</a>
+        </div>
+        <div style="text-align:center;padding:20px 0;border-top:1px solid #eee;color:#999;font-size:12px">
+          <p>Need help? Reply to this email or WhatsApp us.</p>
+        </div>
+      </body>
+      </html>
+    `,
+  })
+}
+
 export async function sendWelcomeEmail(email: string, name: string) {
   const client = getResend()
   if (!client) return

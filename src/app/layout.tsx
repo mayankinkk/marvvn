@@ -4,7 +4,10 @@ import { Inter, Playfair_Display } from 'next/font/google'
 import { SupabaseProvider } from '@/components/SupabaseProvider'
 import { SettingsProvider } from '@/components/SettingsProvider'
 import { I18nProvider } from '@/lib/i18n'
+import { CompareProvider } from '@/lib/compare-context'
+import CompareBar from '@/components/CompareBar'
 import { AnalyticsScripts, Analytics, Pixel } from '@/components/Analytics'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
 
 const inter = Inter({
@@ -61,6 +64,7 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <Analytics />
           <Pixel />
+          <SpeedInsights />
         </Suspense>
         <script
           type="application/ld+json"
@@ -83,9 +87,12 @@ export default function RootLayout({
         />
         <SettingsProvider>
           <SupabaseProvider>
-            <I18nProvider>
-              {children}
-            </I18nProvider>
+            <CompareProvider>
+              <I18nProvider>
+                {children}
+                <CompareBar />
+              </I18nProvider>
+            </CompareProvider>
           </SupabaseProvider>
         </SettingsProvider>
       </body>
