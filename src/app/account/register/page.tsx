@@ -14,6 +14,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
   const { register } = useAuthStore()
   const router = useRouter()
@@ -21,17 +22,20 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setSuccess('')
     if (password.length < 6) {
       setError('Password must be at least 6 characters')
       return
     }
     setLoading(true)
 
-    const success = await register(name, email, password)
-    if (success) {
+    const result = await register(name, email, password)
+    if (result === true) {
       router.push('/account')
+    } else if (result === 'confirmation_required') {
+      setSuccess('Account created! Check your email to confirm your account, then sign in.')
     } else {
-      setError('An account with this email already exists')
+      setError(typeof result === 'string' ? result : 'Registration failed. Please try again.')
     }
     setLoading(false)
   }
@@ -53,6 +57,12 @@ export default function RegisterPage() {
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 text-sm text-red-700">
               {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="mb-4 p-3 bg-green-50 border border-green-200 text-sm text-green-700">
+              {success}
             </div>
           )}
 

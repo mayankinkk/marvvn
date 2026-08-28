@@ -14,8 +14,8 @@ interface AuthStore {
   user: User | null
   isAuthenticated: boolean
   loading: boolean
-  login: (email: string, password: string) => Promise<boolean>
-  register: (name: string, email: string, password: string) => Promise<boolean>
+  login: (email: string, password: string) => Promise<boolean | string>
+  register: (name: string, email: string, password: string) => Promise<boolean | string>
   logout: () => Promise<void>
   fetchUser: () => Promise<void>
   updateProfile: (data: Partial<User>) => void
@@ -37,12 +37,13 @@ export const useAuthStore = create<AuthStore>()(
             body: JSON.stringify({ email, password }),
           })
 
+          const data = await res.json()
+
           if (!res.ok) {
             set({ loading: false })
-            return false
+            return data.error || 'Invalid email or password'
           }
 
-          const data = await res.json()
           const user: User = {
             id: data.user.id,
             email: data.user.email,
@@ -53,7 +54,7 @@ export const useAuthStore = create<AuthStore>()(
           return true
         } catch {
           set({ loading: false })
-          return false
+          return 'Something went wrong. Please try again.'
         }
       },
 
@@ -66,12 +67,18 @@ export const useAuthStore = create<AuthStore>()(
             body: JSON.stringify({ name, email, password }),
           })
 
+          const data = await res.json()
+
           if (!res.ok) {
             set({ loading: false })
-            return false
+            return data.error || 'Registration failed'
           }
 
-          const data = await res.json()
+          if (data.needsConfirmation) {
+            set({ loading: false })
+            return 'confirmation_required'
+          }
+
           if (data.user) {
             const loginRes = await fetch('/api/auth/login', {
               method: 'POST',
@@ -93,7 +100,7 @@ export const useAuthStore = create<AuthStore>()(
           return true
         } catch {
           set({ loading: false })
-          return false
+          return 'Something went wrong. Please try again.'
         }
       },
 

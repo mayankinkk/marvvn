@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import Header from '@/components/Header'
@@ -14,19 +14,29 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const { login } = useAuthStore()
+  const { login, isAuthenticated, loading: authLoading, fetchUser } = useAuthStore()
   const router = useRouter()
+
+  useEffect(() => {
+    fetchUser()
+  }, [fetchUser])
+
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      router.push('/account')
+    }
+  }, [isAuthenticated, authLoading, router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
 
-    const success = await login(email, password)
-    if (success) {
+    const result = await login(email, password)
+    if (result === true) {
       router.push('/account')
     } else {
-      setError('Invalid email or password.')
+      setError(typeof result === 'string' ? result : 'Invalid email or password.')
     }
     setLoading(false)
   }

@@ -18,24 +18,38 @@ export async function POST(request: Request) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { name } },
+    options: {
+      data: { name },
+      emailRedirectTo: `${request.headers.get('origin') || 'https://marvvn.online'}/account`,
+    },
   })
 
   if (error) {
+    if (error.message.includes('already registered') || error.message.includes('already exists')) {
+      return NextResponse.json({ error: 'An account with this email already exists' }, { status: 400 })
+    }
     return NextResponse.json({ error: error.message }, { status: 400 })
   }
 
   if (data.user) {
-    const { error: profileError } = await supabase.from('profiles').upsert(
+    const identities = data.user.identities || []
+    if (identities.length === 0) {
+      return NextResponse.json({ error: 'An account with this email already exists' }, { status: 400 })
+    }
+
+    await supabase.from('profiles').upsert(
       { id: data.user.id, name, email },
       { onConflict: 'id' }
-    )
-    if (profileError) {
-      console.error('Profile upsert error:', profileError)
-    }
+    ).then(({ error: e }) => { if (e) console.error('Profile upsert error:', e) })
 
     sendWelcomeEmail(email, name).catch(console.error)
   }
 
-  return NextResponse.json({ user: data.user }, { status: 201 })
+  const needsConfirmation = !data.session
+
+  return NextResponse.json({
+    user: data.user,
+    session: data.session,
+    needsConfirmation,
+  }, { status: 201 })
 }
