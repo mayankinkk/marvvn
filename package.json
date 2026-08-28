@@ -17,6 +17,7 @@
     "lucide-react": "^0.378.0",
     "next": "14.2.0",
     "next-intl": "^4.14.0",
+    "next-nprogress-bar": "^2.4.7",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "resend": "^6.24.0",

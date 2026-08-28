@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Search, X, ArrowRight, Folder } from 'lucide-react'
@@ -23,7 +23,10 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const debounceRef = useRef<NodeJS.Timeout | null>(null)
 
-  const megaMenuData = parseMegaMenuFromSettings(settings?.mega_menu)
+  const megaMenuData = useMemo(
+    () => parseMegaMenuFromSettings(settings?.mega_menu),
+    [settings?.mega_menu]
+  )
 
   const popularSearches = (() => {
     const raw = settings?.popular_searches
