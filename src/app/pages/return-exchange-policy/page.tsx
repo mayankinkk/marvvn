@@ -4,8 +4,12 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { ChevronRight } from 'lucide-react'
+import { useSettings } from '@/components/SettingsProvider'
 
 export default function ReturnExchangePolicyPage() {
+  const settings = useSettings()
+  const storeEmail = settings.store_email || 'support@marvvn.online'
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -77,8 +81,9 @@ export default function ReturnExchangePolicyPage() {
               <h2 className="text-lg font-medium text-marvvn-black mb-3">Damaged or Defective Items</h2>
               <p>
                 If you received a damaged or defective item, please contact us within 48 hours of 
-                delivery at support@bonkerscorner.com with photos of the damage. We&apos;ll arrange 
-                an immediate replacement or refund.
+                delivery at{' '}
+                <a href={`mailto:${storeEmail}`} className="underline hover:text-marvvn-black">{storeEmail}</a>
+                {' '}with photos of the damage. We&apos;ll arrange an immediate replacement or refund.
               </p>
             </section>
           </div>

@@ -24,7 +24,7 @@ const trendingLinks = [
 const infoLinks = [
   { label: 'Terms & Conditions', href: '/pages/terms-and-conditions' },
   { label: 'Stores Near Me', href: '/pages/store-locator' },
-  { label: 'Blogs', href: '/blogs/bonkers-corner' },
+  { label: 'Blogs', href: '/blogs' },
   { label: 'FAQs', href: '/pages/faq' },
   { label: 'Contact', href: '/pages/get-in-touch' },
   { label: 'Privacy Policy', href: '/policies/privacy-policy' },
@@ -42,13 +42,25 @@ export default function Footer() {
   const [subscribed, setSubscribed] = useState(false)
   const settings = useSettings()
 
-  const handleNewsletter = (e: React.FormEvent) => {
+  const [subscribing, setSubscribing] = useState(false)
+
+  const handleNewsletter = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (email) {
-      setSubscribed(true)
-      setEmail('')
-      setTimeout(() => setSubscribed(false), 3000)
-    }
+    if (!email || subscribing) return
+    setSubscribing(true)
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      if (res.ok) {
+        setSubscribed(true)
+        setEmail('')
+        setTimeout(() => setSubscribed(false), 3000)
+      }
+    } catch {}
+    setSubscribing(false)
   }
 
   const socialLinks = [
@@ -84,7 +96,7 @@ export default function Footer() {
                   className="flex-1 lg:w-72 px-4 py-3 bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:border-white/50"
                   required
                 />
-                <button type="submit" className="px-4 py-3 bg-white text-marvvn-black hover:bg-marvvn-gray-100 transition-colors">
+                <button type="submit" disabled={subscribing} className="px-4 py-3 bg-white text-marvvn-black hover:bg-marvvn-gray-100 transition-colors disabled:opacity-50">
                   <Send className="w-5 h-5" />
                 </button>
               </form>

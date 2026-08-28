@@ -6,6 +6,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { ChevronRight, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useSettings } from '@/components/SettingsProvider'
 
 const faqCategories = [
   {
@@ -21,7 +22,7 @@ const faqCategories = [
     category: 'Returns & Exchanges',
     items: [
       { q: 'What is your return policy?', a: 'We offer a 7-day easy return policy. Items must be unworn, unwashed, and in original packaging with tags attached.' },
-      { q: 'How do I initiate a return?', a: 'You can initiate a return from your account dashboard under "Orders" or contact our support team at support@bonkerscorner.com.' },
+      { q: 'How do I initiate a return?', a: 'You can initiate a return from your account dashboard under "Orders" or contact our support team.' },
       { q: 'When will I receive my refund?', a: 'Refunds are processed within 5-7 business days after we receive the returned item. The amount will be credited to your original payment method.' },
       { q: 'Can I exchange an item?', a: 'Yes! You can exchange for a different size or color within 7 days of delivery, subject to availability.' },
     ]
@@ -45,7 +46,9 @@ const faqCategories = [
 ]
 
 export default function FAQPage() {
+  const settings = useSettings()
   const [openIndex, setOpenIndex] = useState<string | null>(null)
+  const storeEmail = settings.store_email || 'support@marvvn.online'
 
   return (
     <div className="min-h-screen">

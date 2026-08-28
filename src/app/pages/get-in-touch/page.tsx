@@ -5,15 +5,40 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { ChevronRight, Mail, Phone, MapPin, Send } from 'lucide-react'
+import { useSettings } from '@/components/SettingsProvider'
 
 export default function ContactPage() {
+  const settings = useSettings()
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
   const [submitted, setSubmitted] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [error, setError] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitted(true)
+    setSending(true)
+    setError('')
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      if (res.ok) {
+        setSubmitted(true)
+      } else {
+        const data = await res.json()
+        setError(data.error || 'Failed to send message')
+      }
+    } catch {
+      setError('Failed to send message')
+    }
+    setSending(false)
   }
+
+  const storeEmail = settings.store_email || 'support@marvvn.online'
+  const storePhone = settings.store_phone || ''
+  const storeAddress = settings.store_address || 'India'
 
   return (
     <div className="min-h-screen">
@@ -28,7 +53,6 @@ export default function ContactPage() {
         <h1 className="text-2xl lg:text-3xl font-display font-medium mb-8">Get in Touch</h1>
 
         <div className="grid lg:grid-cols-2 gap-12">
-          {/* Contact Info */}
           <div className="space-y-8">
             <div>
               <h2 className="text-lg font-medium mb-4">We&apos;d love to hear from you</h2>
@@ -45,24 +69,26 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h3 className="font-medium text-sm">Email</h3>
-                  <a href="mailto:support@bonkerscorner.com" className="text-sm text-marvvn-gray-600 hover:text-marvvn-black transition-colors">
-                    support@bonkerscorner.com
+                  <a href={`mailto:${storeEmail}`} className="text-sm text-marvvn-gray-600 hover:text-marvvn-black transition-colors">
+                    {storeEmail}
                   </a>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-marvvn-gray-100 flex items-center justify-center flex-shrink-0">
-                  <Phone className="w-5 h-5 text-marvvn-gray-500" />
+              {storePhone && (
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 bg-marvvn-gray-100 flex items-center justify-center flex-shrink-0">
+                    <Phone className="w-5 h-5 text-marvvn-gray-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-sm">Phone</h3>
+                    <a href={`tel:${storePhone.replace(/\s/g, '')}`} className="text-sm text-marvvn-gray-600 hover:text-marvvn-black transition-colors">
+                      {storePhone}
+                    </a>
+                    <p className="text-xs text-marvvn-gray-400 mt-0.5">Mon-Sat, 10AM - 7PM IST</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-medium text-sm">Phone</h3>
-                  <a href="tel:+918655700724" className="text-sm text-marvvn-gray-600 hover:text-marvvn-black transition-colors">
-                    (+91) 8655700724
-                  </a>
-                  <p className="text-xs text-marvvn-gray-400 mt-0.5">Mon-Sat, 10AM - 7PM IST</p>
-                </div>
-              </div>
+              )}
 
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 bg-marvvn-gray-100 flex items-center justify-center flex-shrink-0">
@@ -72,8 +98,7 @@ export default function ContactPage() {
                   <h3 className="font-medium text-sm">Address</h3>
                   <p className="text-sm text-marvvn-gray-600">
                     MARVVN<br />
-                    Mumbai, Maharashtra<br />
-                    India
+                    {storeAddress}
                   </p>
                 </div>
               </div>
@@ -82,20 +107,25 @@ export default function ContactPage() {
             <div className="border-t pt-6">
               <h3 className="font-medium text-sm mb-3">Follow Us</h3>
               <div className="flex gap-3">
-                <a href="https://www.instagram.com/bonkers.corner/" target="_blank" rel="noopener noreferrer" className="px-4 py-2 border border-marvvn-gray-300 text-sm hover:border-marvvn-black transition-colors">
-                  Instagram
-                </a>
-                <a href="https://www.facebook.com/TeamBonkerscorner" target="_blank" rel="noopener noreferrer" className="px-4 py-2 border border-marvvn-gray-300 text-sm hover:border-marvvn-black transition-colors">
-                  Facebook
-                </a>
-                <a href="https://x.com/BonkersCornerX" target="_blank" rel="noopener noreferrer" className="px-4 py-2 border border-marvvn-gray-300 text-sm hover:border-marvvn-black transition-colors">
-                  X
-                </a>
+                {settings.instagram_url && (
+                  <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="px-4 py-2 border border-marvvn-gray-300 text-sm hover:border-marvvn-black transition-colors">
+                    Instagram
+                  </a>
+                )}
+                {settings.facebook_url && (
+                  <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" className="px-4 py-2 border border-marvvn-gray-300 text-sm hover:border-marvvn-black transition-colors">
+                    Facebook
+                  </a>
+                )}
+                {settings.twitter_url && (
+                  <a href={settings.twitter_url} target="_blank" rel="noopener noreferrer" className="px-4 py-2 border border-marvvn-gray-300 text-sm hover:border-marvvn-black transition-colors">
+                    X
+                  </a>
+                )}
               </div>
             </div>
           </div>
 
-          {/* Contact Form */}
           <div>
             {submitted ? (
               <div className="border p-8 text-center">
@@ -111,6 +141,9 @@ export default function ContactPage() {
             ) : (
               <form onSubmit={handleSubmit} className="border p-6 space-y-4">
                 <h2 className="font-medium text-lg mb-4">Send a Message</h2>
+                {error && (
+                  <div className="p-3 bg-red-50 text-red-700 text-sm">{error}</div>
+                )}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-1">Name</label>
@@ -152,8 +185,8 @@ export default function ContactPage() {
                     required
                   />
                 </div>
-                <button type="submit" className="w-full btn-primary py-3">
-                  Send Message
+                <button type="submit" disabled={sending} className="w-full btn-primary py-3 disabled:opacity-50">
+                  {sending ? 'Sending...' : 'Send Message'}
                 </button>
               </form>
             )}

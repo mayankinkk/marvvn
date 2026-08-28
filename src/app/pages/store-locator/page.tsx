@@ -4,29 +4,32 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { ChevronRight, MapPin, Clock, Phone } from 'lucide-react'
+import { useSettings } from '@/components/SettingsProvider'
 
-const stores = [
+const defaultStores = [
   {
     name: 'MARVVN - Mumbai Flagship',
     address: 'Linking Road, Bandra West, Mumbai, Maharashtra 400050',
-    phone: '+91 8655700724',
     hours: 'Mon-Sat: 10AM - 9PM, Sun: 11AM - 8PM',
   },
   {
     name: 'MARVVN - Delhi',
     address: 'MG Road, Connaught Place, New Delhi 110001',
-    phone: '+91 8655700724',
     hours: 'Mon-Sat: 10AM - 9PM, Sun: 11AM - 8PM',
   },
   {
     name: 'MARVVN - Bangalore',
     address: 'Church Street, Bangalore, Karnataka 560001',
-    phone: '+91 8655700724',
     hours: 'Mon-Sat: 10AM - 9PM, Sun: 11AM - 8PM',
   },
 ]
 
 export default function StoreLocatorPage() {
+  const settings = useSettings()
+  const storePhone = settings.store_phone || ''
+
+  const stores = defaultStores.map(s => ({ ...s, phone: storePhone }))
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -51,12 +54,14 @@ export default function StoreLocatorPage() {
                   <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0 text-marvvn-gray-400" />
                   <span>{store.address}</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 flex-shrink-0 text-marvvn-gray-400" />
-                  <a href={`tel:${store.phone.replace(/\s/g, '')}`} className="hover:text-marvvn-black transition-colors">
-                    {store.phone}
-                  </a>
-                </div>
+                {store.phone && (
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-4 h-4 flex-shrink-0 text-marvvn-gray-400" />
+                    <a href={`tel:${store.phone.replace(/\s/g, '')}`} className="hover:text-marvvn-black transition-colors">
+                      {store.phone}
+                    </a>
+                  </div>
+                )}
                 <div className="flex items-start gap-2">
                   <Clock className="w-4 h-4 mt-0.5 flex-shrink-0 text-marvvn-gray-400" />
                   <span>{store.hours}</span>

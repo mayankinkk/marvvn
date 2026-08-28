@@ -4,8 +4,13 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { ChevronRight } from 'lucide-react'
+import { useSettings } from '@/components/SettingsProvider'
 
 export default function TermsPage() {
+  const settings = useSettings()
+  const storeEmail = settings.store_email || 'support@marvvn.online'
+  const storePhone = settings.store_phone || ''
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -96,8 +101,11 @@ export default function TermsPage() {
             <section>
               <h2 className="text-lg font-medium text-marvvn-black mb-3">9. Contact</h2>
               <p>
-                For questions about these terms, contact us at support@bonkerscorner.com or 
-                call (+91) 8655700724.
+                For questions about these terms, contact us at{' '}
+                <a href={`mailto:${storeEmail}`} className="underline hover:text-marvvn-black">{storeEmail}</a>
+                {storePhone && (
+                  <> or call <a href={`tel:${storePhone.replace(/\s/g, '')}`} className="underline hover:text-marvvn-black">{storePhone}</a>.</>
+                )}
               </p>
             </section>
           </div>

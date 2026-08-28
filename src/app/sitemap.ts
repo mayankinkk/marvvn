@@ -41,7 +41,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }))
 
   const dbBlogPages = blogs.map((blog) => ({
-    url: `${baseUrl}/blogs/bonkers-corner/${blog.handle}`,
+    url: `${baseUrl}/blogs/${blog.handle}`,
     lastModified: new Date(blog.created_at),
     changeFrequency: 'monthly' as const,
     priority: 0.6,
@@ -49,7 +49,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const fallbackBlogPages = blogs.length === 0
     ? blogPosts.map((post) => ({
-        url: `${baseUrl}/blogs/bonkers-corner/${post.handle}`,
+        url: `${baseUrl}/blogs/${post.handle}`,
         lastModified: new Date(),
         changeFrequency: 'monthly' as const,
         priority: 0.6,

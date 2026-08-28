@@ -75,8 +75,8 @@ export default function BlogSection() {
             <p className="text-sm text-marvvn-gray-500 uppercase tracking-wider mb-2">Latest News</p>
             <h2 className="section-title">Hot off the press: All the latest news in fashion</h2>
           </div>
-          <Link
-            href="/blogs/bonkers-corner"
+            <Link
+            href="/blogs"
             className="hidden md:inline-flex items-center gap-1 text-sm font-medium hover:text-marvvn-gray-600 transition-colors"
           >
             View all posts <ChevronRight className="w-4 h-4" />
@@ -85,7 +85,7 @@ export default function BlogSection() {
 
         <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
           {posts.slice(0, 3).map((post) => (
-            <Link key={post.id} href={`/blogs/bonkers-corner/${post.handle}`} className="group">
+            <Link key={post.id} href={`/blogs/${post.handle}`} className="group">
               <div className="aspect-[16/9] bg-marvvn-gray-100 mb-4 overflow-hidden relative">
                 <Image
                   src={post.image}
@@ -111,7 +111,7 @@ export default function BlogSection() {
 
         <div className="mt-6 text-center md:hidden">
           <Link
-            href="/blogs/bonkers-corner"
+            href="/blogs"
             className="inline-flex items-center gap-1 text-sm font-medium"
           >
             View all posts <ChevronRight className="w-4 h-4" />
