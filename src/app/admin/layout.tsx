@@ -3,20 +3,54 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { LayoutDashboard, Package, ShoppingCart, Users, Tag, Settings, ArrowLeft, Menu, X, FileText, Star, AlertTriangle, Image } from 'lucide-react'
+import {
+  LayoutDashboard, Package, ShoppingCart, Users, Tag, Settings,
+  Menu, X, FileText, Star, AlertTriangle, Image, Store, LogOut,
+  ChevronDown
+} from 'lucide-react'
 import { useAuthStore } from '@/lib/auth-store'
 
-const navItems = [
-  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/admin/products', label: 'Products', icon: Package },
-  { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
-  { href: '/admin/customers', label: 'Customers', icon: Users },
-  { href: '/admin/coupons', label: 'Coupons', icon: Tag },
-  { href: '/admin/blogs', label: 'Blogs', icon: FileText },
-  { href: '/admin/reviews', label: 'Reviews', icon: Star },
-  { href: '/admin/banners', label: 'Banners', icon: Image },
-  { href: '/admin/inventory', label: 'Inventory', icon: AlertTriangle },
-  { href: '/admin/settings', label: 'Settings', icon: Settings },
+interface NavGroup {
+  label: string
+  items: { href: string; label: string; icon: any }[]
+}
+
+const navGroups: NavGroup[] = [
+  {
+    label: 'Overview',
+    items: [
+      { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+    ],
+  },
+  {
+    label: 'Catalog',
+    items: [
+      { href: '/admin/products', label: 'Products', icon: Package },
+      { href: '/admin/banners', label: 'Banners', icon: Image },
+    ],
+  },
+  {
+    label: 'Sales',
+    items: [
+      { href: '/admin/orders', label: 'Orders', icon: ShoppingCart },
+      { href: '/admin/customers', label: 'Customers', icon: Users },
+      { href: '/admin/coupons', label: 'Coupons', icon: Tag },
+    ],
+  },
+  {
+    label: 'Content',
+    items: [
+      { href: '/admin/blogs', label: 'Blogs', icon: FileText },
+      { href: '/admin/reviews', label: 'Reviews', icon: Star },
+    ],
+  },
+  {
+    label: 'Operations',
+    items: [
+      { href: '/admin/inventory', label: 'Inventory', icon: AlertTriangle },
+      { href: '/admin/settings', label: 'Settings', icon: Settings },
+    ],
+  },
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -46,7 +80,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-marvvn-gray-50">
         <div className="animate-spin w-8 h-8 border-2 border-marvvn-black border-t-transparent rounded-full" />
       </div>
     )
@@ -55,64 +89,107 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (!isAdmin) return null
 
   return (
-    <div className="min-h-screen bg-marvvn-gray-50 flex">
-      {/* Mobile overlay */}
+    <div className="min-h-screen bg-[#f8f9fa] flex">
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+        <div
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-marvvn-black text-white transform transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex items-center justify-between p-6 border-b border-white/10">
-          <Link href="/admin" className="text-lg font-display font-bold tracking-wider">
-            MARVVN Admin
+      <aside
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-[260px] bg-[#111318] text-white transform transition-all duration-300 ease-out lg:translate-x-0 flex flex-col ${
+          sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'
+        }`}
+      >
+        {/* Brand */}
+        <div className="px-5 pt-6 pb-5">
+          <Link href="/admin" className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center">
+              <span className="text-[#111318] font-display font-bold text-sm tracking-tight">M</span>
+            </div>
+            <div>
+              <span className="text-[15px] font-semibold tracking-wide">MARVVN</span>
+              <span className="block text-[11px] text-white/40 font-medium tracking-wider uppercase">Admin Panel</span>
+            </div>
           </Link>
-          <button type="button" onClick={() => setSidebarOpen(false)} className="lg:hidden cursor-pointer">
-            <X className="w-5 h-5" />
-          </button>
         </div>
 
-        <nav className="p-4 space-y-1">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href))
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 text-sm rounded-lg transition-colors ${
-                  isActive ? 'bg-white/10 text-white' : 'text-white/60 hover:text-white hover:bg-white/5'
-                }`}
-              >
-                <item.icon className="w-5 h-5" />
-                {item.label}
-              </Link>
-            )
-          })}
+        {/* Nav */}
+        <nav className="flex-1 overflow-y-auto px-3 pb-4">
+          {navGroups.map((group, gi) => (
+            <div key={group.label} className={gi > 0 ? 'mt-6' : ''}>
+              <p className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/30">
+                {group.label}
+              </p>
+              <div className="space-y-0.5">
+                {group.items.map((item) => {
+                  const isActive = pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href))
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setSidebarOpen(false)}
+                      className={`flex items-center gap-3 px-3 py-2.5 text-[13px] font-medium rounded-lg transition-all duration-150 ${
+                        isActive
+                          ? 'bg-white/[0.08] text-white'
+                          : 'text-white/50 hover:text-white/90 hover:bg-white/[0.04]'
+                      }`}
+                    >
+                      <item.icon className={`w-[18px] h-[18px] ${isActive ? 'text-white' : 'text-white/40'}`} />
+                      {item.label}
+                      {isActive && (
+                        <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white/60" />
+                      )}
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10">
-          <Link href="/" className="flex items-center gap-3 px-4 py-3 text-sm text-white/60 hover:text-white transition-colors">
-            <ArrowLeft className="w-5 h-5" />
-            Back to Store
+        {/* Footer */}
+        <div className="px-3 pb-4 space-y-1">
+          <div className="px-3 py-3 mb-2 bg-white/[0.04] rounded-lg">
+            <p className="text-[12px] text-white/50 truncate">{user?.email}</p>
+          </div>
+          <Link
+            href="/"
+            className="flex items-center gap-3 px-3 py-2.5 text-[13px] font-medium text-white/50 hover:text-white/90 hover:bg-white/[0.04] rounded-lg transition-all duration-150"
+          >
+            <Store className="w-[18px] h-[18px] text-white/40" />
+            View Store
           </Link>
         </div>
       </aside>
 
       {/* Main */}
-      <div className="flex-1 flex flex-col min-h-screen">
+      <div className="flex-1 flex flex-col min-h-screen min-w-0">
         {/* Top bar */}
-        <header className="bg-white border-b px-6 py-4 flex items-center justify-between">
-          <button type="button" onClick={() => setSidebarOpen(true)} className="lg:hidden cursor-pointer">
-            <Menu className="w-6 h-6" />
-          </button>
-          <div className="hidden lg:block" />
-          <div className="text-sm text-marvvn-gray-500">
-            {user?.email}
+        <header className="bg-white border-b border-gray-200 px-6 h-14 flex items-center justify-between flex-shrink-0">
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-1.5 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+            >
+              <Menu className="w-5 h-5 text-gray-600" />
+            </button>
+            <div className="hidden lg:block" />
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-[#111318] rounded-full flex items-center justify-center">
+              <span className="text-white text-[11px] font-semibold uppercase">
+                {user?.email?.charAt(0) || 'A'}
+              </span>
+            </div>
           </div>
         </header>
 
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 lg:p-8">
           {children}
         </main>
       </div>
