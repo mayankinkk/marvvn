@@ -117,8 +117,9 @@ export async function POST(request: Request) {
   const { error: itemsError } = await supabase.from('order_items').insert(itemsWithOrderId)
 
   if (itemsError) {
+    console.error('Order items insert error:', itemsError)
     await supabase.from('orders').delete().eq('id', order.id)
-    return NextResponse.json({ error: 'Failed to create order items' }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to create order items', details: itemsError.message }, { status: 500 })
   }
 
   const { data: profile } = await supabase.from('profiles').select('name, email').eq('id', user.id).single()
