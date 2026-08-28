@@ -11,10 +11,10 @@ import { useCurrency } from '@/lib/hooks/useCurrency'
 import {
   ChevronRight, User, Package, Heart, LogOut, Settings, CreditCard,
   Copy, Check, Edit3, Save, X, Lock, Eye, EyeOff, Bell, Mail, MessageCircle,
-  Truck, Clock, CheckCircle, ArrowRight, Home, MapPin, Gift, Users, Share2
+  Truck, Clock, CheckCircle, ArrowRight, Home, MapPin
 } from 'lucide-react'
 
-type Tab = 'dashboard' | 'orders' | 'addresses' | 'settings' | 'referrals'
+type Tab = 'dashboard' | 'orders' | 'addresses' | 'settings'
 
 interface OrderStats {
   totalOrders: number
@@ -57,10 +57,7 @@ export default function AccountPage() {
   const [showNewPw, setShowNewPw] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saveMsg, setSaveMsg] = useState('')
-  const [copied, setCopied] = useState(false)
   const [notifications, setNotifications] = useState({ email: true, whatsapp: false })
-  const [referralCode, setReferralCode] = useState('')
-  const [shareUrl, setShareUrl] = useState('')
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -72,9 +69,6 @@ export default function AccountPage() {
     if (user) {
       setProfileName(user.name || '')
       setProfilePhone(user.phone || '')
-      const code = (user.email?.split('@')[0] || 'user').toUpperCase().slice(0, 8) + Math.floor(1000 + Math.random() * 9000)
-      setReferralCode(code)
-      setShareUrl(`https://marvvn.online?ref=${code}`)
     }
   }, [user])
 
@@ -89,7 +83,7 @@ export default function AccountPage() {
 
   useEffect(() => {
     const hash = pathname.split('#')[1] as Tab
-    if (hash && ['dashboard', 'orders', 'addresses', 'settings', 'referrals'].includes(hash)) {
+    if (hash && ['dashboard', 'orders', 'addresses', 'settings'].includes(hash)) {
       setActiveTab(hash)
     }
   }, [pathname])
@@ -142,12 +136,6 @@ export default function AccountPage() {
     setSaving(false)
   }
 
-  const copyReferral = () => {
-    navigator.clipboard.writeText(shareUrl)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
-
   if (loading || !isAuthenticated) return null
 
   const sidebarItems = [
@@ -155,7 +143,6 @@ export default function AccountPage() {
     { id: 'orders' as Tab, label: 'Orders', icon: Package },
     { id: 'addresses' as Tab, label: 'Saved Addresses', icon: MapPin },
     { id: 'settings' as Tab, label: 'Settings', icon: Settings },
-    { id: 'referrals' as Tab, label: 'Referrals', icon: Gift },
   ]
 
   return (
@@ -371,14 +358,6 @@ export default function AccountPage() {
                     <Heart className="w-6 h-6 mx-auto mb-2 text-marvvn-gray-400 group-hover:text-marvvn-red transition-colors" />
                     <span className="text-sm font-medium">Wishlist</span>
                   </Link>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('referrals')}
-                    className="border border-marvvn-gray-200 p-5 hover:bg-marvvn-gray-50 transition-colors text-center group"
-                  >
-                    <Gift className="w-6 h-6 mx-auto mb-2 text-marvvn-gray-400 group-hover:text-amber-500 transition-colors" />
-                    <span className="text-sm font-medium">Refer & Earn</span>
-                  </button>
                 </div>
 
                 {/* Recent Orders */}
@@ -599,59 +578,6 @@ export default function AccountPage() {
               </div>
             )}
 
-            {/* Referrals Tab */}
-            {activeTab === 'referrals' && (
-              <div className="space-y-6">
-                <h2 className="font-medium text-lg">Refer & Earn</h2>
-                <div className="bg-marvvn-black text-white p-6 lg:p-8">
-                  <div className="flex items-center gap-3 mb-4">
-                    <Gift className="w-8 h-8" />
-                    <h3 className="text-xl font-display font-medium">Share MARVVN, Earn Rewards</h3>
-                  </div>
-                  <p className="text-marvvn-gray-300 text-sm mb-6">
-                    Share your referral link with friends. When they make their first purchase, you both earn {format(100)} store credit!
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <div className="flex-1 bg-white/10 px-4 py-3 font-mono text-sm tracking-wider">
-                      {shareUrl}
-                    </div>
-                    <button
-                      type="button"
-                      onClick={copyReferral}
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-marvvn-black text-sm font-medium hover:bg-marvvn-gray-100 transition-colors"
-                    >
-                      {copied ? (
-                        <>
-                          <Check className="w-4 h-4" /> Copied!
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-4 h-4" /> Copy Link
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-                <div className="grid sm:grid-cols-3 gap-4">
-                  <div className="border border-marvvn-gray-200 p-5 text-center">
-                    <Users className="w-8 h-8 mx-auto mb-2 text-marvvn-gray-400" />
-                    <p className="text-2xl font-display font-bold">0</p>
-                    <p className="text-xs text-marvvn-gray-500">Friends Referred</p>
-                  </div>
-                  <div className="border border-marvvn-gray-200 p-5 text-center">
-                    <Gift className="w-8 h-8 mx-auto mb-2 text-marvvn-gray-400" />
-                    <p className="text-2xl font-display font-bold">{format(0)}</p>
-                    <p className="text-xs text-marvvn-gray-500">Credits Earned</p>
-                  </div>
-                  <div className="border border-marvvn-gray-200 p-5 text-center">
-                    <CreditCard className="w-8 h-8 mx-auto mb-2 text-marvvn-gray-400" />
-                    <p className="text-2xl font-display font-bold">{format(0)}</p>
-                    <p className="text-xs text-marvvn-gray-500">Credits Remaining</p>
-                  </div>
-                </div>
-
-              </div>
-            )}
           </div>
         </div>
       </main>
