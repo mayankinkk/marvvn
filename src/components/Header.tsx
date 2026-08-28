@@ -88,13 +88,13 @@ export default function Header() {
       <div className="bg-marvvn-black text-white py-2 overflow-hidden">
         <div className="animate-marquee whitespace-nowrap text-sm font-medium">
           <span className="inline-block px-8">
-            Extra 10% OFF | Use code SHARKTANK10 | Min. cart ₹500 🛒 &nbsp;&nbsp;🦈 AS SEEN ON SHARK TANK 🦈
+            ⚡︎NOT MADE TO FIT IN | BUILT FOR THE REAL ONES⚡︎
           </span>
           <span className="inline-block px-8">
-            Extra 10% OFF | Use code SHARKTANK10 | Min. cart ₹500 🛒 &nbsp;&nbsp;🦈 AS SEEN ON SHARK TANK 🦈
+            ⚡︎NOT MADE TO FIT IN | BUILT FOR THE REAL ONES⚡︎
           </span>
           <span className="inline-block px-8">
-            Extra 10% OFF | Use code SHARKTANK10 | Min. cart ₹500 🛒 &nbsp;&nbsp;🦈 AS SEEN ON SHARK TANK 🦈
+            ⚡︎NOT MADE TO FIT IN | BUILT FOR THE REAL ONES⚡︎
           </span>
         </div>
       </div>
