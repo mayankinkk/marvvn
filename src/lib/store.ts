@@ -171,6 +171,7 @@ export const useCartStore = create<CartStore>()(
     }),
     {
       name: 'marvvn-cart',
+      skipHydration: true,
       partialize: (state) => ({
         items: state.items,
         promoCode: state.promoCode,

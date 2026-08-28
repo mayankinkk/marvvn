@@ -85,6 +85,7 @@ export const useWishlistStore = create<WishlistStore>()(
     }),
     {
       name: 'marvvn-wishlist',
+      skipHydration: true,
     }
   )
 )

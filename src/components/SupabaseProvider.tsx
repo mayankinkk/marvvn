@@ -13,6 +13,15 @@ export function SupabaseProvider({ children }: { children: ReactNode }) {
   const loadCartFromServer = useCartStore((s) => s.loadFromServer)
   const loadWishlistFromServer = useWishlistStore((s) => s.loadFromServer)
 
+  // Rehydrate all Zustand persist stores AFTER React hydration completes.
+  // skipHydration:true on each store prevents the SSR mismatch; this effect
+  // restores localStorage data once it's safe to do so.
+  useEffect(() => {
+    useCartStore.persist.rehydrate()
+    useWishlistStore.persist.rehydrate()
+    useAuthStore.persist.rehydrate()
+  }, [])
+
   useEffect(() => {
     fetchUser()
   }, [fetchUser])

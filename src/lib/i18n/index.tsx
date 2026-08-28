@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react'
 import locales from './locales.json'
 
 type Locale = 'en' | 'hi'
@@ -16,12 +16,15 @@ function getNestedValue(obj: any, path: string): string {
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocale] = useState<Locale>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem('marvvn-locale') as Locale) || 'en'
-    }
-    return 'en'
-  })
+  // Always start with 'en' on both server and client to avoid hydration mismatch.
+  // Read localStorage only after mount via useEffect.
+  const [locale, setLocale] = useState<Locale>('en')
+
+  // Restore saved locale from localStorage after mount (post-hydration)
+  useEffect(() => {
+    const stored = localStorage.getItem('marvvn-locale') as Locale
+    if (stored && (stored === 'en' || stored === 'hi')) setLocale(stored)
+  }, [])
 
   const handleSetLocale = useCallback((l: Locale) => {
     setLocale(l)
