@@ -8,6 +8,10 @@ import { Heart, ShoppingBag, Minus, Plus, ChevronRight, Truck, RotateCcw, Shield
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
+import ProductReviews from '@/components/ProductReviews'
+import SizeGuide from '@/components/SizeGuide'
+import RecentlyViewed, { trackRecentlyViewed } from '@/components/RecentlyViewed'
+import { trackViewItem } from '@/components/Analytics'
 import { useProducts } from '@/lib/hooks/useProducts'
 import { formatPrice, calculateDiscount, cn } from '@/lib/utils'
 import { useCartStore } from '@/lib/store'
@@ -31,6 +35,13 @@ export default function ProductPage() {
     setQuantity(1)
     setActiveImage(0)
   }, [handle])
+
+  useEffect(() => {
+    if (product) {
+      trackRecentlyViewed(product)
+      trackViewItem(product.id, product.title, product.price)
+    }
+  }, [product])
 
   if (products.length > 0 && !product) {
     return (
@@ -137,7 +148,10 @@ export default function ProductPage() {
             <p className="text-marvvn-gray-600">{product.description}</p>
 
             <div>
-              <h3 className="text-sm font-medium uppercase tracking-wider mb-3">Size</h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-medium uppercase tracking-wider">Size</h3>
+                <SizeGuide category={product.category === 'women' ? 'women' : 'men'} />
+              </div>
               <div className="flex flex-wrap gap-2">
                 {product.sizes.map((size) => (
                   <button
@@ -249,7 +263,11 @@ export default function ProductPage() {
             </div>
           </section>
         )}
+
+        <ProductReviews productHandle={handle} />
       </main>
+
+      <RecentlyViewed />
 
       <Footer />
     </div>

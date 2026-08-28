@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -48,6 +48,15 @@ export default function CheckoutPage() {
     cvv: '',
     upiId: '',
   })
+
+  useEffect(() => {
+    if (payment.method !== 'cod' && !(window as any).Razorpay) {
+      const script = document.createElement('script')
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+      script.async = true
+      document.body.appendChild(script)
+    }
+  }, [payment.method])
 
   const validateShipping = (): boolean => {
     const errors: Record<string, string> = {}
@@ -99,7 +108,7 @@ export default function CheckoutPage() {
     setOrderError('')
 
     try {
-      const response = await fetch('/api/orders', {
+      const orderRes = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -124,14 +133,63 @@ export default function CheckoutPage() {
         }),
       })
 
-      if (!response.ok) {
-        const data = await response.json()
+      if (!orderRes.ok) {
+        const data = await orderRes.json()
         throw new Error(data.error || 'Failed to place order')
       }
 
-      const data = await response.json()
+      const orderData = await orderRes.json()
+
+      if (payment.method !== 'cod') {
+        const payRes = await fetch('/api/payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: total, orderId: orderData.order.id }),
+        })
+
+        if (!payRes.ok) throw new Error('Payment initialization failed')
+        const payData = await payRes.json()
+
+        const options = {
+          key: payData.keyId,
+          amount: payData.amount,
+          currency: payData.currency,
+          name: 'MARVVN',
+          order_id: payData.orderId,
+          handler: async (response: any) => {
+            await fetch('/api/payment/verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ ...response, orderId: orderData.order.id }),
+            })
+            clearCart()
+            router.push(`/checkout/success?orderId=${orderData.order.id}`)
+          },
+          prefill: {
+            name: `${shipping.firstName} ${shipping.lastName}`,
+            email: shipping.email,
+            contact: shipping.phone,
+          },
+          theme: { color: '#000000' },
+          modal: {
+            ondismiss: () => {
+              setIsPlacing(false)
+              setOrderError('Payment was cancelled. Your order is saved — you can complete payment from your orders.')
+            },
+          },
+        }
+
+        const razorpay = new (window as any).Razorpay(options)
+        razorpay.on('payment.failed', (response: any) => {
+          setIsPlacing(false)
+          setOrderError('Payment failed. Please try again.')
+        })
+        razorpay.open()
+        return
+      }
+
       clearCart()
-      router.push(`/checkout/success?orderId=${data.order.id}`)
+      router.push(`/checkout/success?orderId=${orderData.order.id}`)
     } catch (err: any) {
       setOrderError(err.message || 'Something went wrong. Please try again.')
       setIsPlacing(false)

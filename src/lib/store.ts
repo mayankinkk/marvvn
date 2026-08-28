@@ -3,6 +3,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { Product, CartItem } from './types'
+import { trackAddToCart } from '@/components/Analytics'
 
 interface CartStore {
   items: CartItem[]
@@ -70,6 +71,7 @@ export const useCartStore = create<CartStore>()(
 
         set({ items: newItems })
         syncToServer(newItems)
+        trackAddToCart(product.id, product.title, product.price)
       },
 
       removeItem: (productId, size, color) => {

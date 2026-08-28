@@ -12,6 +12,7 @@ import FeaturesBar from '@/components/FeaturesBar'
 import AboutSection from '@/components/AboutSection'
 import BlogSection from '@/components/BlogSection'
 import ReviewsSection from '@/components/ReviewsSection'
+import RecentlyViewed from '@/components/RecentlyViewed'
 import Footer from '@/components/Footer'
 import { useProducts } from '@/lib/hooks/useProducts'
 import { useSettings } from '@/components/SettingsProvider'
@@ -152,6 +153,7 @@ export default function Home() {
         <FeaturesBar />
         <AboutSection />
         <BlogSection />
+        <RecentlyViewed />
       </main>
 
       <Footer />

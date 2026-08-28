@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { sendOrderConfirmation } from '@/lib/email'
+import { sendWhatsAppOrderNotification } from '@/lib/whatsapp'
+import { decrementStock } from '@/lib/inventory'
 
 export async function GET() {
   const supabase = createClient()
@@ -139,6 +141,28 @@ export async function POST(request: Request) {
       })),
       total: finalTotal,
       shippingAddress: shippingAddress,
+      }).catch(console.error)
+  }
+
+  for (const item of orderItems) {
+    decrementStock(item.product_id, item.quantity).catch(console.error)
+  }
+
+  if (shippingAddress.phone) {
+    const productIds = items.map((item: any) => item.productId)
+    const { data: whatsappProducts } = await supabase.from('products').select('id, title').in('id', productIds)
+    const whatsappTitleMap = new Map(whatsappProducts?.map((p: any) => [p.id, p.title]) || [])
+
+    sendWhatsAppOrderNotification({
+      id: order.id,
+      total: finalTotal,
+      items: items.map((item: any) => ({
+        title: whatsappTitleMap.get(item.productId) || 'Product',
+        quantity: item.quantity,
+        size: item.size,
+      })),
+      customerName: profile?.name || 'Customer',
+      customerPhone: shippingAddress.phone,
     }).catch(console.error)
   }
 

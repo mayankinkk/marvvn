@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { sendOrderStatusUpdate } from '@/lib/email'
+import { sendWhatsAppOrderStatusUpdate } from '@/lib/whatsapp'
 
 async function isAdmin(supabase: any) {
   const { data: { user } } = await supabase.auth.getUser()
@@ -53,6 +55,17 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+
+  if (status && data) {
+    const { data: profile } = await supabase.from('profiles').select('email, name').eq('id', data.user_id).single()
+    if (profile?.email) {
+      sendOrderStatusUpdate(id, profile.email, status).catch(console.error)
+    }
+    const phone = data.shipping_address?.phone
+    if (phone) {
+      sendWhatsAppOrderStatusUpdate(phone, id, status).catch(console.error)
+    }
   }
 
   return NextResponse.json({ order: data })

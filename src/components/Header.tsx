@@ -11,6 +11,7 @@ import { useSettings } from '@/components/SettingsProvider'
 import { womenMegaMenu, menMegaMenu, accessoriesMegaMenu } from '@/lib/mega-menu-data'
 import CartDrawer from './CartDrawer'
 import SearchModal from './SearchModal'
+import LanguageSwitcher from './LanguageSwitcher'
 
 const navLinks = [
   { label: 'Women', href: '/collections/women', megaMenu: womenMegaMenu },
@@ -115,6 +116,7 @@ export default function Header() {
               </Link>
             </div>
             <div className="flex items-center gap-4">
+              <LanguageSwitcher />
               {topLinks.map((link) => (
                 <Link
                   key={link.label}
