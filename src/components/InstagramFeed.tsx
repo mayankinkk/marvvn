@@ -24,7 +24,7 @@ export default function InstagramFeed({ count = 6 }: InstagramFeedProps) {
     <section className="py-16 border-t">
       <div className="container">
         <div className="text-center mb-8">
-          <h2 className="text-2xl lg:text-3xl font-display font-medium mb-2">Follow Us @marvvn.co</h2>
+          <h2 className="text-2xl lg:text-3xl font-display font-medium mb-2">Follow Us @{instagramUrl?.split('instagram.com/')[1]?.replace(/\/$/, '') || 'marvvn.co'}</h2>
           <p className="text-sm text-marvvn-gray-500">Tag us to be featured</p>
         </div>
 

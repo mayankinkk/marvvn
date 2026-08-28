@@ -193,9 +193,6 @@ export default function CartPage() {
                 >
                   Checkout <ArrowRight className="w-4 h-4" />
                 </Link>
-                <p className="text-xs text-marvvn-gray-400 mt-4 text-center">
-                  Try code SHARKTANK10 for 10% off!
-                </p>
               </div>
             </div>
           </div>

@@ -4,8 +4,11 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { ChevronRight } from 'lucide-react'
+import { useSettings } from '@/components/SettingsProvider'
 
 export default function PrivacyPolicyPage() {
+  const settings = useSettings()
+  const storeEmail = settings.store_email || 'support@marvvn.online'
   return (
     <div className="min-h-screen">
       <Header />
@@ -76,7 +79,7 @@ export default function PrivacyPolicyPage() {
               <h2 className="text-lg font-medium text-marvvn-black mb-3">6. Your Rights</h2>
               <p>
                 You have the right to access, correct, or delete your personal information. 
-                To exercise these rights, contact us at support@marvvn.online.
+                To exercise these rights, contact us at {storeEmail}.
               </p>
             </section>
 
@@ -100,8 +103,8 @@ export default function PrivacyPolicyPage() {
             <section>
               <h2 className="text-lg font-medium text-marvvn-black mb-3">9. Contact Us</h2>
               <p>
-                For privacy-related inquiries, contact us at support@marvvn.online or 
-                write to us at MARVVN, Mumbai, Maharashtra, India.
+                For privacy-related inquiries, contact us at {storeEmail} or 
+                write to us at {settings.store_name || 'MARVVN'}, {settings.store_address || 'India'}.
               </p>
             </section>
           </div>

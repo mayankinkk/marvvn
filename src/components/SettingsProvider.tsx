@@ -19,7 +19,7 @@ const DEFAULTS: Record<string, string> = {
   tax_rate: '0',
   free_shipping_threshold: '999',
   shipping_fee: '99',
-  whatsapp_number: '',
+  whatsapp_number: '917578017237',
   instagram_url: '',
   facebook_url: '',
   twitter_url: '',
@@ -27,11 +27,11 @@ const DEFAULTS: Record<string, string> = {
   logo_url: '',
   primary_color: '#000000',
   accent_color: '#666666',
-  maintenance_mode: 'false',
   announcement_bar: '⚡︎NOT MADE TO FIT IN | BUILT FOR THE REAL ONES ⚡︎',
-  maintenance_message: '',
+  maintenance_mode: 'false',
+  maintenance_message: 'We are currently under maintenance. Please check back later.',
   seo_title: 'MARVVN | Unisex Luxury Streetwear Clothing Brand',
-  seo_description: 'Luxury streetwear clothing brand for men and women.',
+  seo_description: 'Luxury streetwear clothing brand for men and women. Shop oversized t-shirts, joggers, hoodies, and more.',
   seo_keywords: 'streetwear, oversized t-shirts, joggers, hoodies, marvvn',
 }
 
@@ -41,7 +41,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     fetch('/api/settings')
       .then((res) => res.json())
-      .then((data) => setSettings(data))
+      .then((data) => setSettings({ ...DEFAULTS, ...data }))
       .catch(() => {})
   }, [])
 
