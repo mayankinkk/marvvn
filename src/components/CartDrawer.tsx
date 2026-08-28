@@ -23,21 +23,19 @@ export default function CartDrawer() {
     }
   }
 
+  if (!isOpen) return null
+
   return (
     <>
       {/* Overlay */}
       <div
-        className={`fixed inset-0 bg-black/50 z-[70] transition-opacity duration-300 ${
-          isOpen ? 'opacity-100 visible pointer-events-auto' : 'opacity-0 invisible pointer-events-none'
-        }`}
+        className="fixed inset-0 bg-black/50 z-[70] transition-opacity duration-300"
         onClick={() => setCartOpen(false)}
       />
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-full max-w-md bg-white z-[80] transform transition-transform duration-300 ${
-          isOpen ? 'translate-x-0 pointer-events-auto' : 'translate-x-full pointer-events-none'
-        }`}
+        className="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[80] shadow-2xl transition-transform duration-300"
       >
         <div className="flex flex-col h-full">
           {/* Header */}

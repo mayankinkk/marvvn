@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useParams } from 'next/navigation'
 import { ArrowLeft, Save, Package, CheckCircle, Truck, MapPin, XCircle, Clock } from 'lucide-react'
 import { formatPrice } from '@/lib/utils'
 import Image from 'next/image'
@@ -23,12 +24,9 @@ const statusColors: Record<string, { bg: string; text: string; dot: string }> = 
 
 const paymentOptions = ['pending', 'paid', 'failed', 'refunded']
 
-export default function AdminOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  return <AdminOrderContent params={params} />
-}
-
-function AdminOrderContent({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params)
+export default function AdminOrderDetailPage() {
+  const params = useParams()
+  const id = params.id as string
   const [order, setOrder] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)

@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect, use } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useParams } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { blogPosts as defaultBlogPosts } from '@/lib/data'
@@ -21,8 +22,9 @@ interface BlogPost {
   created_at?: string
 }
 
-export default function BlogPostPage({ params }: { params: Promise<{ handle: string }> }) {
-  const { handle } = use(params)
+export default function BlogPostPage() {
+  const params = useParams()
+  const handle = params.handle as string
   const [post, setPost] = useState<BlogPost | null>(null)
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)

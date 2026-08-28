@@ -279,13 +279,10 @@ export default function Header() {
         </div>
 
         {/* Mega Menu - Desktop */}
-        {navLinks.map((link) => (
+        {activeMegaMenu && navLinks.map((link) => link.label === activeMegaMenu && (
           <div
             key={link.label}
-            className={cn(
-              'absolute left-0 right-0 top-full bg-white border-t border-marvvn-gray-100 shadow-lg transition-all duration-200',
-              activeMegaMenu === link.label ? 'opacity-100 visible pointer-events-auto' : 'opacity-0 invisible pointer-events-none'
-            )}
+            className="absolute left-0 right-0 top-full bg-white border-t border-marvvn-gray-100 shadow-lg transition-all duration-200"
             onMouseEnter={() => handleMegaMenuEnter(link.label)}
             onMouseLeave={handleMegaMenuLeave}
           >
@@ -334,10 +331,8 @@ export default function Header() {
       </header>
 
       {/* Mobile Menu */}
-      <div className={cn(
-        'fixed inset-0 z-[60] bg-white transform transition-transform duration-300 lg:hidden',
-        mobileMenuOpen ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'
-      )} role="dialog" aria-modal="true" aria-label="Navigation menu">
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-[60] bg-white lg:hidden" role="dialog" aria-modal="true" aria-label="Navigation menu">
         <div className="flex items-center justify-between p-4 border-b">
           <span className="text-xl font-display font-bold">{settings.store_name || 'MARVVN'}</span>
           <button type="button" onClick={() => setMobileMenuOpen(false)} aria-label="Close menu">
@@ -413,12 +408,13 @@ export default function Header() {
           </div>
         </nav>
       </div>
+      )}
 
       {/* Cart Drawer */}
       <CartDrawer />
 
       {/* Search Modal */}
-      <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />
+      {searchOpen && <SearchModal isOpen={searchOpen} onClose={() => setSearchOpen(false)} />}
     </>
   )
 }
