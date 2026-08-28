@@ -6,30 +6,37 @@ import Link from 'next/link'
 export default function AboutSection() {
   const [email, setEmail] = useState('')
   const [subscribed, setSubscribed] = useState(false)
+  const [subscribing, setSubscribing] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (email) {
-      setSubscribed(true)
-      setEmail('')
-      setTimeout(() => setSubscribed(false), 3000)
-    }
+    if (!email || subscribing) return
+    setSubscribing(true)
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      if (res.ok) {
+        setSubscribed(true)
+        setEmail('')
+        setTimeout(() => setSubscribed(false), 3000)
+      }
+    } catch {}
+    setSubscribing(false)
   }
 
   return (
     <section className="relative">
       <div className="grid lg:grid-cols-2 min-h-[500px]">
-        <div className="relative">
-          <img
-            src="https://www.bonkerscorner.com/cdn/shop/files/our_story_750x1334.jpg?v=1769665909"
-            alt="MARVVN Story"
-            className="hidden lg:block w-full h-full object-cover"
-          />
-          <img
-            src="https://www.bonkerscorner.com/cdn/shop/files/our_story_750x1334.jpg?v=1769665909"
-            alt="MARVVN Story"
-            className="lg:hidden w-full h-full object-cover aspect-[4/5]"
-          />
+        <div className="relative bg-marvvn-gray-100">
+          <div className="hidden lg:flex w-full h-full items-center justify-center">
+            <span className="text-marvvn-gray-400 text-lg font-display">Our Story</span>
+          </div>
+          <div className="lg:hidden w-full aspect-[4/5] flex items-center justify-center bg-marvvn-gray-100">
+            <span className="text-marvvn-gray-400 text-lg font-display">Our Story</span>
+          </div>
         </div>
         <div className="bg-marvvn-black text-white flex items-center justify-center p-8 lg:p-16">
           <div className="max-w-md text-center lg:text-left">
@@ -54,8 +61,8 @@ export default function AboutSection() {
                   className="flex-1 px-4 py-3 bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:border-white/50"
                   required
                 />
-                <button type="submit" className="px-4 py-3 bg-white text-marvvn-black hover:bg-marvvn-gray-100 transition-colors">
-                  Subscribe
+                <button type="submit" disabled={subscribing} className="px-4 py-3 bg-white text-marvvn-black hover:bg-marvvn-gray-100 transition-colors disabled:opacity-50">
+                  {subscribing ? '...' : 'Subscribe'}
                 </button>
               </form>
             )}

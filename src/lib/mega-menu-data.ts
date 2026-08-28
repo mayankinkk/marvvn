@@ -57,7 +57,7 @@ export const womenMegaMenu: MegaMenuSection = {
     },
   ],
   featuredImage: {
-    src: 'https://www.bonkerscorner.com/cdn/shop/files/womens_menu_bar_800x.jpg?v=1785750100',
+    src: '/images/products/product-12.svg',
     alt: 'Women Collection',
     href: '/collections/womens-bottoms',
     label: 'Bottoms',
@@ -118,7 +118,7 @@ export const menMegaMenu: MegaMenuSection = {
     },
   ],
   featuredImage: {
-    src: 'https://www.bonkerscorner.com/cdn/shop/files/mens_menu_bar_800x.jpg?v=1785750100',
+    src: '/images/products/product-11.svg',
     alt: 'Men Collection',
     href: '/collections/oversized-t-shirt-men',
     label: 'Oversized T-shirt',
@@ -143,7 +143,7 @@ export const accessoriesMegaMenu: MegaMenuSection = {
     },
   ],
   featuredImage: {
-    src: 'https://www.bonkerscorner.com/cdn/shop/files/bag1_800x.jpg?v=1785741927',
+    src: '/images/products/product-15.svg',
     alt: 'Accessories Collection',
     href: '/collections/bags',
     label: 'Bags',

@@ -19,12 +19,8 @@ export default function AboutUsPage() {
         <div className="max-w-3xl mx-auto">
           <h1 className="text-2xl lg:text-3xl font-display font-medium mb-8">About MARVVN</h1>
 
-          <div className="aspect-[16/9] bg-marvvn-gray-50 overflow-hidden mb-8">
-            <img
-              src="https://www.bonkerscorner.com/cdn/shop/files/our_story_750x1334.jpg?v=1769665909"
-              alt="MARVVN Story"
-              className="w-full h-full object-cover"
-            />
+          <div className="aspect-[16/9] bg-marvvn-gray-100 overflow-hidden mb-8 flex items-center justify-center">
+            <span className="text-marvvn-gray-400 text-lg font-display">Our Story</span>
           </div>
 
           <div className="space-y-6 text-marvvn-gray-600">

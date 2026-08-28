@@ -8,24 +8,24 @@ import { cn } from '@/lib/utils'
 
 const slides = [
   {
-    desktopImage: 'https://www.bonkerscorner.com/cdn/shop/files/main_banner_1_dae22d89-2b75-4bcd-93e2-2096fefe9c31_1920x700.jpg?v=1782816084',
-    mobileImage: 'https://www.bonkerscorner.com/cdn/shop/files/mobile_main_afe71bda-2c7c-4065-8d29-9043c0f43d14_750x1334.jpg?v=1782816176',
+    desktopImage: '/images/banners/hero-1-desktop.svg',
+    mobileImage: '/images/banners/hero-1-mobile.svg',
     tagline: 'MADE TO MOVE WITH YOU',
     title: 'FREESTYLE COLLECTION',
     ctaText: 'Shop Now',
     ctaLink: '/collections/new-arrivals',
   },
   {
-    desktopImage: 'https://www.bonkerscorner.com/cdn/shop/files/spidey_black_wo_3_1920x700.jpg?v=1786083071',
-    mobileImage: 'https://www.bonkerscorner.com/cdn/shop/files/spidey_wo_mobile_750x1334.jpg?v=1786081629',
+    desktopImage: '/images/banners/hero-2-desktop.svg',
+    mobileImage: '/images/banners/hero-2-mobile.svg',
     tagline: 'INSPIRED BY YOUR FRIENDLY NEIGHBORHOOD SPIDER-MAN',
     title: 'SPIDER-MAN COLLECTION',
     ctaText: 'Shop Women',
     ctaLink: '/collections/spiderman-women',
   },
   {
-    desktopImage: 'https://www.bonkerscorner.com/cdn/shop/files/reb_bull_website_1_1920x700.jpg?v=1784620202',
-    mobileImage: 'https://www.bonkerscorner.com/cdn/shop/files/reb_bull_mobile_1a0cee28-664f-421f-b1fd-94f5c9ec4118_750x1334.jpg?v=1784619880',
+    desktopImage: '/images/banners/hero-3-desktop.svg',
+    mobileImage: '/images/banners/hero-3-mobile.svg',
     tagline: 'MATCHDAY UNIFORM',
     title: 'RED BULL X MARVVN',
     ctaText: 'Shop Now',

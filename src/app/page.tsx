@@ -37,8 +37,8 @@ export default function Home() {
         <section className="py-4 lg:py-6">
           <div className="container">
             <PromoBanner
-              desktopImage="https://www.bonkerscorner.com/cdn/shop/files/main_banner_1_dae22d89-2b75-4bcd-93e2-2096fefe9c31_1920x700.jpg?v=1782816084"
-              mobileImage="https://www.bonkerscorner.com/cdn/shop/files/mobile_main_afe71bda-2c7c-4065-8d29-9043c0f43d14_750x1334.jpg?v=1782816176"
+              desktopImage="/images/banners/promo-1-desktop.svg"
+              mobileImage="/images/banners/promo-1-mobile.svg"
               tagline="MADE TO MOVE WITH YOU"
               title="FREESTYLE COLLECTION"
               ctaText="Shop Now"
@@ -50,8 +50,8 @@ export default function Home() {
         <section className="py-4 lg:py-6">
           <div className="container">
             <PromoBanner
-              desktopImage="https://www.bonkerscorner.com/cdn/shop/files/spidey_black_wo_3_1920x700.jpg?v=1786083071"
-              mobileImage="https://www.bonkerscorner.com/cdn/shop/files/spidey_wo_mobile_750x1334.jpg?v=1786081629"
+              desktopImage="/images/banners/promo-2-desktop.svg"
+              mobileImage="/images/banners/promo-2-mobile.svg"
               tagline="INSPIRED BY YOUR FRIENDLY NEIGHBORHOOD SPIDER-MAN"
               title="SPIDER-MAN COLLECTION"
               ctaText="Shop Women"
@@ -63,8 +63,8 @@ export default function Home() {
         <section className="py-4 lg:py-6">
           <div className="container">
             <PromoBanner
-              desktopImage="https://www.bonkerscorner.com/cdn/shop/files/reb_bull_website_1_1920x700.jpg?v=1784620202"
-              mobileImage="https://www.bonkerscorner.com/cdn/shop/files/reb_bull_mobile_1a0cee28-664f-421f-b1fd-94f5c9ec4118_750x1334.jpg?v=1784619880"
+              desktopImage="/images/banners/promo-3-desktop.svg"
+              mobileImage="/images/banners/promo-3-mobile.svg"
               tagline="MATCHDAY UNIFORM"
               title="RED BULL X MARVVN"
               ctaText="Shop Now"
@@ -88,8 +88,8 @@ export default function Home() {
         <section className="py-4 lg:py-6">
           <div className="container">
             <PromoBanner
-              desktopImage="https://www.bonkerscorner.com/cdn/shop/files/womens_second_banner_1_1920x700.jpg?v=1782816422"
-              mobileImage="https://www.bonkerscorner.com/cdn/shop/files/mobile_womens_solo_988c97eb-ef57-49c2-86bc-64baaa177021_750x1334.jpg?v=1782816176"
+              desktopImage="/images/banners/promo-4-desktop.svg"
+              mobileImage="/images/banners/promo-4-mobile.svg"
               tagline="EXPLORE NEW IN"
               title="EXPLORE NEW IN"
               ctaText="Shop Now"
@@ -126,8 +126,8 @@ export default function Home() {
         <section className="py-4 lg:py-6">
           <div className="container">
             <PromoBanner
-              desktopImage="https://www.bonkerscorner.com/cdn/shop/files/mens_second_banner_6dab768c-4c98-4b21-881a-1e35f9e94414_1920x700.jpg?v=1782816084"
-              mobileImage="https://www.bonkerscorner.com/cdn/shop/files/mobile_mens_solo_397dd2f8-58ef-460d-be9f-22e9078c7c5d_750x1334.jpg?v=1783013761"
+              desktopImage="/images/banners/promo-5-desktop.svg"
+              mobileImage="/images/banners/promo-5-mobile.svg"
               tagline="DISCOVER WHAT'S NEW"
               title="DISCOVER WHAT'S NEW"
               ctaText="EXPLORE"
