@@ -647,23 +647,7 @@ export default function AccountPage() {
                     <p className="text-xs text-marvvn-gray-500">Credits Remaining</p>
                   </div>
                 </div>
-                <div className="border border-marvvn-gray-200 p-6">
-                  <h3 className="font-medium mb-3">How it works</h3>
-                  <ol className="space-y-3 text-sm text-marvvn-gray-600">
-                    <li className="flex items-start gap-3">
-                      <span className="w-6 h-6 bg-marvvn-black text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">1</span>
-                      Share your unique referral link with friends
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <span className="w-6 h-6 bg-marvvn-black text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">2</span>
-                      Your friend signs up and makes their first purchase
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <span className="w-6 h-6 bg-marvvn-black text-white text-xs flex items-center justify-center flex-shrink-0 mt-0.5">3</span>
-                      Both of you receive ₹100 store credit automatically
-                    </li>
-                  </ol>
-                </div>
+
               </div>
             )}
           </div>
