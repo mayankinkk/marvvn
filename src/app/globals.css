@@ -107,6 +107,16 @@
     100% { transform: translateX(-50%); }
   }
 
+  .marquee-container {
+    display: flex;
+    width: max-content;
+    animation: marquee 20s linear infinite;
+  }
+
+  .marquee-container:hover {
+    animation-play-state: paused;
+  }
+
   @keyframes slide-down {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }

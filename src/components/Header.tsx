@@ -87,16 +87,12 @@ export default function Header() {
       {/* Announcement Bar */}
       {settings.announcement_bar && (
         <div className="bg-marvvn-black text-white py-2 overflow-hidden">
-          <div className="animate-marquee whitespace-nowrap text-sm font-medium">
-            <span className="inline-block px-8">
-              {settings.announcement_bar}
-            </span>
-            <span className="inline-block px-8">
-              {settings.announcement_bar}
-            </span>
-            <span className="inline-block px-8">
-              {settings.announcement_bar}
-            </span>
+          <div className="marquee-container whitespace-nowrap text-sm font-medium">
+            {[...Array(6)].map((_, i) => (
+              <span key={i} className="inline-block px-8 shrink-0">
+                {settings.announcement_bar}
+              </span>
+            ))}
           </div>
         </div>
       )}
