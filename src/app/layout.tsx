@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from 'next'
+import { Suspense } from 'react'
 import { Inter, Playfair_Display } from 'next/font/google'
 import { SupabaseProvider } from '@/components/SupabaseProvider'
 import { SettingsProvider } from '@/components/SettingsProvider'
 import { I18nProvider } from '@/lib/i18n'
 import { AnalyticsScripts, Analytics, Pixel } from '@/components/Analytics'
-import PageTransition from '@/components/PageTransition'
 import './globals.css'
 
 const inter = Inter({
@@ -58,8 +58,10 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192.png" />
       </head>
       <body className={`${inter.variable} ${playfair.variable} font-sans`}>
-        <Analytics />
-        <Pixel />
+        <Suspense fallback={null}>
+          <Analytics />
+          <Pixel />
+        </Suspense>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -82,9 +84,7 @@ export default function RootLayout({
         <SettingsProvider>
           <SupabaseProvider>
             <I18nProvider>
-              <PageTransition>
-                {children}
-              </PageTransition>
+              {children}
             </I18nProvider>
           </SupabaseProvider>
         </SettingsProvider>
