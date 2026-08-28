@@ -49,7 +49,7 @@ export default function MegaMenuPage() {
       .then(r => r.json())
       .then(data => {
         const raw = data.settings?.mega_menu
-        if (raw) {
+        if (raw && raw !== '[]' && raw !== 'null') {
           try {
             const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw
             if (Array.isArray(parsed) && parsed.length > 0) {
