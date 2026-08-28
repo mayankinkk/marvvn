@@ -7,14 +7,15 @@ import Footer from '@/components/Footer'
 import { ChevronRight, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useSettings } from '@/components/SettingsProvider'
+import { useCurrency } from '@/lib/hooks/useCurrency'
 
-const faqCategories = [
+const faqCategories = (symbol: string, threshold: string, fee: string, codLimit: string) => [
   {
     category: 'Orders & Shipping',
     items: [
       { q: 'How long does shipping take?', a: 'Standard shipping takes 3-5 business days within India. Express shipping (available at checkout) delivers within 1-2 business days.' },
       { q: 'How can I track my order?', a: 'Once your order is shipped, you\'ll receive a tracking link via email and SMS. You can also track your order from your account dashboard.' },
-      { q: 'What are the shipping charges?', a: 'We offer free shipping on orders above ₹1,499. For orders below ₹1,499, a flat shipping fee of ₹99 applies.' },
+      { q: 'What are the shipping charges?', a: `We offer free shipping on orders above ${symbol}${threshold}. For orders below ${symbol}${threshold}, a flat shipping fee of ${symbol}${fee} applies.` },
       { q: 'Do you ship internationally?', a: 'Currently, we only ship within India. We\'re working on expanding to international shipping soon.' },
     ]
   },
@@ -38,7 +39,7 @@ const faqCategories = [
   {
     category: 'Payment & Promos',
     items: [
-      { q: 'What payment methods do you accept?', a: 'We accept UPI, credit/debit cards, net banking, and Cash on Delivery (COD) for orders up to ₹10,000.' },
+      { q: 'What payment methods do you accept?', a: `We accept UPI, credit/debit cards, net banking, and Cash on Delivery (COD) for orders up to ${symbol}${codLimit}.` },
       { q: 'How do I use a promo code?', a: 'Enter your promo code at checkout or in the cart drawer. Click "Apply" and the discount will be reflected in your total.' },
       { q: 'Can I use multiple promo codes?', a: 'Only one promo code can be applied per order. Choose the one that gives you the best discount!' },
     ]
@@ -47,8 +48,10 @@ const faqCategories = [
 
 export default function FAQPage() {
   const settings = useSettings()
+  const { symbol } = useCurrency()
   const [openIndex, setOpenIndex] = useState<string | null>(null)
   const storeEmail = settings.store_email || 'support@marvvn.online'
+  const faqs = faqCategories(symbol, settings.free_shipping_threshold || '999', settings.shipping_fee || '99', '10,000')
 
   return (
     <div className="min-h-screen">
@@ -63,7 +66,7 @@ export default function FAQPage() {
         <h1 className="text-2xl lg:text-3xl font-display font-medium mb-8">Frequently Asked Questions</h1>
 
         <div className="max-w-3xl space-y-8">
-          {faqCategories.map((cat) => (
+          {faqs.map((cat) => (
             <div key={cat.category}>
               <h2 className="text-lg font-medium mb-4 pb-2 border-b">{cat.category}</h2>
               <div className="divide-y">

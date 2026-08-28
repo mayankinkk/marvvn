@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
+import { useCurrency } from '@/lib/hooks/useCurrency'
 import { Search, Package, ChevronRight, Truck, CheckCircle, Clock, XCircle, MapPin } from 'lucide-react'
 
 const statusSteps = [
@@ -27,6 +28,7 @@ export default function OrderTrackingPage() {
   const [order, setOrder] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const { format } = useCurrency()
 
   const handleTrack = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -178,7 +180,7 @@ export default function OrderTrackingPage() {
                 </div>
                 <div className="border-t mt-3 pt-3 flex justify-between font-medium">
                   <span className="text-sm">Total</span>
-                  <span className="text-sm">₹{order.total?.toLocaleString()}</span>
+                  <span className="text-sm">{format(order.total || 0)}</span>
                 </div>
               </div>
             </div>

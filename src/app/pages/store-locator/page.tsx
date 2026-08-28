@@ -5,6 +5,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { ChevronRight, MapPin, Clock, Phone } from 'lucide-react'
 import { useSettings } from '@/components/SettingsProvider'
+import { useCurrency } from '@/lib/hooks/useCurrency'
 
 const defaultStores = [
   {
@@ -26,6 +27,7 @@ const defaultStores = [
 
 export default function StoreLocatorPage() {
   const settings = useSettings()
+  const { symbol } = useCurrency()
   const storePhone = settings.store_phone || ''
 
   const stores = defaultStores.map(s => ({ ...s, phone: storePhone }))
@@ -74,7 +76,7 @@ export default function StoreLocatorPage() {
         <div className="mt-12 bg-marvvn-gray-50 p-8 text-center">
           <h2 className="text-lg font-medium mb-2">Can&apos;t find a store near you?</h2>
           <p className="text-sm text-marvvn-gray-500 mb-4">
-            Shop online and get free shipping on orders above ₹1,499
+            Shop online and get free shipping on orders above {symbol}{settings.free_shipping_threshold || '999'}
           </p>
           <Link href="/collections/new-arrivals" className="btn-primary">
             Shop Online

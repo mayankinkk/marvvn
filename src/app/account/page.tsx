@@ -7,6 +7,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useAuthStore } from '@/lib/auth-store'
 import { useWishlistStore } from '@/lib/wishlist-store'
+import { useCurrency } from '@/lib/hooks/useCurrency'
 import {
   ChevronRight, User, Package, Heart, LogOut, Settings, CreditCard,
   Copy, Check, Edit3, Save, X, Lock, Eye, EyeOff, Bell, Mail, MessageCircle,
@@ -41,6 +42,7 @@ const statusIcons: Record<string, any> = {
 export default function AccountPage() {
   const { user, isAuthenticated, loading, logout, fetchUser } = useAuthStore()
   const { totalItems: wishlistCount } = useWishlistStore()
+  const { format } = useCurrency()
   const router = useRouter()
   const pathname = usePathname()
   const [activeTab, setActiveTab] = useState<Tab>('dashboard')
@@ -200,7 +202,7 @@ export default function AccountPage() {
                   <CreditCard className="w-5 h-5 text-marvvn-gray-500" />
                 </div>
                 <div>
-                  <p className="text-2xl font-display font-bold">₹{stats.totalSpent.toLocaleString('en-IN')}</p>
+                  <p className="text-2xl font-display font-bold">{format(stats.totalSpent)}</p>
                   <p className="text-xs text-marvvn-gray-500">Total Spent</p>
                 </div>
               </div>
@@ -407,7 +409,7 @@ export default function AccountPage() {
                               </div>
                             </div>
                             <div className="text-right">
-                              <p className="text-sm font-medium">₹{order.total?.toLocaleString('en-IN')}</p>
+                              <p className="text-sm font-medium">{format(order.total || 0)}</p>
                               <span className={`text-xs px-2 py-0.5 ${statusColors[order.status] || 'bg-gray-100 text-gray-800'}`}>
                                 {order.status}
                               </span>
@@ -445,7 +447,7 @@ export default function AccountPage() {
                           </div>
                           <div className="flex items-center justify-between pt-3 border-t border-marvvn-gray-100">
                             <p className="text-sm text-marvvn-gray-500">Payment: {order.payment_status || 'Pending'}</p>
-                            <p className="font-medium">₹{order.total?.toLocaleString('en-IN')}</p>
+                            <p className="font-medium">{format(order.total || 0)}</p>
                           </div>
                         </div>
                       )
@@ -607,7 +609,7 @@ export default function AccountPage() {
                     <h3 className="text-xl font-display font-medium">Share MARVVN, Earn Rewards</h3>
                   </div>
                   <p className="text-marvvn-gray-300 text-sm mb-6">
-                    Share your referral link with friends. When they make their first purchase, you both earn ₹100 store credit!
+                    Share your referral link with friends. When they make their first purchase, you both earn {format(100)} store credit!
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3">
                     <div className="flex-1 bg-white/10 px-4 py-3 font-mono text-sm tracking-wider">
@@ -638,12 +640,12 @@ export default function AccountPage() {
                   </div>
                   <div className="border border-marvvn-gray-200 p-5 text-center">
                     <Gift className="w-8 h-8 mx-auto mb-2 text-marvvn-gray-400" />
-                    <p className="text-2xl font-display font-bold">₹0</p>
+                    <p className="text-2xl font-display font-bold">{format(0)}</p>
                     <p className="text-xs text-marvvn-gray-500">Credits Earned</p>
                   </div>
                   <div className="border border-marvvn-gray-200 p-5 text-center">
                     <CreditCard className="w-8 h-8 mx-auto mb-2 text-marvvn-gray-400" />
-                    <p className="text-2xl font-display font-bold">₹0</p>
+                    <p className="text-2xl font-display font-bold">{format(0)}</p>
                     <p className="text-xs text-marvvn-gray-500">Credits Remaining</p>
                   </div>
                 </div>

@@ -8,6 +8,7 @@ import { Heart, ShoppingBag, Minus, Plus, ChevronRight, Truck, RotateCcw, Shield
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
+import { useCurrency } from '@/lib/hooks/useCurrency'
 import ProductReviews from '@/components/ProductReviews'
 import SizeGuide from '@/components/SizeGuide'
 import RecentlyViewed, { trackRecentlyViewed } from '@/components/RecentlyViewed'
@@ -27,6 +28,7 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1)
   const [activeImage, setActiveImage] = useState(0)
   const { addItem, toggleCart } = useCartStore()
+  const { format, symbol } = useCurrency()
   const { toggleItem, isInWishlist } = useWishlistStore()
 
   useEffect(() => {
@@ -239,7 +241,7 @@ export default function ProductPage() {
             <div className="border-t pt-6 space-y-4">
               <div className="flex items-center gap-3 text-sm">
                 <Truck className="w-5 h-5 text-marvvn-gray-400" />
-                <span>Free shipping on orders over ₹1,499</span>
+                <span>Free shipping on orders over {symbol}1,499</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <RotateCcw className="w-5 h-5 text-marvvn-gray-400" />

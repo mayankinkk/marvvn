@@ -5,9 +5,11 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { ChevronRight } from 'lucide-react'
 import { useSettings } from '@/components/SettingsProvider'
+import { useCurrency } from '@/lib/hooks/useCurrency'
 
 export default function TermsPage() {
   const settings = useSettings()
+  const { symbol } = useCurrency()
   const storeEmail = settings.store_email || 'support@marvvn.online'
   const storePhone = settings.store_phone || ''
 
@@ -58,7 +60,7 @@ export default function TermsPage() {
               <h2 className="text-lg font-medium text-marvvn-black mb-3">4. Shipping</h2>
               <p>
                 We aim to ship orders within 24-48 hours. Delivery times are estimates and not 
-                guaranteed. Free shipping is available on orders above ₹1,499. Shipping charges 
+                guaranteed. Free shipping is available on orders above {symbol}{settings.free_shipping_threshold || '999'}. Shipping charges 
                 apply for orders below this threshold.
               </p>
             </section>

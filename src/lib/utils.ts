@@ -5,10 +5,16 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatPrice(price: number): string {
+export function formatPrice(price: number, currency: string = 'INR', symbol?: string): string {
+  if (symbol) {
+    return `${symbol}${new Intl.NumberFormat('en-IN', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(price)}`
+  }
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
-    currency: 'INR',
+    currency,
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(price)

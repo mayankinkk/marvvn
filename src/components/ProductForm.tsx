@@ -158,7 +158,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
 
         <div className="grid md:grid-cols-3 gap-6">
           <div>
-            <label className="block text-sm font-medium mb-1">Price (₹) *</label>
+            <label className="block text-sm font-medium mb-1">Price *</label>
             <input
               type="number"
               value={form.price}
@@ -170,7 +170,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Compare at Price (₹)</label>
+            <label className="block text-sm font-medium mb-1">Compare at Price</label>
             <input
               type="number"
               value={form.compare_at_price}
