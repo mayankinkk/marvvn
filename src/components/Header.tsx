@@ -336,7 +336,7 @@ export default function Header() {
       {/* Mobile Menu */}
       <div className={cn(
         'fixed inset-0 z-[60] bg-white transform transition-transform duration-300 lg:hidden',
-        mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        mobileMenuOpen ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'
       )} role="dialog" aria-modal="true" aria-label="Navigation menu">
         <div className="flex items-center justify-between p-4 border-b">
           <span className="text-xl font-display font-bold">{settings.store_name || 'MARVVN'}</span>
