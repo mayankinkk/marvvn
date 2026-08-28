@@ -15,17 +15,6 @@ interface WishlistStore {
   loadFromServer: () => Promise<void>
 }
 
-async function syncToServer(items: Product[]) {
-  try {
-    const productIds = items.map((item) => item.id)
-    await fetch('/api/wishlist', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ productIds }),
-    })
-  } catch {}
-}
-
 export const useWishlistStore = create<WishlistStore>()(
   persist(
     (set, get) => ({
@@ -35,14 +24,22 @@ export const useWishlistStore = create<WishlistStore>()(
         if (!get().isInWishlist(product.id)) {
           const newItems = [...get().items, product]
           set({ items: newItems })
-          syncToServer(newItems)
+          fetch('/api/wishlist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productId: product.id }),
+          }).catch((e) => console.error('Wishlist sync failed:', e))
         }
       },
 
       removeItem: (productId) => {
         const newItems = get().items.filter((item) => item.id !== productId)
         set({ items: newItems })
-        syncToServer(newItems)
+        fetch('/api/wishlist', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productId }),
+        }).catch((e) => console.error('Wishlist sync failed:', e))
       },
 
       toggleItem: (product) => {
@@ -61,7 +58,6 @@ export const useWishlistStore = create<WishlistStore>()(
 
       clearWishlist: () => {
         set({ items: [] })
-        syncToServer([])
       },
 
       loadFromServer: async () => {
@@ -69,20 +65,22 @@ export const useWishlistStore = create<WishlistStore>()(
           const res = await fetch('/api/wishlist')
           if (!res.ok) return
           const data = await res.json()
-          if (data.wishlist && data.wishlist.length > 0) {
+          if (data.items && data.items.length > 0) {
             const productRes = await fetch('/api/products')
             const productData = await productRes.json()
             const allProducts = productData.products || []
 
-            const items: Product[] = data.wishlist
-              .map((wi: any) => allProducts.find((p: any) => p.id === wi.product_id))
+            const items: Product[] = data.items
+              .map((wi: any) => allProducts.find((p: any) => p.id === wi.id))
               .filter(Boolean)
 
             if (items.length > 0) {
               set({ items })
             }
           }
-        } catch {}
+        } catch (e) {
+          console.error('Failed to load wishlist from server:', e)
+        }
       },
     }),
     {

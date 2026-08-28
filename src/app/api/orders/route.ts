@@ -30,40 +30,92 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { items, total, discount, promoCode, shippingAddress, paymentMethod } = await request.json()
+  const { items, promoCode, shippingAddress, paymentMethod } = await request.json()
+
+  if (!items || !Array.isArray(items) || items.length === 0) {
+    return NextResponse.json({ error: 'No items provided' }, { status: 400 })
+  }
+
+  if (!shippingAddress || !paymentMethod) {
+    return NextResponse.json({ error: 'Shipping address and payment method are required' }, { status: 400 })
+  }
+
+  const productIds = items.map((item: any) => item.productId)
+  const { data: products, error: productsError } = await supabase
+    .from('products')
+    .select('id, price')
+    .in('id', productIds)
+
+  if (productsError) {
+    return NextResponse.json({ error: 'Failed to validate products' }, { status: 500 })
+  }
+
+  const productMap = new Map(products?.map((p: any) => [p.id, p.price]) || [])
+
+  let serverTotal = 0
+  const orderItems = items.map((item: any) => {
+    const serverPrice = productMap.get(item.productId)
+    if (serverPrice === undefined) {
+      throw new Error(`Product ${item.productId} not found`)
+    }
+    const quantity = Math.max(1, Math.min(99, parseInt(item.quantity) || 1))
+    serverTotal += serverPrice * quantity
+    return {
+      product_id: item.productId,
+      quantity,
+      size: item.size || null,
+      color: item.color || null,
+      price: serverPrice,
+    }
+  })
+
+  let discount = 0
+  if (promoCode) {
+    const { data: coupon } = await supabase
+      .from('coupons')
+      .select('discount_value, discount_type, min_cart')
+      .eq('code', promoCode.toUpperCase())
+      .eq('is_active', true)
+      .single()
+
+    if (coupon && serverTotal >= (coupon.min_cart || 0)) {
+      discount = coupon.discount_type === 'percentage'
+        ? (serverTotal * coupon.discount_value) / 100
+        : coupon.discount_value
+    }
+  }
+
+  const finalTotal = Math.max(0, serverTotal - discount)
 
   const { data: order, error: orderError } = await supabase
     .from('orders')
     .insert({
       user_id: user.id,
-      total,
-      discount: discount || 0,
+      total: finalTotal,
+      discount,
       promo_code: promoCode || null,
       shipping_address: shippingAddress,
       payment_method: paymentMethod,
       status: 'pending',
-      payment_status: paymentMethod === 'cod' ? 'pending' : 'paid',
+      payment_status: paymentMethod === 'cod' ? 'pending' : 'pending',
     })
     .select()
     .single()
 
   if (orderError) {
-    return NextResponse.json({ error: orderError.message }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
   }
 
-  const orderItems = items.map((item: any) => ({
+  const itemsWithOrderId = orderItems.map((item: any) => ({
+    ...item,
     order_id: order.id,
-    product_id: item.productId,
-    quantity: item.quantity,
-    size: item.size,
-    color: item.color,
-    price: item.price,
   }))
 
-  const { error: itemsError } = await supabase.from('order_items').insert(orderItems)
+  const { error: itemsError } = await supabase.from('order_items').insert(itemsWithOrderId)
 
   if (itemsError) {
-    return NextResponse.json({ error: itemsError.message }, { status: 500 })
+    await supabase.from('orders').delete().eq('id', order.id)
+    return NextResponse.json({ error: 'Failed to create order items' }, { status: 500 })
   }
 
   return NextResponse.json({ order }, { status: 201 })

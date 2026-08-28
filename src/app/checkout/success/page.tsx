@@ -1,12 +1,15 @@
 'use client'
 
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { CheckCircle, Package, Home } from 'lucide-react'
+import { Suspense } from 'react'
 
-export default function CheckoutSuccessPage() {
-  const orderId = `BC${Date.now().toString().slice(-8)}`
+function CheckoutSuccessContent() {
+  const searchParams = useSearchParams()
+  const orderId = searchParams.get('orderId') || 'N/A'
 
   return (
     <div className="min-h-screen">
@@ -48,5 +51,13 @@ export default function CheckoutSuccessPage() {
       </main>
       <Footer />
     </div>
+  )
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <CheckoutSuccessContent />
+    </Suspense>
   )
 }

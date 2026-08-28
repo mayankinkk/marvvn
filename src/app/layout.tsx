@@ -37,7 +37,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
+      <body className={`${inter.variable} ${playfair.variable} font-sans`}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -47,22 +47,16 @@ export default function RootLayout({
               name: 'MARVVN',
               url: 'https://marvvn.online',
               logo: 'https://marvvn.online/logo.png',
-              sameAs: [
-                'https://www.instagram.com/bonkers.corner/',
-                'https://www.facebook.com/TeamBonkerscorner',
-                'https://x.com/BonkersCornerX',
-              ],
+              sameAs: [],
               contactPoint: {
                 '@type': 'ContactPoint',
-                telephone: '+91-8655700724',
+                telephone: '',
                 contactType: 'customer service',
                 availableLanguage: 'English',
               },
             }),
           }}
         />
-      </head>
-      <body className={`${inter.variable} ${playfair.variable} font-sans`}>
         <SettingsProvider>
           <SupabaseProvider>
             {children}

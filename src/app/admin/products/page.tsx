@@ -27,9 +27,15 @@ export default function AdminProductsPage() {
     if (!confirm('Delete this product?')) return
     setDeleting(id)
     try {
-      await fetch(`/api/admin/products/${id}`, { method: 'DELETE' })
-      setProducts(products.filter((p) => p.id !== id))
-    } catch {}
+      const res = await fetch(`/api/admin/products/${id}`, { method: 'DELETE' })
+      if (res.ok) {
+        setProducts(products.filter((p) => p.id !== id))
+      } else {
+        alert('Failed to delete product')
+      }
+    } catch {
+      alert('Failed to delete product')
+    }
     setDeleting(null)
   }
 

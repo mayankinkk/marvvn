@@ -10,13 +10,18 @@ async function isAdmin(supabase: any) {
 
 export async function GET() {
   const supabase = createClient()
+
+  if (!(await isAdmin(supabase))) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
   const { data, error } = await supabase
     .from('products')
     .select('*')
     .order('created_at', { ascending: false })
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 })
   }
 
   return NextResponse.json({ products: data })
@@ -32,16 +37,24 @@ export async function POST(request: Request) {
   const body = await request.json()
   const { handle, title, description, price, compare_at_price, images, category, collection, tags, sizes, colors, is_new, is_bestseller, badge } = body
 
+  if (!handle || !title || price === undefined) {
+    return NextResponse.json({ error: 'Handle, title, and price are required' }, { status: 400 })
+  }
+
+  if (typeof price !== 'number' || price < 0) {
+    return NextResponse.json({ error: 'Price must be a non-negative number' }, { status: 400 })
+  }
+
   const { data, error } = await supabase
     .from('products')
     .insert({
       handle,
       title,
-      description,
+      description: description || '',
       price,
       compare_at_price: compare_at_price || null,
       images: images || [],
-      category,
+      category: category || '',
       collection: collection || [],
       tags: tags || [],
       sizes: sizes || [],
@@ -54,7 +67,10 @@ export async function POST(request: Request) {
     .single()
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    if (error.code === '23505') {
+      return NextResponse.json({ error: 'A product with this handle already exists' }, { status: 409 })
+    }
+    return NextResponse.json({ error: 'Failed to create product' }, { status: 500 })
   }
 
   return NextResponse.json({ product: data }, { status: 201 })

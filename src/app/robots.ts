@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/account/', '/checkout/', '/api/'],
       },
     ],
-    sitemap: 'https://bonkerscorner.com/sitemap.xml',
+    sitemap: 'https://marvvn.online/sitemap.xml',
   }
 }

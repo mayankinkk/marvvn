@@ -50,10 +50,26 @@ export async function POST(request: Request) {
 
   const { productId, quantity, size, color } = await request.json()
 
+  if (!productId || typeof productId !== 'string') {
+    return NextResponse.json({ error: 'Valid productId is required' }, { status: 400 })
+  }
+
+  const validQuantity = Math.max(1, Math.min(99, parseInt(quantity) || 1))
+
+  const { data: product, error: productError } = await supabase
+    .from('products')
+    .select('id')
+    .eq('id', productId)
+    .single()
+
+  if (productError || !product) {
+    return NextResponse.json({ error: 'Product not found' }, { status: 404 })
+  }
+
   const { data, error } = await supabase
     .from('cart_items')
     .upsert(
-      { user_id: user.id, product_id: productId, quantity, size, color },
+      { user_id: user.id, product_id: productId, quantity: validQuantity, size: size || null, color: color || null },
       { onConflict: 'user_id,product_id,size,color' }
     )
     .select()
@@ -74,15 +90,26 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { productId, size, color } = await request.json()
+  let body
+  try {
+    body = await request.json()
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+  }
+
+  const { productId, size, color } = body
+
+  if (!productId) {
+    return NextResponse.json({ error: 'productId is required' }, { status: 400 })
+  }
 
   const { error } = await supabase
     .from('cart_items')
     .delete()
     .eq('user_id', user.id)
     .eq('product_id', productId)
-    .eq('size', size)
-    .eq('color', color)
+    .eq('size', size || '')
+    .eq('color', color || '')
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })

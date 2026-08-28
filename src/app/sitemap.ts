@@ -36,7 +36,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }))
 
   const blogPages = blogPosts.map((post) => ({
-    url: `${baseUrl}/blogs/bonkers-corner/${post.handle}`,
+    url: `${baseUrl}/blogs/${post.handle}`,
     lastModified: new Date(),
     changeFrequency: 'monthly' as const,
     priority: 0.6,

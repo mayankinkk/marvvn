@@ -8,7 +8,16 @@ async function isAdmin(supabase: any) {
   return profile?.is_admin || false
 }
 
-const DEFAULTS = {
+const ALLOWED_KEYS = new Set([
+  'store_name', 'store_description', 'store_email', 'store_phone', 'store_address',
+  'currency', 'currency_symbol', 'tax_rate', 'free_shipping_threshold', 'shipping_fee',
+  'whatsapp_number', 'instagram_url', 'facebook_url', 'twitter_url',
+  'logo_url', 'banner_url', 'primary_color', 'accent_color',
+  'maintenance_mode', 'maintenance_message', 'order_email_enabled', 'low_stock_threshold',
+  'seo_title', 'seo_description', 'seo_keywords',
+])
+
+const DEFAULTS: Record<string, string> = {
   store_name: 'MARVVN',
   store_description: 'Premium streetwear and oversized tees',
   store_email: '',
@@ -47,7 +56,27 @@ export async function GET() {
 
   const settings: Record<string, string> = { ...DEFAULTS }
   ;(data || []).forEach((row: any) => {
-    settings[row.key] = row.value
+    if (ALLOWED_KEYS.has(row.key)) {
+      settings[row.key] = row.value
+    }
+  })
+
+  return NextResponse.json({ settings })
+}
+
+export async function GET_PUBLIC() {
+  const supabase = createClient()
+
+  const { data, error } = await supabase.from('store_settings').select('*')
+  if (error) {
+    return NextResponse.json({ settings: DEFAULTS })
+  }
+
+  const settings: Record<string, string> = { ...DEFAULTS }
+  ;(data || []).forEach((row: any) => {
+    if (ALLOWED_KEYS.has(row.key)) {
+      settings[row.key] = row.value
+    }
   })
 
   return NextResponse.json({ settings })
@@ -64,7 +93,13 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: 'Invalid settings' }, { status: 400 })
   }
 
-  const updates = Object.entries(settings).map(([key, value]) => ({
+  const filteredEntries = Object.entries(settings).filter(([key]) => ALLOWED_KEYS.has(key))
+
+  if (filteredEntries.length === 0) {
+    return NextResponse.json({ error: 'No valid settings provided' }, { status: 400 })
+  }
+
+  const updates = filteredEntries.map(([key, value]) => ({
     key,
     value: String(value),
   }))
@@ -73,7 +108,7 @@ export async function PUT(request: Request) {
     .from('store_settings')
     .upsert(updates, { onConflict: 'key' })
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ error: 'Failed to save settings' }, { status: 500 })
 
   return NextResponse.json({ success: true })
 }

@@ -2,7 +2,6 @@
 
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { createClient } from '@/lib/supabase/client'
 
 interface User {
   id: string
@@ -27,45 +26,75 @@ export const useAuthStore = create<AuthStore>()(
     (set, get) => ({
       user: null,
       isAuthenticated: false,
-      loading: true,
+      loading: false,
 
       login: async (email, password) => {
-        const res = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
-        })
+        set({ loading: true })
+        try {
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password }),
+          })
 
-        if (!res.ok) return false
+          if (!res.ok) {
+            set({ loading: false })
+            return false
+          }
 
-        const data = await res.json()
-        const user: User = {
-          id: data.user.id,
-          email: data.user.email,
-          name: data.user.user_metadata?.name || '',
-          phone: data.user.user_metadata?.phone || '',
+          const data = await res.json()
+          const user: User = {
+            id: data.user.id,
+            email: data.user.email,
+            name: data.user.user_metadata?.name || '',
+            phone: data.user.user_metadata?.phone || '',
+          }
+          set({ user, isAuthenticated: true, loading: false })
+          return true
+        } catch {
+          set({ loading: false })
+          return false
         }
-        set({ user, isAuthenticated: true })
-        return true
       },
 
       register: async (name, email, password) => {
-        const res = await fetch('/api/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, email, password }),
-        })
+        set({ loading: true })
+        try {
+          const res = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password }),
+          })
 
-        if (!res.ok) return false
+          if (!res.ok) {
+            set({ loading: false })
+            return false
+          }
 
-        const data = await res.json()
-        const user: User = {
-          id: data.user.id,
-          email: data.user.email,
-          name,
+          const data = await res.json()
+          if (data.user) {
+            const loginRes = await fetch('/api/auth/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email, password }),
+            })
+            if (loginRes.ok) {
+              const loginData = await loginRes.json()
+              const user: User = {
+                id: loginData.user.id,
+                email: loginData.user.email,
+                name,
+              }
+              set({ user, isAuthenticated: true, loading: false })
+              return true
+            }
+          }
+          set({ loading: false })
+          return true
+        } catch {
+          set({ loading: false })
+          return false
         }
-        set({ user, isAuthenticated: true })
-        return true
       },
 
       logout: async () => {
@@ -74,6 +103,7 @@ export const useAuthStore = create<AuthStore>()(
       },
 
       fetchUser: async () => {
+        set({ loading: true })
         try {
           const res = await fetch('/api/auth/me')
           if (res.ok) {
@@ -84,10 +114,10 @@ export const useAuthStore = create<AuthStore>()(
             }
           }
         } catch {}
-        set({ loading: false })
+        set({ user: null, isAuthenticated: false, loading: false })
       },
 
-      updateProfile: (data) => {
+      updateProfile: async (data) => {
         const user = get().user
         if (user) {
           set({ user: { ...user, ...data } })

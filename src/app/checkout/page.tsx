@@ -27,6 +27,7 @@ export default function CheckoutPage() {
   const [promoError, setPromoError] = useState('')
   const [isPlacing, setIsPlacing] = useState(false)
   const [orderError, setOrderError] = useState('')
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
 
   const [shipping, setShipping] = useState({
     firstName: user?.name?.split(' ')[0] || '',
@@ -48,10 +49,44 @@ export default function CheckoutPage() {
     upiId: '',
   })
 
-  const handleApplyPromo = () => {
+  const validateShipping = (): boolean => {
+    const errors: Record<string, string> = {}
+    if (!shipping.firstName.trim()) errors.firstName = 'Required'
+    if (!shipping.lastName.trim()) errors.lastName = 'Required'
+    if (!shipping.email.trim() || !shipping.email.includes('@')) errors.email = 'Valid email required'
+    if (!shipping.phone.trim() || shipping.phone.length < 10) errors.phone = 'Valid phone required'
+    if (!shipping.address.trim()) errors.address = 'Required'
+    if (!shipping.city.trim()) errors.city = 'Required'
+    if (!shipping.state.trim()) errors.state = 'Required'
+    if (!shipping.pincode.trim() || shipping.pincode.length < 6) errors.pincode = 'Valid pincode required'
+    setValidationErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
+  const validatePayment = (): boolean => {
+    if (payment.method === 'card') {
+      const errors: Record<string, string> = {}
+      if (!payment.cardNumber.trim() || payment.cardNumber.replace(/\s/g, '').length < 16) errors.cardNumber = 'Valid card number required'
+      if (!payment.cardName.trim()) errors.cardName = 'Required'
+      if (!payment.expiry.trim() || !/^\d{2}\/\d{2}$/.test(payment.expiry)) errors.expiry = 'MM/YY required'
+      if (!payment.cvv.trim() || payment.cvv.length < 3) errors.cvv = 'Valid CVV required'
+      setValidationErrors(errors)
+      return Object.keys(errors).length === 0
+    }
+    if (payment.method === 'upi') {
+      const errors: Record<string, string> = {}
+      if (!payment.upiId.trim() || !payment.upiId.includes('@')) errors.upiId = 'Valid UPI ID required'
+      setValidationErrors(errors)
+      return Object.keys(errors).length === 0
+    }
+    setValidationErrors({})
+    return true
+  }
+
+  const handleApplyPromo = async () => {
     setPromoError('')
     if (!promoInput.trim()) return
-    const success = applyPromoCode(promoInput)
+    const success = await applyPromoCode(promoInput)
     if (!success) {
       setPromoError('Invalid promo code')
     } else {
@@ -64,9 +99,6 @@ export default function CheckoutPage() {
     setOrderError('')
 
     try {
-      const shippingCost = totalPrice() >= freeShippingThreshold ? 0 : shippingFee
-      const total = finalPrice() + shippingCost
-
       const response = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -76,10 +108,7 @@ export default function CheckoutPage() {
             quantity: item.quantity,
             size: item.size,
             color: item.color,
-            price: item.product.price,
           })),
-          total,
-          discount: discount || 0,
           promoCode: promoCode || null,
           shippingAddress: {
             firstName: shipping.firstName,
@@ -100,11 +129,20 @@ export default function CheckoutPage() {
         throw new Error(data.error || 'Failed to place order')
       }
 
+      const data = await response.json()
       clearCart()
-      router.push('/checkout/success')
+      router.push(`/checkout/success?orderId=${data.order.id}`)
     } catch (err: any) {
       setOrderError(err.message || 'Something went wrong. Please try again.')
       setIsPlacing(false)
+    }
+  }
+
+  const handleNextStep = () => {
+    if (step === 'shipping' && validateShipping()) {
+      setStep('payment')
+    } else if (step === 'payment' && validatePayment()) {
+      setStep('review')
     }
   }
 
@@ -183,9 +221,9 @@ export default function CheckoutPage() {
                       type="text"
                       value={shipping.firstName}
                       onChange={(e) => setShipping({ ...shipping, firstName: e.target.value })}
-                      className="input-field"
-                      required
+                      className={`input-field ${validationErrors.firstName ? 'border-red-500' : ''}`}
                     />
+                    {validationErrors.firstName && <p className="text-xs text-red-500 mt-1">{validationErrors.firstName}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">Last Name</label>
@@ -193,9 +231,9 @@ export default function CheckoutPage() {
                       type="text"
                       value={shipping.lastName}
                       onChange={(e) => setShipping({ ...shipping, lastName: e.target.value })}
-                      className="input-field"
-                      required
+                      className={`input-field ${validationErrors.lastName ? 'border-red-500' : ''}`}
                     />
+                    {validationErrors.lastName && <p className="text-xs text-red-500 mt-1">{validationErrors.lastName}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">Email</label>
@@ -203,9 +241,9 @@ export default function CheckoutPage() {
                       type="email"
                       value={shipping.email}
                       onChange={(e) => setShipping({ ...shipping, email: e.target.value })}
-                      className="input-field"
-                      required
+                      className={`input-field ${validationErrors.email ? 'border-red-500' : ''}`}
                     />
+                    {validationErrors.email && <p className="text-xs text-red-500 mt-1">{validationErrors.email}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">Phone</label>
@@ -213,9 +251,9 @@ export default function CheckoutPage() {
                       type="tel"
                       value={shipping.phone}
                       onChange={(e) => setShipping({ ...shipping, phone: e.target.value })}
-                      className="input-field"
-                      required
+                      className={`input-field ${validationErrors.phone ? 'border-red-500' : ''}`}
                     />
+                    {validationErrors.phone && <p className="text-xs text-red-500 mt-1">{validationErrors.phone}</p>}
                   </div>
                   <div className="col-span-2">
                     <label className="block text-sm font-medium mb-1">Address</label>
@@ -223,9 +261,9 @@ export default function CheckoutPage() {
                       type="text"
                       value={shipping.address}
                       onChange={(e) => setShipping({ ...shipping, address: e.target.value })}
-                      className="input-field"
-                      required
+                      className={`input-field ${validationErrors.address ? 'border-red-500' : ''}`}
                     />
+                    {validationErrors.address && <p className="text-xs text-red-500 mt-1">{validationErrors.address}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">City</label>
@@ -233,9 +271,9 @@ export default function CheckoutPage() {
                       type="text"
                       value={shipping.city}
                       onChange={(e) => setShipping({ ...shipping, city: e.target.value })}
-                      className="input-field"
-                      required
+                      className={`input-field ${validationErrors.city ? 'border-red-500' : ''}`}
                     />
+                    {validationErrors.city && <p className="text-xs text-red-500 mt-1">{validationErrors.city}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">State</label>
@@ -243,9 +281,9 @@ export default function CheckoutPage() {
                       type="text"
                       value={shipping.state}
                       onChange={(e) => setShipping({ ...shipping, state: e.target.value })}
-                      className="input-field"
-                      required
+                      className={`input-field ${validationErrors.state ? 'border-red-500' : ''}`}
                     />
+                    {validationErrors.state && <p className="text-xs text-red-500 mt-1">{validationErrors.state}</p>}
                   </div>
                   <div>
                     <label className="block text-sm font-medium mb-1">Pincode</label>
@@ -253,14 +291,14 @@ export default function CheckoutPage() {
                       type="text"
                       value={shipping.pincode}
                       onChange={(e) => setShipping({ ...shipping, pincode: e.target.value })}
-                      className="input-field"
-                      required
+                      className={`input-field ${validationErrors.pincode ? 'border-red-500' : ''}`}
                     />
+                    {validationErrors.pincode && <p className="text-xs text-red-500 mt-1">{validationErrors.pincode}</p>}
                   </div>
                 </div>
                 <button
                   type="button"
-                  onClick={() => setStep('payment')}
+                  onClick={handleNextStep}
                   className="w-full btn-primary mt-6 py-3 cursor-pointer"
                 >
                   Continue to Payment
@@ -296,11 +334,13 @@ export default function CheckoutPage() {
                         <label className="block text-sm font-medium mb-1">Card Number</label>
                         <input
                           type="text"
+                          inputMode="numeric"
                           placeholder="1234 5678 9012 3456"
                           value={payment.cardNumber}
                           onChange={(e) => setPayment({ ...payment, cardNumber: e.target.value })}
-                          className="input-field"
+                          className={`input-field ${validationErrors.cardNumber ? 'border-red-500' : ''}`}
                         />
+                        {validationErrors.cardNumber && <p className="text-xs text-red-500 mt-1">{validationErrors.cardNumber}</p>}
                       </div>
                       <div className="col-span-2">
                         <label className="block text-sm font-medium mb-1">Name on Card</label>
@@ -308,8 +348,9 @@ export default function CheckoutPage() {
                           type="text"
                           value={payment.cardName}
                           onChange={(e) => setPayment({ ...payment, cardName: e.target.value })}
-                          className="input-field"
+                          className={`input-field ${validationErrors.cardName ? 'border-red-500' : ''}`}
                         />
+                        {validationErrors.cardName && <p className="text-xs text-red-500 mt-1">{validationErrors.cardName}</p>}
                       </div>
                       <div>
                         <label className="block text-sm font-medium mb-1">Expiry</label>
@@ -318,18 +359,22 @@ export default function CheckoutPage() {
                           placeholder="MM/YY"
                           value={payment.expiry}
                           onChange={(e) => setPayment({ ...payment, expiry: e.target.value })}
-                          className="input-field"
+                          className={`input-field ${validationErrors.expiry ? 'border-red-500' : ''}`}
                         />
+                        {validationErrors.expiry && <p className="text-xs text-red-500 mt-1">{validationErrors.expiry}</p>}
                       </div>
                       <div>
                         <label className="block text-sm font-medium mb-1">CVV</label>
                         <input
-                          type="text"
+                          type="password"
+                          inputMode="numeric"
                           placeholder="123"
+                          maxLength={4}
                           value={payment.cvv}
                           onChange={(e) => setPayment({ ...payment, cvv: e.target.value })}
-                          className="input-field"
+                          className={`input-field ${validationErrors.cvv ? 'border-red-500' : ''}`}
                         />
+                        {validationErrors.cvv && <p className="text-xs text-red-500 mt-1">{validationErrors.cvv}</p>}
                       </div>
                     </div>
                   )}
@@ -342,8 +387,9 @@ export default function CheckoutPage() {
                         placeholder="yourname@upi"
                         value={payment.upiId}
                         onChange={(e) => setPayment({ ...payment, upiId: e.target.value })}
-                        className="input-field"
+                        className={`input-field ${validationErrors.upiId ? 'border-red-500' : ''}`}
                       />
+                      {validationErrors.upiId && <p className="text-xs text-red-500 mt-1">{validationErrors.upiId}</p>}
                     </div>
                   )}
                 </div>
@@ -351,7 +397,7 @@ export default function CheckoutPage() {
                   <button type="button" onClick={() => setStep('shipping')} className="btn-secondary flex-1 py-3 cursor-pointer">
                     Back
                   </button>
-                  <button type="button" onClick={() => setStep('review')} className="btn-primary flex-1 py-3 cursor-pointer">
+                  <button type="button" onClick={handleNextStep} className="btn-primary flex-1 py-3 cursor-pointer">
                     Review Order
                   </button>
                 </div>
@@ -388,7 +434,7 @@ export default function CheckoutPage() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate">{item.product.title}</p>
-                        <p className="text-xs text-marvvn-gray-500">{item.size} / {item.color} × {item.quantity}</p>
+                        <p className="text-xs text-marvvn-gray-500">{item.size} / {item.color} x {item.quantity}</p>
                       </div>
                       <span className="text-sm font-medium">{formatPrice(item.product.price * item.quantity)}</span>
                     </div>
@@ -427,7 +473,7 @@ export default function CheckoutPage() {
                 {items.map((item) => (
                   <div key={`${item.product.id}-${item.size}-${item.color}`} className="flex justify-between">
                     <span className="text-marvvn-gray-600 truncate mr-2">
-                      {item.product.title} × {item.quantity}
+                      {item.product.title} x {item.quantity}
                     </span>
                     <span className="flex-shrink-0">{formatPrice(item.product.price * item.quantity)}</span>
                   </div>

@@ -14,10 +14,10 @@ export async function GET() {
 
   const { data: profiles, error } = await supabase
     .from('profiles')
-    .select('*')
+    .select('id, name, email, created_at')
     .order('created_at', { ascending: false })
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ error: 'Failed to fetch customers' }, { status: 500 })
 
   const userIds = (profiles || []).map((p: any) => p.id)
   const { data: orders } = await supabase
@@ -31,7 +31,6 @@ export async function GET() {
       ...profile,
       totalOrders: userOrders.length,
       totalSpent: userOrders.reduce((sum: number, o: any) => sum + (o.status !== 'cancelled' ? Number(o.total) : 0), 0),
-      lastOrder: userOrders.length > 0 ? userOrders.sort((a: any, b: any) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0] : null,
     }
   })
 

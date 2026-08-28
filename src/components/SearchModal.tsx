@@ -17,6 +17,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const { products } = useProducts()
   const [results, setResults] = useState<typeof products>([])
   const inputRef = useRef<HTMLInputElement>(null)
+  const debounceRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     if (isOpen) {
@@ -28,17 +29,30 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   }, [isOpen])
 
   useEffect(() => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current)
+    }
+
     if (query.length < 2) {
       setResults([])
       return
     }
-    const filtered = products.filter(
-      (p) =>
-        p.title.toLowerCase().includes(query.toLowerCase()) ||
-        p.tags?.some((t) => t.toLowerCase().includes(query.toLowerCase())) ||
-        p.category?.toLowerCase().includes(query.toLowerCase())
-    )
-    setResults(filtered.slice(0, 8))
+
+    debounceRef.current = setTimeout(() => {
+      const filtered = products.filter(
+        (p) =>
+          p.title.toLowerCase().includes(query.toLowerCase()) ||
+          p.tags?.some((t) => t.toLowerCase().includes(query.toLowerCase())) ||
+          p.category?.toLowerCase().includes(query.toLowerCase())
+      )
+      setResults(filtered.slice(0, 8))
+    }, 250)
+
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current)
+      }
+    }
   }, [query, products])
 
   if (!isOpen) return null

@@ -8,23 +8,27 @@ export const config = {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Skip admin routes and API routes
   if (pathname.startsWith('/admin') || pathname.startsWith('/api')) {
     return NextResponse.next()
   }
 
-  // Check maintenance mode from cookie (set by SupabaseProvider on first load)
-  const maintenanceCookie = request.cookies.get('store_maintenance')
-
-  if (maintenanceCookie?.value === 'true') {
-    // Check if user is admin by looking for a session cookie
-    const hasSession = request.cookies.get('sb-vowubjguzgdbaircgdwq-auth-token')
-    if (!hasSession) {
-      // Show maintenance page
-      const url = request.nextUrl.clone()
-      url.pathname = '/maintenance'
-      return NextResponse.rewrite(url)
+  try {
+    const url = request.nextUrl.clone()
+    url.pathname = '/api/settings'
+    const settingsRes = await fetch(url, { next: { revalidate: 60 } })
+    if (settingsRes.ok) {
+      const settings = await settingsRes.json()
+      if (settings.maintenance_mode === true || settings.maintenance_mode === 'true') {
+        const sessionCookie = request.cookies.get('sb-vowubjguzgdbaircgdwq-auth-token')
+        if (!sessionCookie) {
+          const maintenanceUrl = request.nextUrl.clone()
+          maintenanceUrl.pathname = '/maintenance'
+          return NextResponse.rewrite(maintenanceUrl)
+        }
+      }
     }
+  } catch {
+    // If settings fetch fails, continue normally
   }
 
   return NextResponse.next()

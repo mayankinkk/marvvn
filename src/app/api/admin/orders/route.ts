@@ -17,11 +17,14 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from('orders')
-    .select('*, order_items(*, products(title, handle, images))')
+    .select(`
+      id, user_id, total, discount, promo_code, status, payment_method, payment_status, created_at,
+      order_items(quantity, size, color, price, products(title, handle, images))
+    `)
     .order('created_at', { ascending: false })
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: 'Failed to fetch orders' }, { status: 500 })
   }
 
   return NextResponse.json({ orders: data })

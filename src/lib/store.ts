@@ -15,7 +15,7 @@ interface CartStore {
   clearCart: () => void
   toggleCart: () => void
   setCartOpen: (open: boolean) => void
-  applyPromoCode: (code: string) => boolean
+  applyPromoCode: (code: string) => Promise<boolean>
   removePromoCode: () => void
   totalItems: () => number
   totalPrice: () => number
@@ -23,27 +23,25 @@ interface CartStore {
   loadFromServer: () => Promise<void>
 }
 
-const PROMO_CODES: Record<string, number> = {
-  'SHARKTANK10': 10,
-  'WELCOME10': 10,
-  'MARVVN15': 15,
-  'FLAT20': 20,
-}
-
 async function syncToServer(items: CartItem[]) {
   try {
+    if (items.length === 0) return
     const serializable = items.map((item) => ({
       productId: item.product.id,
       quantity: item.quantity,
       size: item.size,
       color: item.color,
     }))
-    await fetch('/api/cart', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items: serializable }),
-    })
-  } catch {}
+    for (const item of serializable) {
+      await fetch('/api/cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(item),
+      })
+    }
+  } catch (e) {
+    console.error('Cart sync failed:', e)
+  }
 }
 
 export const useCartStore = create<CartStore>()(
@@ -88,9 +86,10 @@ export const useCartStore = create<CartStore>()(
           return
         }
 
+        const clampedQty = Math.min(99, quantity)
         const newItems = get().items.map((item) =>
           item.product.id === productId && item.size === size && item.color === color
-            ? { ...item, quantity }
+            ? { ...item, quantity: clampedQty }
             : item
         )
         set({ items: newItems })
@@ -99,18 +98,26 @@ export const useCartStore = create<CartStore>()(
 
       clearCart: () => {
         set({ items: [], promoCode: '', discount: 0 })
-        syncToServer([])
       },
 
       toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),
 
       setCartOpen: (open) => set({ isOpen: open }),
 
-      applyPromoCode: (code) => {
-        const upperCode = code.toUpperCase()
-        if (PROMO_CODES[upperCode]) {
-          set({ promoCode: upperCode, discount: PROMO_CODES[upperCode] })
-          return true
+      applyPromoCode: async (code) => {
+        try {
+          const res = await fetch('/api/settings')
+          if (!res.ok) return false
+          const data = await res.json()
+          const validCoupons = data.valid_coupons || []
+          const upperCode = code.toUpperCase()
+          const coupon = validCoupons.find((c: any) => c.code === upperCode)
+          if (coupon) {
+            set({ promoCode: upperCode, discount: coupon.discount_value || 0 })
+            return true
+          }
+        } catch (e) {
+          console.error('Promo code validation failed:', e)
         }
         return false
       },
@@ -136,15 +143,13 @@ export const useCartStore = create<CartStore>()(
           const res = await fetch('/api/cart')
           if (!res.ok) return
           const data = await res.json()
-          if (data.cart && data.cart.length > 0) {
-            const { useProducts } = await import('./hooks/useProducts')
-            // We need products data to hydrate cart items
+          if (data.items && data.items.length > 0) {
             const productRes = await fetch('/api/products')
             const productData = await productRes.json()
             const allProducts = productData.products || []
 
-            const items: CartItem[] = data.cart.map((ci: any) => {
-              const product = allProducts.find((p: any) => p.id === ci.product_id)
+            const items: CartItem[] = data.items.map((ci: any) => {
+              const product = allProducts.find((p: any) => p.id === ci.productId)
               return product ? {
                 product,
                 quantity: ci.quantity,
@@ -157,7 +162,9 @@ export const useCartStore = create<CartStore>()(
               set({ items })
             }
           }
-        } catch {}
+        } catch (e) {
+          console.error('Failed to load cart from server:', e)
+        }
       },
     }),
     {

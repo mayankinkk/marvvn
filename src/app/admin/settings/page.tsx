@@ -37,6 +37,22 @@ export default function AdminSettingsPage() {
   const handleSave = async () => {
     setSaving(true)
     try {
+      if (settings.tax_rate && (parseFloat(settings.tax_rate) < 0 || parseFloat(settings.tax_rate) > 100)) {
+        alert('Tax rate must be between 0 and 100')
+        setSaving(false)
+        return
+      }
+      if (settings.free_shipping_threshold && parseFloat(settings.free_shipping_threshold) < 0) {
+        alert('Free shipping threshold cannot be negative')
+        setSaving(false)
+        return
+      }
+      if (settings.shipping_fee && parseFloat(settings.shipping_fee) < 0) {
+        alert('Shipping fee cannot be negative')
+        setSaving(false)
+        return
+      }
+
       const res = await fetch('/api/admin/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -45,8 +61,12 @@ export default function AdminSettingsPage() {
       if (res.ok) {
         setSaved(true)
         setTimeout(() => setSaved(false), 3000)
+      } else {
+        alert('Failed to save settings')
       }
-    } catch {}
+    } catch {
+      alert('Failed to save settings')
+    }
     setSaving(false)
   }
 

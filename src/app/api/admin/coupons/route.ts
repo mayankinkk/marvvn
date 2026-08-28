@@ -8,15 +8,12 @@ async function isAdmin(supabase: any) {
   return profile?.is_admin || false
 }
 
-// Coupons stored in a simple table or as JSON. For now, use a coupons table.
-// Run: CREATE TABLE IF NOT EXISTS coupons (id UUID DEFAULT gen_random_uuid() PRIMARY KEY, code TEXT UNIQUE NOT NULL, discount_type TEXT NOT NULL CHECK (discount_type IN ('percentage', 'fixed')), discount_value NUMERIC(10,2) NOT NULL, min_cart NUMERIC(10,2) DEFAULT 0, max_uses INTEGER, used_count INTEGER DEFAULT 0, active BOOLEAN DEFAULT true, expires_at TIMESTAMPTZ, created_at TIMESTAMPTZ DEFAULT now());
-
 export async function GET() {
   const supabase = createClient()
   if (!(await isAdmin(supabase))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const { data, error } = await supabase.from('coupons').select('*').order('created_at', { ascending: false })
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ error: 'Failed to fetch coupons' }, { status: 500 })
   return NextResponse.json({ coupons: data })
 }
 
@@ -27,10 +24,30 @@ export async function POST(request: Request) {
   const body = await request.json()
   const { code, discount_type, discount_value, min_cart, max_uses, expires_at } = body
 
+  if (!code || !discount_type || discount_value === undefined) {
+    return NextResponse.json({ error: 'Code, discount type, and value are required' }, { status: 400 })
+  }
+
+  if (!['percentage', 'fixed'].includes(discount_type)) {
+    return NextResponse.json({ error: 'Discount type must be percentage or fixed' }, { status: 400 })
+  }
+
+  if (typeof discount_value !== 'number' || discount_value <= 0) {
+    return NextResponse.json({ error: 'Discount value must be a positive number' }, { status: 400 })
+  }
+
+  if (discount_type === 'percentage' && discount_value > 100) {
+    return NextResponse.json({ error: 'Percentage discount cannot exceed 100%' }, { status: 400 })
+  }
+
+  if (min_cart !== undefined && (typeof min_cart !== 'number' || min_cart < 0)) {
+    return NextResponse.json({ error: 'Min cart must be a non-negative number' }, { status: 400 })
+  }
+
   const { data, error } = await supabase
     .from('coupons')
     .insert({
-      code: code.toUpperCase(),
+      code: code.toUpperCase().trim(),
       discount_type,
       discount_value,
       min_cart: min_cart || 0,
@@ -40,7 +57,12 @@ export async function POST(request: Request) {
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) {
+    if (error.code === '23505') {
+      return NextResponse.json({ error: 'A coupon with this code already exists' }, { status: 409 })
+    }
+    return NextResponse.json({ error: 'Failed to create coupon' }, { status: 500 })
+  }
   return NextResponse.json({ coupon: data }, { status: 201 })
 }
 
@@ -51,22 +73,25 @@ export async function PUT(request: Request) {
   const body = await request.json()
   const { id, code, discount_type, discount_value, min_cart, max_uses, active, expires_at } = body
 
+  if (!id) return NextResponse.json({ error: 'Coupon ID is required' }, { status: 400 })
+
+  const updates: Record<string, any> = {}
+  if (code !== undefined) updates.code = code.toUpperCase().trim()
+  if (discount_type !== undefined) updates.discount_type = discount_type
+  if (discount_value !== undefined) updates.discount_value = discount_value
+  if (min_cart !== undefined) updates.min_cart = min_cart
+  if (max_uses !== undefined) updates.max_uses = max_uses
+  if (active !== undefined) updates.active = active
+  if (expires_at !== undefined) updates.expires_at = expires_at
+
   const { data, error } = await supabase
     .from('coupons')
-    .update({
-      code: code?.toUpperCase(),
-      discount_type,
-      discount_value,
-      min_cart,
-      max_uses,
-      active,
-      expires_at,
-    })
+    .update(updates)
     .eq('id', id)
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ error: 'Failed to update coupon' }, { status: 500 })
   return NextResponse.json({ coupon: data })
 }
 
@@ -79,6 +104,6 @@ export async function DELETE(request: Request) {
   if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
 
   const { error } = await supabase.from('coupons').delete().eq('id', id)
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ error: 'Failed to delete coupon' }, { status: 500 })
   return NextResponse.json({ success: true })
 }

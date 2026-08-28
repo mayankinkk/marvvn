@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { Search, User, Heart, ShoppingBag, Menu, X, MapPin, ChevronDown, ChevronRight, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -32,6 +32,8 @@ export default function Header() {
   const [expandedMobile, setExpandedMobile] = useState<string | null>(null)
   const [searchOpen, setSearchOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const userMenuRef = useRef<HTMLDivElement>(null)
+  const megaMenuTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const { toggleCart, totalItems } = useCartStore()
   const { totalItems: wishlistCount } = useWishlistStore()
   const { isAuthenticated, user, logout } = useAuthStore()
@@ -44,6 +46,40 @@ export default function Header() {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false)
+      }
+    }
+    if (userMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [userMenuOpen])
+
+  useEffect(() => {
+    return () => {
+      if (megaMenuTimeoutRef.current) {
+        clearTimeout(megaMenuTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  const handleMegaMenuEnter = (label: string) => {
+    if (megaMenuTimeoutRef.current) {
+      clearTimeout(megaMenuTimeoutRef.current)
+      megaMenuTimeoutRef.current = null
+    }
+    setActiveMegaMenu(label)
+  }
+
+  const handleMegaMenuLeave = () => {
+    megaMenuTimeoutRef.current = setTimeout(() => {
+      setActiveMegaMenu(null)
+    }, 150)
+  }
 
   return (
     <>
@@ -122,8 +158,8 @@ export default function Header() {
                 <div
                   key={link.label}
                   className="relative h-full flex items-center"
-                  onMouseEnter={() => setActiveMegaMenu(link.label)}
-                  onMouseLeave={() => setActiveMegaMenu(null)}
+                  onMouseEnter={() => handleMegaMenuEnter(link.label)}
+                  onMouseLeave={handleMegaMenuLeave}
                 >
                   <Link
                     href={link.href}
@@ -145,7 +181,7 @@ export default function Header() {
               </button>
 
               {/* Account */}
-              <div className="relative hidden lg:block">
+              <div className="relative hidden lg:block" ref={userMenuRef}>
                 <button
                   type="button"
                   className="p-2 hover:bg-marvvn-gray-50 rounded-full transition-colors"
@@ -222,11 +258,11 @@ export default function Header() {
           <div
             key={link.label}
             className={cn(
-              'absolute left-0 right-0 top-full bg-white border-t border-marvvn-gray-100 shadow-lg transition-all duration-300',
+              'absolute left-0 right-0 top-full bg-white border-t border-marvvn-gray-100 shadow-lg transition-all duration-200',
               activeMegaMenu === link.label ? 'opacity-100 visible' : 'opacity-0 invisible'
             )}
-            onMouseEnter={() => setActiveMegaMenu(link.label)}
-            onMouseLeave={() => setActiveMegaMenu(null)}
+            onMouseEnter={() => handleMegaMenuEnter(link.label)}
+            onMouseLeave={handleMegaMenuLeave}
           >
             <div className="container py-8">
               <div className="grid grid-cols-4 gap-8">
@@ -276,7 +312,7 @@ export default function Header() {
       <div className={cn(
         'fixed inset-0 z-[60] bg-white transform transition-transform duration-300 lg:hidden',
         mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-      )}>
+      )} role="dialog" aria-modal="true" aria-label="Navigation menu">
         <div className="flex items-center justify-between p-4 border-b">
           <span className="text-xl font-display font-bold">{settings.store_name || 'MARVVN'}</span>
           <button type="button" onClick={() => setMobileMenuOpen(false)} aria-label="Close menu">
