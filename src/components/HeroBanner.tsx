@@ -47,8 +47,6 @@ export default function HeroBanner() {
     return () => clearInterval(timer)
   }, [isAutoPlaying, slides.length])
 
-  const hasContent = slides.some(s => s.desktopImage !== '/images/banners/hero-1-desktop.svg' || s.title !== 'FREESTYLE COLLECTION')
-  if (!hasContent) return null
 
   return (
     <section

@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useSettings } from '@/components/SettingsProvider'
 
 interface InstagramFeedProps {
@@ -9,8 +10,11 @@ interface InstagramFeedProps {
 export default function InstagramFeed({ count = 6 }: InstagramFeedProps) {
   const settings = useSettings()
   const instagramUrl = settings.instagram_url
+  const [isMounted, setIsMounted] = useState(false)
 
-  if (!instagramUrl) return null
+  useEffect(() => { setIsMounted(true) }, [])
+
+  if (!isMounted || !instagramUrl) return null
 
   // Placeholder Instagram grid - in production, use Instagram Basic Display API
   // or a service like Pixelfed, or static images from your Instagram
