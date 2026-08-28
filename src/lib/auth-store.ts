@@ -26,7 +26,7 @@ export const useAuthStore = create<AuthStore>()(
     (set, get) => ({
       user: null,
       isAuthenticated: false,
-      loading: false,
+      loading: true,
 
       login: async (email, password) => {
         set({ loading: true })
