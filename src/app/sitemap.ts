@@ -6,12 +6,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://marvvn.online'
 
   let products: { handle: string }[] = []
+  let blogs: { handle: string; created_at: string }[] = []
   try {
     const supabase = createClient()
-    const { data } = await supabase.from('products').select('handle')
-    products = data || []
+    const { data: productData } = await supabase.from('products').select('handle')
+    products = productData || []
+
+    const { data: blogData } = await supabase.from('blogs').select('handle, created_at').eq('published', true)
+    blogs = blogData || []
   } catch {
     products = []
+    blogs = []
   }
 
   const home = {
@@ -35,12 +40,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  const blogPages = blogPosts.map((post) => ({
-    url: `${baseUrl}/blogs/${post.handle}`,
-    lastModified: new Date(),
+  const dbBlogPages = blogs.map((blog) => ({
+    url: `${baseUrl}/blogs/bonkers-corner/${blog.handle}`,
+    lastModified: new Date(blog.created_at),
     changeFrequency: 'monthly' as const,
     priority: 0.6,
   }))
+
+  const fallbackBlogPages = blogs.length === 0
+    ? blogPosts.map((post) => ({
+        url: `${baseUrl}/blogs/bonkers-corner/${post.handle}`,
+        lastModified: new Date(),
+        changeFrequency: 'monthly' as const,
+        priority: 0.6,
+      }))
+    : []
 
   const staticPages = [
     { url: `${baseUrl}/pages/about-us`, lastModified: new Date(), changeFrequency: 'monthly' as const, priority: 0.5 },
@@ -53,5 +67,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/search`, lastModified: new Date(), changeFrequency: 'daily' as const, priority: 0.6 },
   ]
 
-  return [home, ...collectionPages, ...productPages, ...blogPages, ...staticPages]
+  return [home, ...collectionPages, ...productPages, ...dbBlogPages, ...fallbackBlogPages, ...staticPages]
 }
