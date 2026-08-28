@@ -64,24 +64,6 @@ export async function GET() {
   return NextResponse.json({ settings })
 }
 
-export async function GET_PUBLIC() {
-  const supabase = createClient()
-
-  const { data, error } = await supabase.from('store_settings').select('*')
-  if (error) {
-    return NextResponse.json({ settings: DEFAULTS })
-  }
-
-  const settings: Record<string, string> = { ...DEFAULTS }
-  ;(data || []).forEach((row: any) => {
-    if (ALLOWED_KEYS.has(row.key)) {
-      settings[row.key] = row.value
-    }
-  })
-
-  return NextResponse.json({ settings })
-}
-
 export async function PUT(request: Request) {
   const supabase = createClient()
   if (!(await isAdmin(supabase))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
