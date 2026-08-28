@@ -1,0 +1,138 @@
+{
+  "en": {
+    "nav": {
+      "shop": "Shop",
+      "newArrivals": "New Arrivals",
+      "bestSellers": "Best Sellers",
+      "search": "Search",
+      "account": "Account",
+      "cart": "Cart",
+      "wishlist": "Wishlist"
+    },
+    "home": {
+      "shopNow": "Shop Now",
+      "viewAll": "View All",
+      "newIn": "New In",
+      "bestSeller": "Best Seller",
+      "shopWomen": "Shop Women",
+      "shopMen": "Shop Men"
+    },
+    "product": {
+      "addToCart": "Add to Cart",
+      "buyNow": "Buy Now",
+      "size": "Size",
+      "color": "Color",
+      "quantity": "Quantity",
+      "inStock": "In Stock",
+      "outOfStock": "Out of Stock",
+      "description": "Description",
+      "reviews": "Reviews",
+      "sizeGuide": "Size Guide"
+    },
+    "cart": {
+      "title": "Shopping Cart",
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "total": "Total",
+      "checkout": "Proceed to Checkout",
+      "empty": "Your cart is empty",
+      "remove": "Remove",
+      "freeShipping": "Free Shipping"
+    },
+    "checkout": {
+      "title": "Checkout",
+      "shippingAddress": "Shipping Address",
+      "paymentMethod": "Payment Method",
+      "placeOrder": "Place Order",
+      "cod": "Cash on Delivery",
+      "online": "Online Payment"
+    },
+    "account": {
+      "login": "Login",
+      "register": "Register",
+      "email": "Email",
+      "password": "Password",
+      "name": "Name",
+      "orders": "My Orders",
+      "wishlist": "Wishlist",
+      "logout": "Logout"
+    },
+    "footer": {
+      "newsletter": "Subscribe to our newsletter",
+      "emailPlaceholder": "Enter your email",
+      "subscribe": "Subscribe",
+      "shop": "Shop",
+      "trending": "Trending",
+      "info": "Info",
+      "contact": "Contact"
+    }
+  },
+  "hi": {
+    "nav": {
+      "shop": "खरीदें",
+      "newArrivals": "नए आइटम",
+      "bestSellers": "बेस्टसेलर",
+      "search": "खोजें",
+      "account": "खाता",
+      "cart": "कार्ट",
+      "wishlist": "विशलिस्ट"
+    },
+    "home": {
+      "shopNow": "अभी खरीदें",
+      "viewAll": "सभी देखें",
+      "newIn": "नए आइटम",
+      "bestSeller": "बेस्टसेलर",
+      "shopWomen": "महिलाओं के लिए खरीदें",
+      "shopMen": "पुरुषों के लिए खरीदें"
+    },
+    "product": {
+      "addToCart": "कार्ट में जोड़ें",
+      "buyNow": "अभी खरीदें",
+      "size": "साइज",
+      "color": "रंग",
+      "quantity": "मात्रा",
+      "inStock": "स्टॉक में",
+      "outOfStock": "स्टॉक में नहीं",
+      "description": "विवरण",
+      "reviews": "समीक्षाएँ",
+      "sizeGuide": "साइज गाइड"
+    },
+    "cart": {
+      "title": "शॉपिंग कार्ट",
+      "subtotal": "उप-कुल",
+      "shipping": "शिपिंग",
+      "total": "कुल",
+      "checkout": "चेकआउट करें",
+      "empty": "आपका कार्ट खाली है",
+      "remove": "हटाएं",
+      "freeShipping": "मुफ्त शिपिंग"
+    },
+    "checkout": {
+      "title": "चेकआउट",
+      "shippingAddress": "शिपिंग पता",
+      "paymentMethod": "भुगतान का तरीका",
+      "placeOrder": "ऑर्डर दें",
+      "cod": "कैश ऑन डिलीवरी",
+      "online": "ऑनलाइन भुगतान"
+    },
+    "account": {
+      "login": "लॉगिन",
+      "register": "रजिस्टर",
+      "email": "ईमेल",
+      "password": "पासवर्ड",
+      "name": "नाम",
+      "orders": "मेरे ऑर्डर",
+      "wishlist": "विशलिस्ट",
+      "logout": "लॉगआउट"
+    },
+    "footer": {
+      "newsletter": "हमारे न्यूज़लेटर की सदस्यता लें",
+      "emailPlaceholder": "अपना ईमेल दर्ज करें",
+      "subscribe": "सदस्यता लें",
+      "shop": "खरीदें",
+      "trending": "ट्रेंडिंग",
+      "info": "जानकारी",
+      "contact": "संपर्क"
+    }
+  }
+}

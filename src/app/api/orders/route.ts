@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { sendOrderConfirmation } from '@/lib/email'
 
 export async function GET() {
   const supabase = createClient()
@@ -116,6 +117,29 @@ export async function POST(request: Request) {
   if (itemsError) {
     await supabase.from('orders').delete().eq('id', order.id)
     return NextResponse.json({ error: 'Failed to create order items' }, { status: 500 })
+  }
+
+  const { data: profile } = await supabase.from('profiles').select('name, email').eq('id', user.id).single()
+
+  if (profile?.email) {
+    const productIds = items.map((item: any) => item.productId)
+    const { data: productDetails } = await supabase.from('products').select('id, title').in('id', productIds)
+    const titleMap = new Map(productDetails?.map((p: any) => [p.id, p.title]) || [])
+
+    sendOrderConfirmation({
+      orderId: order.id,
+      customerName: profile.name || 'Customer',
+      customerEmail: profile.email,
+      items: items.map((item: any) => ({
+        title: titleMap.get(item.productId) || 'Product',
+        quantity: item.quantity,
+        price: productMap.get(item.productId) || 0,
+        size: item.size,
+        color: item.color,
+      })),
+      total: finalTotal,
+      shippingAddress: shippingAddress,
+    }).catch(console.error)
   }
 
   return NextResponse.json({ order }, { status: 201 })

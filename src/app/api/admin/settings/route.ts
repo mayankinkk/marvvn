@@ -11,10 +11,13 @@ async function isAdmin(supabase: any) {
 const ALLOWED_KEYS = new Set([
   'store_name', 'store_description', 'store_email', 'store_phone', 'store_address',
   'currency', 'currency_symbol', 'tax_rate', 'free_shipping_threshold', 'shipping_fee',
-  'whatsapp_number', 'instagram_url', 'facebook_url', 'twitter_url',
+  'whatsapp_number', 'instagram_url', 'facebook_url', 'twitter_url', 'youtube_url',
   'logo_url', 'banner_url', 'primary_color', 'accent_color',
   'maintenance_mode', 'maintenance_message', 'order_email_enabled', 'low_stock_threshold',
   'seo_title', 'seo_description', 'seo_keywords',
+  'hero_banner_1_title', 'hero_banner_1_subtitle', 'hero_banner_1_link',
+  'hero_banner_2_title', 'hero_banner_2_subtitle', 'hero_banner_2_link',
+  'hero_banner_3_title', 'hero_banner_3_subtitle', 'hero_banner_3_link',
 ])
 
 const DEFAULTS: Record<string, string> = {

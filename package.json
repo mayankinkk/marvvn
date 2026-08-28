@@ -12,10 +12,13 @@
     "@supabase/ssr": "^0.12.5",
     "@supabase/supabase-js": "^2.112.4",
     "clsx": "^2.1.0",
+    "framer-motion": "^13.1.1",
     "lucide-react": "^0.378.0",
     "next": "14.2.0",
+    "next-intl": "^4.14.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
+    "resend": "^6.24.0",
     "tailwind-merge": "^2.2.0",
     "zustand": "^4.5.0"
   },

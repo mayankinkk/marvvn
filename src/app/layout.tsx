@@ -1,7 +1,10 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 import { SupabaseProvider } from '@/components/SupabaseProvider'
 import { SettingsProvider } from '@/components/SettingsProvider'
+import { I18nProvider } from '@/lib/i18n'
+import { AnalyticsScripts, Analytics, Pixel } from '@/components/Analytics'
+import PageTransition from '@/components/PageTransition'
 import './globals.css'
 
 const inter = Inter({
@@ -27,7 +30,20 @@ export const metadata: Metadata = {
     siteName: 'MARVVN',
     title: 'MARVVN | Unisex Luxury Streetwear Clothing Brand',
     description: 'Luxury streetwear clothing brand for men and women. Shop oversized t-shirts, joggers, hoodies, and more.',
+    images: [{ url: '/og.png', width: 1200, height: 630 }],
   },
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'MARVVN',
+  },
+}
+
+export const viewport: Viewport = {
+  themeColor: '#000000',
+  width: 'device-width',
+  initialScale: 1,
 }
 
 export default function RootLayout({
@@ -37,7 +53,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <AnalyticsScripts />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-192.png" />
+      </head>
       <body className={`${inter.variable} ${playfair.variable} font-sans`}>
+        <Analytics />
+        <Pixel />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -52,14 +74,18 @@ export default function RootLayout({
                 '@type': 'ContactPoint',
                 telephone: '',
                 contactType: 'customer service',
-                availableLanguage: 'English',
+                availableLanguage: ['English', 'Hindi'],
               },
             }),
           }}
         />
         <SettingsProvider>
           <SupabaseProvider>
-            {children}
+            <I18nProvider>
+              <PageTransition>
+                {children}
+              </PageTransition>
+            </I18nProvider>
           </SupabaseProvider>
         </SettingsProvider>
       </body>

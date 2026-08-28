@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { sendWelcomeEmail } from '@/lib/email'
 
 export async function POST(request: Request) {
   const { name, email, password } = await request.json()
@@ -32,6 +33,8 @@ export async function POST(request: Request) {
     if (profileError) {
       console.error('Profile upsert error:', profileError)
     }
+
+    sendWelcomeEmail(email, name).catch(console.error)
   }
 
   return NextResponse.json({ user: data.user }, { status: 201 })
