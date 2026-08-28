@@ -14,7 +14,7 @@ export async function PUT(request: Request) {
 
   if (name || phone) {
     const updates: any = {}
-    if (name) updates.full_name = name
+    if (name) updates.name = name
     if (phone) updates.phone = phone
 
     const { error } = await supabase.from('profiles').upsert({

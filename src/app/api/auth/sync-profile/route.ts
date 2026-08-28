@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server'
 export async function POST(request: Request) {
   const supabase = createClient()
   const body = await request.json()
-  const { id, email, full_name, avatar_url } = body
+  const { id, email, full_name } = body
 
   if (!id || !email) {
     return NextResponse.json({ error: 'Missing id or email' }, { status: 400 })
@@ -12,9 +12,7 @@ export async function POST(request: Request) {
 
   const { error } = await supabase.from('profiles').upsert({
     id,
-    email,
-    full_name: full_name || email.split('@')[0],
-    avatar_url: avatar_url || null,
+    name: full_name || email.split('@')[0],
   }, { onConflict: 'id' })
 
   if (error) {
