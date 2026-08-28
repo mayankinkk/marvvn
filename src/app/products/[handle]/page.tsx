@@ -13,7 +13,7 @@ import ProductReviews from '@/components/ProductReviews'
 import SizeGuide from '@/components/SizeGuide'
 import RecentlyViewed, { trackRecentlyViewed } from '@/components/RecentlyViewed'
 import { trackViewItem } from '@/components/Analytics'
-import { useProducts } from '@/lib/hooks/useProducts'
+import { useProducts, useProduct } from '@/lib/hooks/useProducts'
 import { formatPrice, calculateDiscount, cn } from '@/lib/utils'
 import { useCartStore } from '@/lib/store'
 import { useWishlistStore } from '@/lib/wishlist-store'
@@ -21,8 +21,8 @@ import { useWishlistStore } from '@/lib/wishlist-store'
 export default function ProductPage() {
   const params = useParams()
   const handle = params.handle as string
+  const { product, loading } = useProduct(handle)
   const { products } = useProducts()
-  const product = products.find((p) => p.handle === handle)
   const [selectedSize, setSelectedSize] = useState('')
   const [selectedColor, setSelectedColor] = useState('')
   const [quantity, setQuantity] = useState(1)
@@ -45,21 +45,39 @@ export default function ProductPage() {
     }
   }, [product])
 
-  if (products.length > 0 && !product) {
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
-          <Link href="/" className="btn-primary">Return Home</Link>
+      <div className="min-h-screen">
+        <Header />
+        <div className="container py-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 animate-pulse">
+            <div className="aspect-square bg-marvvn-gray-100 rounded" />
+            <div className="space-y-4">
+              <div className="h-8 bg-marvvn-gray-100 rounded w-3/4" />
+              <div className="h-6 bg-marvvn-gray-100 rounded w-1/4" />
+              <div className="h-4 bg-marvvn-gray-100 rounded w-full" />
+              <div className="h-4 bg-marvvn-gray-100 rounded w-full" />
+              <div className="h-4 bg-marvvn-gray-100 rounded w-2/3" />
+              <div className="h-12 bg-marvvn-gray-100 rounded w-full mt-8" />
+            </div>
+          </div>
         </div>
+        <Footer />
       </div>
     )
   }
 
   if (!product) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-marvvn-gray-500">Loading product...</p>
+      <div className="min-h-screen">
+        <Header />
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
+            <Link href="/" className="btn-primary">Return Home</Link>
+          </div>
+        </div>
+        <Footer />
       </div>
     )
   }
