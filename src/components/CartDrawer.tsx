@@ -28,7 +28,7 @@ export default function CartDrawer() {
       {/* Overlay */}
       <div
         className={`fixed inset-0 bg-black/50 z-[70] transition-opacity duration-300 ${
-          isOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+          isOpen ? 'opacity-100 visible pointer-events-auto' : 'opacity-0 invisible pointer-events-none'
         }`}
         onClick={() => setCartOpen(false)}
       />
