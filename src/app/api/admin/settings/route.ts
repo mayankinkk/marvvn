@@ -24,9 +24,9 @@ const ALLOWED_KEYS = new Set([
 const DEFAULTS: Record<string, string> = {
   store_name: 'MARVVN',
   store_description: 'Premium streetwear and oversized tees',
-  store_email: '',
-  store_phone: '',
-  store_address: '',
+  store_email: 'marvvnclothing@gmail.com',
+  store_phone: '7578017237',
+  store_address: 'Faridabad',
   currency: 'INR',
   currency_symbol: '₹',
   tax_rate: '0',

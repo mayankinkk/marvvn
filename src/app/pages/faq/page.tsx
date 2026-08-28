@@ -50,7 +50,7 @@ export default function FAQPage() {
   const settings = useSettings()
   const { symbol } = useCurrency()
   const [openIndex, setOpenIndex] = useState<string | null>(null)
-  const storeEmail = settings.store_email || 'support@marvvn.online'
+  const storeEmail = settings.store_email || 'marvvnclothing@gmail.com'
   const faqs = faqCategories(symbol, settings.free_shipping_threshold || '999', settings.shipping_fee || '99', '10,000')
 
   return (

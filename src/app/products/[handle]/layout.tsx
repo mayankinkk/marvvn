@@ -1,6 +1,8 @@
 import { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 
+export const dynamic = 'force-dynamic'
+
 export async function generateStaticParams() {
   try {
     const supabase = createClient()

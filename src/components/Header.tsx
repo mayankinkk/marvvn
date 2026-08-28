@@ -284,7 +284,7 @@ export default function Header() {
             key={link.label}
             className={cn(
               'absolute left-0 right-0 top-full bg-white border-t border-marvvn-gray-100 shadow-lg transition-all duration-200',
-              activeMegaMenu === link.label ? 'opacity-100 visible' : 'opacity-0 invisible'
+              activeMegaMenu === link.label ? 'opacity-100 visible pointer-events-auto' : 'opacity-0 invisible pointer-events-none'
             )}
             onMouseEnter={() => handleMegaMenuEnter(link.label)}
             onMouseLeave={handleMegaMenuLeave}

@@ -36,7 +36,7 @@ export default function ContactPage() {
     setSending(false)
   }
 
-  const storeEmail = settings.store_email || 'support@marvvn.online'
+  const storeEmail = settings.store_email || 'marvvnclothing@gmail.com'
   const storePhone = settings.store_phone || ''
   const storeAddress = settings.store_address || 'India'
 

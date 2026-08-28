@@ -8,7 +8,7 @@ import { useSettings } from '@/components/SettingsProvider'
 
 export default function PrivacyPolicyPage() {
   const settings = useSettings()
-  const storeEmail = settings.store_email || 'support@marvvn.online'
+  const storeEmail = settings.store_email || 'marvvnclothing@gmail.com'
   return (
     <div className="min-h-screen">
       <Header />
