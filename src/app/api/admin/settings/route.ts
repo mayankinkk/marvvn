@@ -18,6 +18,7 @@ const ALLOWED_KEYS = new Set([
   'hero_banner_1_title', 'hero_banner_1_subtitle', 'hero_banner_1_link',
   'hero_banner_2_title', 'hero_banner_2_subtitle', 'hero_banner_2_link',
   'hero_banner_3_title', 'hero_banner_3_subtitle', 'hero_banner_3_link',
+  'popular_searches',
 ])
 
 const DEFAULTS: Record<string, string> = {
@@ -47,6 +48,7 @@ const DEFAULTS: Record<string, string> = {
   seo_description: 'Shop premium streetwear, oversized t-shirts, and more at MARVVN',
   seo_keywords: 'streetwear, oversized tees, marvvn, fashion',
   announcement_bar: '⚡︎NOT MADE TO FIT IN | BUILT FOR THE REAL ONES ⚡︎',
+  popular_searches: JSON.stringify(['Oversized T-Shirt', 'Joggers', 'Marvel', 'Cargos', 'Caps']),
   mega_menu: JSON.stringify([
     {
       title: 'Women',

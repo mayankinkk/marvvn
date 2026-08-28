@@ -1,5 +1,14 @@
 import { MegaMenuSection } from './types'
 
+export function parseMegaMenuFromSettings(raw: any): MegaMenuSection[] {
+  if (!raw) return [womenMegaMenu, menMegaMenu, accessoriesMegaMenu]
+  try {
+    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw
+    if (Array.isArray(parsed) && parsed.length > 0) return parsed
+  } catch {}
+  return [womenMegaMenu, menMegaMenu, accessoriesMegaMenu]
+}
+
 export const womenMegaMenu: MegaMenuSection = {
   title: 'Women',
   columns: [

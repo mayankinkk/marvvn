@@ -34,6 +34,7 @@ const DEFAULTS: Record<string, string> = {
   seo_description: 'Luxury streetwear clothing brand for men and women. Shop oversized t-shirts, joggers, hoodies, and more.',
   seo_keywords: 'streetwear, oversized t-shirts, joggers, hoodies, marvvn',
   mega_menu: '[]',
+  popular_searches: '[]',
 }
 
 export function SettingsProvider({ children }: { children: ReactNode }) {

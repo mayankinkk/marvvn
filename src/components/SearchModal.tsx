@@ -3,9 +3,12 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Search, X, ArrowRight } from 'lucide-react'
+import { Search, X, ArrowRight, Folder } from 'lucide-react'
 import { useProducts } from '@/lib/hooks/useProducts'
+import { useSettings } from '@/components/SettingsProvider'
+import { getAllSearchResults, SearchResult } from '@/lib/search-utils'
 import { formatPrice } from '@/lib/utils'
+import { parseMegaMenuFromSettings } from '@/lib/mega-menu-data'
 
 interface SearchModalProps {
   isOpen: boolean
@@ -15,9 +18,21 @@ interface SearchModalProps {
 export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   const [query, setQuery] = useState('')
   const { products } = useProducts()
-  const [results, setResults] = useState<typeof products>([])
+  const settings = useSettings()
+  const [results, setResults] = useState<SearchResult[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
   const debounceRef = useRef<NodeJS.Timeout | null>(null)
+
+  const megaMenuData = parseMegaMenuFromSettings(settings?.mega_menu)
+
+  const popularSearches = (() => {
+    const raw = settings?.popular_searches
+    if (Array.isArray(raw) && raw.length > 0) return raw
+    if (typeof raw === 'string' && raw.startsWith('[')) {
+      try { return JSON.parse(raw) } catch {}
+    }
+    return ['Oversized T-Shirt', 'Joggers', 'Marvel', 'Cargos', 'Caps']
+  })()
 
   useEffect(() => {
     if (isOpen) {
@@ -29,9 +44,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
   }, [isOpen])
 
   useEffect(() => {
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current)
-    }
+    if (debounceRef.current) clearTimeout(debounceRef.current)
 
     if (query.length < 2) {
       setResults([])
@@ -39,21 +52,14 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
     }
 
     debounceRef.current = setTimeout(() => {
-      const filtered = products.filter(
-        (p) =>
-          p.title.toLowerCase().includes(query.toLowerCase()) ||
-          p.tags?.some((t) => t.toLowerCase().includes(query.toLowerCase())) ||
-          p.category?.toLowerCase().includes(query.toLowerCase())
-      )
-      setResults(filtered.slice(0, 8))
+      const allResults = getAllSearchResults(products, megaMenuData, query, 8)
+      setResults(allResults)
     }, 250)
 
     return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current)
-      }
+      if (debounceRef.current) clearTimeout(debounceRef.current)
     }
-  }, [query, products])
+  }, [query, products, megaMenuData])
 
   if (!isOpen) return null
 
@@ -84,38 +90,51 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
           {results.length > 0 && (
             <div className="mt-4 border-t pt-4 max-h-[60vh] overflow-y-auto">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {results.map((product) => (
+                {results.map((result) => (
                   <Link
-                    key={product.id}
-                    href={`/products/${product.handle}`}
+                    key={`${result.type}-${result.id}`}
+                    href={result.href}
                     onClick={onClose}
                     className="group"
                   >
                     <div className="aspect-[3/4] bg-marvvn-gray-50 mb-2 overflow-hidden relative">
-                      <Image
-                        src={product.images?.[0] || '/placeholder.png'}
-                        alt={product.title}
-                        fill
-                        sizes="(max-width: 768px) 50vw, 25vw"
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
+                      {result.type === 'collection' ? (
+                        <div className="flex items-center justify-center h-full w-full bg-marvvn-gray-100">
+                          <Folder className="w-8 h-8 text-marvvn-gray-400" />
+                        </div>
+                      ) : result.image ? (
+                        <Image
+                          src={result.image}
+                          alt={result.title}
+                          fill
+                          sizes="(max-width: 768px) 50vw, 25vw"
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full w-full bg-marvvn-gray-100">
+                          <Search className="w-8 h-8 text-marvvn-gray-300" />
+                        </div>
+                      )}
                     </div>
                     <h4 className="text-sm font-medium truncate group-hover:text-marvvn-gray-600 transition-colors">
-                      {product.title}
+                      {result.title}
                     </h4>
-                    <p className="text-sm text-marvvn-gray-500">{formatPrice(product.price)}</p>
+                    {result.price !== undefined && (
+                      <p className="text-sm text-marvvn-gray-500">{formatPrice(result.price)}</p>
+                    )}
+                    {result.type === 'collection' && (
+                      <p className="text-xs text-marvvn-gray-400">Collection</p>
+                    )}
                   </Link>
                 ))}
               </div>
-              {query.length >= 2 && (
-                <Link
-                  href={`/search?q=${encodeURIComponent(query)}`}
-                  onClick={onClose}
-                  className="flex items-center justify-center gap-2 mt-6 py-3 text-sm font-medium border border-marvvn-gray-300 hover:border-marvvn-black transition-colors"
-                >
-                  View all results <ArrowRight className="w-4 h-4" />
-                </Link>
-              )}
+              <Link
+                href={`/search?q=${encodeURIComponent(query)}`}
+                onClick={onClose}
+                className="flex items-center justify-center gap-2 mt-6 py-3 text-sm font-medium border border-marvvn-gray-300 hover:border-marvvn-black transition-colors"
+              >
+                View all results <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           )}
 
@@ -129,7 +148,7 @@ export default function SearchModal({ isOpen, onClose }: SearchModalProps) {
             <div className="mt-4 border-t pt-4">
               <p className="text-xs text-marvvn-gray-400 uppercase tracking-wider mb-3">Popular Searches</p>
               <div className="flex flex-wrap gap-2">
-                {['Oversized T-Shirt', 'Joggers', 'Marvel', 'Cargos', 'Caps'].map((term) => (
+                {popularSearches.map((term: string) => (
                   <button
                     key={term}
                     type="button"
