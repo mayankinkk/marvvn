@@ -20,6 +20,7 @@ const DEFAULTS: Record<string, string> = {
   logo_url: '',
   primary_color: '#000000',
   accent_color: '#666666',
+  announcement_bar: '⚡︎NOT MADE TO FIT IN | BUILT FOR THE REAL ONES ⚡︎',
   maintenance_mode: 'false',
   maintenance_message: 'We are currently under maintenance. Please check back later.',
   seo_title: 'MARVVN | Unisex Luxury Streetwear Clothing Brand',

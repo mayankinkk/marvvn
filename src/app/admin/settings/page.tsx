@@ -131,6 +131,17 @@ export default function AdminSettingsPage() {
                 <Field label="Currency Symbol" value={settings.currency_symbol || '₹'} onChange={(v) => update('currency_symbol', v)} />
               </div>
               <div>
+                <label className="block text-sm font-medium mb-1">Announcement Bar</label>
+                <input
+                  type="text"
+                  value={settings.announcement_bar || ''}
+                  onChange={(e) => update('announcement_bar', e.target.value)}
+                  className="input-field w-full"
+                  placeholder="Text shown in the top scrolling bar..."
+                />
+                <p className="text-xs text-marvvn-gray-500 mt-1">Leave empty to hide the announcement bar.</p>
+              </div>
+              <div>
                 <label className="block text-sm font-medium mb-1">Store Address</label>
                 <textarea
                   value={settings.store_address || ''}

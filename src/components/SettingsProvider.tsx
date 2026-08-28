@@ -28,6 +28,7 @@ const DEFAULTS: Record<string, string> = {
   primary_color: '#000000',
   accent_color: '#666666',
   maintenance_mode: 'false',
+  announcement_bar: '⚡︎NOT MADE TO FIT IN | BUILT FOR THE REAL ONES ⚡︎',
   maintenance_message: '',
   seo_title: 'MARVVN | Unisex Luxury Streetwear Clothing Brand',
   seo_description: 'Luxury streetwear clothing brand for men and women.',

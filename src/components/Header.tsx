@@ -85,19 +85,21 @@ export default function Header() {
   return (
     <>
       {/* Announcement Bar */}
-      <div className="bg-marvvn-black text-white py-2 overflow-hidden">
-        <div className="animate-marquee whitespace-nowrap text-sm font-medium">
-          <span className="inline-block px-8">
-            ⚡︎NOT MADE TO FIT IN | BUILT FOR THE REAL ONES⚡︎
-          </span>
-          <span className="inline-block px-8">
-            ⚡︎NOT MADE TO FIT IN | BUILT FOR THE REAL ONES⚡︎
-          </span>
-          <span className="inline-block px-8">
-            ⚡︎NOT MADE TO FIT IN | BUILT FOR THE REAL ONES⚡︎
-          </span>
+      {settings.announcement_bar && (
+        <div className="bg-marvvn-black text-white py-2 overflow-hidden">
+          <div className="animate-marquee whitespace-nowrap text-sm font-medium">
+            <span className="inline-block px-8">
+              {settings.announcement_bar}
+            </span>
+            <span className="inline-block px-8">
+              {settings.announcement_bar}
+            </span>
+            <span className="inline-block px-8">
+              {settings.announcement_bar}
+            </span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Main Header */}
       <header
