@@ -3,6 +3,7 @@ import { Suspense } from 'react'
 import { Inter, Playfair_Display } from 'next/font/google'
 import { SupabaseProvider } from '@/components/SupabaseProvider'
 import { SettingsProvider } from '@/components/SettingsProvider'
+import AuthCodeHandler from '@/components/AuthCodeHandler'
 import { I18nProvider } from '@/lib/i18n'
 import { AnalyticsScripts, Analytics, Pixel } from '@/components/Analytics'
 import { SpeedInsights } from '@vercel/speed-insights/next'
@@ -85,6 +86,9 @@ export default function RootLayout({
         />
         <SettingsProvider>
           <SupabaseProvider>
+              <Suspense fallback={null}>
+                <AuthCodeHandler />
+              </Suspense>
               <I18nProvider>
                 {children}
               </I18nProvider>
