@@ -15,7 +15,17 @@ export async function middleware(request: NextRequest) {
   try {
     const url = request.nextUrl.clone()
     url.pathname = '/api/settings'
-    const settingsRes = await fetch(url, { next: { revalidate: 60 } })
+
+    // Use a short timeout so slow Supabase responses never block navigation
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 500)
+
+    const settingsRes = await fetch(url, {
+      signal: controller.signal,
+      next: { revalidate: 60 },
+    })
+    clearTimeout(timeoutId)
+
     if (settingsRes.ok) {
       const settings = await settingsRes.json()
       if (settings.maintenance_mode === true || settings.maintenance_mode === 'true') {
@@ -28,7 +38,7 @@ export async function middleware(request: NextRequest) {
       }
     }
   } catch {
-    // If settings fetch fails, continue normally
+    // Settings fetch failed or timed out — continue navigation normally
   }
 
   return NextResponse.next()
