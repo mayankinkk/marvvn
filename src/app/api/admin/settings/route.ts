@@ -14,7 +14,7 @@ const ALLOWED_KEYS = new Set([
   'whatsapp_number', 'instagram_url', 'facebook_url', 'twitter_url', 'youtube_url',
   'logo_url', 'banner_url', 'primary_color', 'accent_color',
   'maintenance_mode', 'maintenance_message', 'order_email_enabled', 'low_stock_threshold',
-  'seo_title', 'seo_description', 'seo_keywords',
+  'seo_title', 'seo_description', 'seo_keywords', 'announcement_bar', 'mega_menu',
   'hero_banner_1_title', 'hero_banner_1_subtitle', 'hero_banner_1_link',
   'hero_banner_2_title', 'hero_banner_2_subtitle', 'hero_banner_2_link',
   'hero_banner_3_title', 'hero_banner_3_subtitle', 'hero_banner_3_link',
@@ -46,6 +46,8 @@ const DEFAULTS: Record<string, string> = {
   seo_title: 'MARVVN - Premium Streetwear',
   seo_description: 'Shop premium streetwear, oversized t-shirts, and more at MARVVN',
   seo_keywords: 'streetwear, oversized tees, marvvn, fashion',
+  announcement_bar: '⚡︎NOT MADE TO FIT IN | BUILT FOR THE REAL ONES ⚡︎',
+  mega_menu: '[]',
 }
 
 export async function GET() {

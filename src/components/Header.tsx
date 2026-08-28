@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import Link from 'next/link'
 import { Search, User, Heart, ShoppingBag, Menu, X, MapPin, ChevronDown, ChevronRight, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -9,15 +9,16 @@ import { useWishlistStore } from '@/lib/wishlist-store'
 import { useAuthStore } from '@/lib/auth-store'
 import { useSettings } from '@/components/SettingsProvider'
 import { womenMegaMenu, menMegaMenu, accessoriesMegaMenu } from '@/lib/mega-menu-data'
+import { MegaMenuSection } from '@/lib/types'
 import CartDrawer from './CartDrawer'
 import SearchModal from './SearchModal'
 import LanguageSwitcher from './LanguageSwitcher'
 
-const navLinks = [
-  { label: 'Women', href: '/collections/women', megaMenu: womenMegaMenu },
-  { label: 'Men', href: '/collections/men', megaMenu: menMegaMenu },
-  { label: 'Accessories', href: '/collections/accessories', megaMenu: accessoriesMegaMenu },
-]
+const defaultMenus: Record<string, MegaMenuSection> = {
+  Women: womenMegaMenu,
+  Men: menMegaMenu,
+  Accessories: accessoriesMegaMenu,
+}
 
 const topLinks = [
   { label: 'New Arrivals', href: '/collections/new-arrivals' },
@@ -39,6 +40,30 @@ export default function Header() {
   const { totalItems: wishlistCount } = useWishlistStore()
   const { isAuthenticated, user, logout } = useAuthStore()
   const settings = useSettings()
+
+  const navLinks = useMemo(() => {
+    let menus: MegaMenuSection[] = []
+    try {
+      const raw = settings.mega_menu
+      if (raw && raw !== '[]') {
+        menus = typeof raw === 'string' ? JSON.parse(raw) : raw
+      }
+    } catch {}
+
+    if (menus.length === 0) {
+      return [
+        { label: 'Women', href: '/collections/women', megaMenu: womenMegaMenu },
+        { label: 'Men', href: '/collections/men', megaMenu: menMegaMenu },
+        { label: 'Accessories', href: '/collections/accessories', megaMenu: accessoriesMegaMenu },
+      ]
+    }
+
+    return menus.map((m) => ({
+      label: m.title,
+      href: `/collections/${m.title.toLowerCase()}`,
+      megaMenu: m,
+    }))
+  }, [settings.mega_menu])
 
   useEffect(() => {
     const handleScroll = () => {

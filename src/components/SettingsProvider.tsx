@@ -33,6 +33,7 @@ const DEFAULTS: Record<string, string> = {
   seo_title: 'MARVVN | Unisex Luxury Streetwear Clothing Brand',
   seo_description: 'Luxury streetwear clothing brand for men and women. Shop oversized t-shirts, joggers, hoodies, and more.',
   seo_keywords: 'streetwear, oversized t-shirts, joggers, hoodies, marvvn',
+  mega_menu: '[]',
 }
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
