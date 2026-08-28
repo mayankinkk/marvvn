@@ -10,9 +10,9 @@ import { useCartStore } from '@/lib/store'
 import { useAuthStore } from '@/lib/auth-store'
 import { useSettings } from '@/components/SettingsProvider'
 import { formatPrice } from '@/lib/utils'
-import { ChevronRight, CreditCard, Truck, Check, Tag, X, Loader2 } from 'lucide-react'
+import { ChevronDown, ChevronUp, Check, Truck, ShieldCheck, RotateCcw, Tag, X, Loader2, CreditCard, Wallet, Banknote } from 'lucide-react'
 
-type Step = 'shipping' | 'payment' | 'review'
+type Step = 'contact' | 'shipping' | 'payment'
 
 export default function CheckoutPage() {
   const { items, totalPrice, finalPrice, promoCode, discount, applyPromoCode, removePromoCode, clearCart } = useCartStore()
@@ -22,31 +22,33 @@ export default function CheckoutPage() {
 
   const freeShippingThreshold = Number(settings.free_shipping_threshold) || 999
   const shippingFee = Number(settings.shipping_fee) || 99
-  const [step, setStep] = useState<Step>('shipping')
+
+  const [step, setStep] = useState<Step>('contact')
   const [promoInput, setPromoInput] = useState('')
   const [promoError, setPromoError] = useState('')
   const [isPlacing, setIsPlacing] = useState(false)
   const [orderError, setOrderError] = useState('')
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
+  const [v, setV] = useState<Record<string, string>>({})
+  const [openSection, setOpenSection] = useState<string | null>('contact')
+  const [showItems, setShowItems] = useState(false)
+
+  const [contact, setContact] = useState({
+    email: user?.email || '',
+    phone: '',
+  })
 
   const [shipping, setShipping] = useState({
     firstName: user?.name?.split(' ')[0] || '',
     lastName: user?.name?.split(' ').slice(1).join(' ') || '',
-    email: user?.email || '',
-    phone: '',
     address: '',
+    apartment: '',
     city: '',
     state: '',
     pincode: '',
   })
 
   const [payment, setPayment] = useState({
-    method: 'cod' as 'cod' | 'upi' | 'card',
-    cardNumber: '',
-    cardName: '',
-    expiry: '',
-    cvv: '',
-    upiId: '',
+    method: 'upi' as 'cod' | 'upi' | 'card',
   })
 
   useEffect(() => {
@@ -58,12 +60,11 @@ export default function CheckoutPage() {
     }
   }, [payment.method])
 
-  // Track cart abandonment - send email if user leaves without completing
+  // Track cart abandonment
   useEffect(() => {
     if (items.length === 0) return
-    const email = shipping.email || user?.email
+    const email = contact.email || user?.email
     if (!email) return
-
     const timer = setTimeout(() => {
       fetch('/api/cart-abandonment', {
         method: 'POST',
@@ -71,56 +72,46 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           email,
           items: items.map(i => ({ title: i.product.title, quantity: i.quantity, price: i.product.price, handle: i.product.handle })),
-          total: totalPrice,
+          total: totalPrice(),
         }),
       }).catch(() => {})
-    }, 60 * 60 * 1000) // 1 hour
-
+    }, 60 * 60 * 1000)
     return () => clearTimeout(timer)
-  }, [items, totalPrice, shipping.email, user?.email])
+  }, [items, totalPrice, contact.email, user?.email])
 
-  const validateShipping = (): boolean => {
+  const shippingCost = totalPrice() >= freeShippingThreshold ? 0 : shippingFee
+  const total = finalPrice() + shippingCost
+
+  const validate = (fields: Record<string, any>): boolean => {
     const errors: Record<string, string> = {}
-    if (!shipping.firstName.trim()) errors.firstName = 'Required'
-    if (!shipping.lastName.trim()) errors.lastName = 'Required'
-    if (!shipping.email.trim() || !shipping.email.includes('@')) errors.email = 'Valid email required'
-    if (!shipping.phone.trim() || shipping.phone.length < 10) errors.phone = 'Valid phone required'
-    if (!shipping.address.trim()) errors.address = 'Required'
-    if (!shipping.city.trim()) errors.city = 'Required'
-    if (!shipping.state.trim()) errors.state = 'Required'
-    if (!shipping.pincode.trim() || shipping.pincode.length < 6) errors.pincode = 'Valid pincode required'
-    setValidationErrors(errors)
+    Object.entries(fields).forEach(([key, val]) => {
+      if (!val || (typeof val === 'string' && !val.trim())) errors[key] = 'This field is required'
+    })
+    if (contact.email && !contact.email.includes('@')) errors.email = 'Enter a valid email'
+    if (contact.phone && contact.phone.length < 10) errors.phone = 'Enter a valid phone number'
+    if (shipping.pincode && shipping.pincode.length < 6) errors.pincode = 'Enter a valid pincode'
+    setV(errors)
     return Object.keys(errors).length === 0
   }
 
-  const validatePayment = (): boolean => {
-    if (payment.method === 'card') {
-      const errors: Record<string, string> = {}
-      if (!payment.cardNumber.trim() || payment.cardNumber.replace(/\s/g, '').length < 16) errors.cardNumber = 'Valid card number required'
-      if (!payment.cardName.trim()) errors.cardName = 'Required'
-      if (!payment.expiry.trim() || !/^\d{2}\/\d{2}$/.test(payment.expiry)) errors.expiry = 'MM/YY required'
-      if (!payment.cvv.trim() || payment.cvv.length < 3) errors.cvv = 'Valid CVV required'
-      setValidationErrors(errors)
-      return Object.keys(errors).length === 0
-    }
-    if (payment.method === 'upi') {
-      const errors: Record<string, string> = {}
-      if (!payment.upiId.trim() || !payment.upiId.includes('@')) errors.upiId = 'Valid UPI ID required'
-      setValidationErrors(errors)
-      return Object.keys(errors).length === 0
-    }
-    setValidationErrors({})
-    return true
-  }
-
-  const handleApplyPromo = async () => {
-    setPromoError('')
-    if (!promoInput.trim()) return
-    const success = await applyPromoCode(promoInput)
-    if (!success) {
-      setPromoError('Invalid promo code')
-    } else {
-      setPromoInput('')
+  const handleNext = () => {
+    if (step === 'contact') {
+      if (validate({ email: contact.email, phone: contact.phone })) {
+        setStep('shipping')
+        setOpenSection('shipping')
+      }
+    } else if (step === 'shipping') {
+      if (validate({
+        firstName: shipping.firstName,
+        lastName: shipping.lastName,
+        address: shipping.address,
+        city: shipping.city,
+        state: shipping.state,
+        pincode: shipping.pincode,
+      })) {
+        setStep('payment')
+        setOpenSection('payment')
+      }
     }
   }
 
@@ -133,7 +124,7 @@ export default function CheckoutPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: items.map((item) => ({
+          items: items.map(item => ({
             productId: item.product.id,
             quantity: item.quantity,
             size: item.size,
@@ -143,9 +134,10 @@ export default function CheckoutPage() {
           shippingAddress: {
             firstName: shipping.firstName,
             lastName: shipping.lastName,
-            email: shipping.email,
-            phone: shipping.phone,
+            email: contact.email,
+            phone: contact.phone,
             address: shipping.address,
+            apartment: shipping.apartment,
             city: shipping.city,
             state: shipping.state,
             pincode: shipping.pincode,
@@ -188,8 +180,8 @@ export default function CheckoutPage() {
           },
           prefill: {
             name: `${shipping.firstName} ${shipping.lastName}`,
-            email: shipping.email,
-            contact: shipping.phone,
+            email: contact.email,
+            contact: contact.phone,
           },
           theme: { color: '#000000' },
           modal: {
@@ -201,7 +193,7 @@ export default function CheckoutPage() {
         }
 
         const razorpay = new (window as any).Razorpay(options)
-        razorpay.on('payment.failed', (response: any) => {
+        razorpay.on('payment.failed', () => {
           setIsPlacing(false)
           setOrderError('Payment failed. Please try again.')
         })
@@ -212,16 +204,8 @@ export default function CheckoutPage() {
       clearCart()
       router.push(`/checkout/success?orderId=${orderData.order.id}`)
     } catch (err: any) {
-      setOrderError(err.message || 'Something went wrong. Please try again.')
+      setOrderError(err.message || 'Something went wrong.')
       setIsPlacing(false)
-    }
-  }
-
-  const handleNextStep = () => {
-    if (step === 'shipping' && validateShipping()) {
-      setStep('payment')
-    } else if (step === 'payment' && validatePayment()) {
-      setStep('review')
     }
   }
 
@@ -238,297 +222,237 @@ export default function CheckoutPage() {
     )
   }
 
-  const shippingCost = totalPrice() >= freeShippingThreshold ? 0 : shippingFee
-  const total = finalPrice() + shippingCost
+  const stepIndex = { contact: 0, shipping: 1, payment: 2 }
 
   return (
-    <div className="min-h-screen bg-marvvn-gray-50">
+    <div className="min-h-screen bg-white">
       <Header />
 
-      <main className="container py-8 lg:py-12">
-        <nav className="flex items-center gap-2 text-xs text-marvvn-gray-500 mb-6">
-          <Link href="/" className="hover:text-marvvn-black">Home</Link>
-          <ChevronRight className="w-3 h-3" />
-          <Link href="/cart" className="hover:text-marvvn-black">Cart</Link>
-          <ChevronRight className="w-3 h-3" />
-          <span className="text-marvvn-black">Checkout</span>
-        </nav>
-
-        <h1 className="text-2xl lg:text-3xl font-display font-medium mb-8">Checkout</h1>
-
-        <div className="flex items-center justify-center gap-4 mb-8">
-          {([
-            { key: 'shipping', label: 'Shipping', icon: Truck },
-            { key: 'payment', label: 'Payment', icon: CreditCard },
-            { key: 'review', label: 'Review', icon: Check },
-          ] as const).map((s, i) => (
-            <div key={s.key} className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                step === s.key ? 'bg-marvvn-black text-white' :
-                ['shipping', 'payment', 'review'].indexOf(step) > i ? 'bg-green-600 text-white' :
-                'bg-marvvn-gray-200 text-marvvn-gray-500'
-              }`}>
-                {['shipping', 'payment', 'review'].indexOf(step) > i ? (
-                  <Check className="w-4 h-4" />
-                ) : (
-                  i + 1
-                )}
-              </div>
-              <span className={`text-sm hidden sm:block ${step === s.key ? 'font-medium' : 'text-marvvn-gray-500'}`}>
-                {s.label}
-              </span>
-              {i < 2 && <div className="w-12 h-px bg-marvvn-gray-300 mx-2" />}
-            </div>
-          ))}
-        </div>
-
-        {orderError && (
-          <div className="bg-red-50 border border-red-200 p-4 mb-6 text-sm text-red-700">
-            {orderError}
-          </div>
-        )}
-
-        <div className="grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
-            {step === 'shipping' && (
-              <div className="bg-white border p-6">
-                <h2 className="font-medium text-lg mb-6">Shipping Information</h2>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">First Name</label>
-                    <input
-                      type="text"
-                      value={shipping.firstName}
-                      onChange={(e) => setShipping({ ...shipping, firstName: e.target.value })}
-                      className={`input-field ${validationErrors.firstName ? 'border-red-500' : ''}`}
-                    />
-                    {validationErrors.firstName && <p className="text-xs text-red-500 mt-1">{validationErrors.firstName}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Last Name</label>
-                    <input
-                      type="text"
-                      value={shipping.lastName}
-                      onChange={(e) => setShipping({ ...shipping, lastName: e.target.value })}
-                      className={`input-field ${validationErrors.lastName ? 'border-red-500' : ''}`}
-                    />
-                    {validationErrors.lastName && <p className="text-xs text-red-500 mt-1">{validationErrors.lastName}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Email</label>
-                    <input
-                      type="email"
-                      value={shipping.email}
-                      onChange={(e) => setShipping({ ...shipping, email: e.target.value })}
-                      className={`input-field ${validationErrors.email ? 'border-red-500' : ''}`}
-                    />
-                    {validationErrors.email && <p className="text-xs text-red-500 mt-1">{validationErrors.email}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Phone</label>
-                    <input
-                      type="tel"
-                      value={shipping.phone}
-                      onChange={(e) => setShipping({ ...shipping, phone: e.target.value })}
-                      className={`input-field ${validationErrors.phone ? 'border-red-500' : ''}`}
-                    />
-                    {validationErrors.phone && <p className="text-xs text-red-500 mt-1">{validationErrors.phone}</p>}
-                  </div>
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium mb-1">Address</label>
-                    <input
-                      type="text"
-                      value={shipping.address}
-                      onChange={(e) => setShipping({ ...shipping, address: e.target.value })}
-                      className={`input-field ${validationErrors.address ? 'border-red-500' : ''}`}
-                    />
-                    {validationErrors.address && <p className="text-xs text-red-500 mt-1">{validationErrors.address}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">City</label>
-                    <input
-                      type="text"
-                      value={shipping.city}
-                      onChange={(e) => setShipping({ ...shipping, city: e.target.value })}
-                      className={`input-field ${validationErrors.city ? 'border-red-500' : ''}`}
-                    />
-                    {validationErrors.city && <p className="text-xs text-red-500 mt-1">{validationErrors.city}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">State</label>
-                    <input
-                      type="text"
-                      value={shipping.state}
-                      onChange={(e) => setShipping({ ...shipping, state: e.target.value })}
-                      className={`input-field ${validationErrors.state ? 'border-red-500' : ''}`}
-                    />
-                    {validationErrors.state && <p className="text-xs text-red-500 mt-1">{validationErrors.state}</p>}
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Pincode</label>
-                    <input
-                      type="text"
-                      value={shipping.pincode}
-                      onChange={(e) => setShipping({ ...shipping, pincode: e.target.value })}
-                      className={`input-field ${validationErrors.pincode ? 'border-red-500' : ''}`}
-                    />
-                    {validationErrors.pincode && <p className="text-xs text-red-500 mt-1">{validationErrors.pincode}</p>}
-                  </div>
-                </div>
+      {/* Progress Bar */}
+      <div className="border-b border-marvvn-gray-100">
+        <div className="container py-4">
+          <div className="flex items-center justify-between max-w-xl mx-auto">
+            {(['contact', 'shipping', 'payment'] as const).map((s, i) => (
+              <div key={s} className="flex items-center flex-1 last:flex-none">
                 <button
                   type="button"
-                  onClick={handleNextStep}
-                  className="w-full btn-primary mt-6 py-3 cursor-pointer"
+                  onClick={() => {
+                    if (i <= stepIndex[step]) {
+                      setStep(s)
+                      setOpenSection(s)
+                    }
+                  }}
+                  className={`flex items-center gap-2 cursor-pointer ${
+                    i <= stepIndex[step] ? 'text-marvvn-black' : 'text-marvvn-gray-300'
+                  }`}
                 >
-                  Continue to Payment
+                  <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold transition-colors ${
+                    i < stepIndex[step] ? 'bg-marvvn-black text-white' :
+                    i === stepIndex[step] ? 'bg-marvvn-black text-white' :
+                    'bg-marvvn-gray-100 text-marvvn-gray-400'
+                  }`}>
+                    {i < stepIndex[step] ? <Check className="w-3.5 h-3.5" /> : i + 1}
+                  </span>
+                  <span className="text-xs font-medium hidden sm:block">{s === 'contact' ? 'Contact' : s === 'shipping' ? 'Shipping' : 'Payment'}</span>
                 </button>
+                {i < 2 && <div className={`flex-1 h-px mx-3 ${i < stepIndex[step] ? 'bg-marvvn-black' : 'bg-marvvn-gray-100'}`} />}
               </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <main className="container py-6 lg:py-10">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-12">
+          {/* Left — Form */}
+          <div className="lg:col-span-7">
+            <h1 className="text-xl lg:text-2xl font-semibold text-marvvn-black mb-6">Checkout</h1>
+
+            {orderError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-sm text-red-700">{orderError}</div>
             )}
 
-            {step === 'payment' && (
-              <div className="bg-white border p-6">
-                <h2 className="font-medium text-lg mb-6">Payment Method</h2>
-                <div className="space-y-4">
-                  {[
-                    { value: 'cod', label: 'Cash on Delivery' },
-                    { value: 'upi', label: 'UPI Payment' },
-                    { value: 'card', label: 'Credit/Debit Card' },
-                  ].map((m) => (
-                    <label key={m.value} className="flex items-center gap-3 p-3 border cursor-pointer hover:bg-marvvn-gray-50 transition-colors">
-                      <input
-                        type="radio"
-                        name="payment"
-                        value={m.value}
-                        checked={payment.method === m.value}
-                        onChange={(e) => setPayment({ ...payment, method: e.target.value as typeof payment.method })}
-                        className="accent-marvvn-black"
-                      />
-                      <span className="text-sm">{m.label}</span>
-                    </label>
-                  ))}
-
-                  {payment.method === 'card' && (
-                    <div className="grid grid-cols-2 gap-4 mt-4 p-4 bg-marvvn-gray-50">
-                      <div className="col-span-2">
-                        <label className="block text-sm font-medium mb-1">Card Number</label>
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          placeholder="1234 5678 9012 3456"
-                          value={payment.cardNumber}
-                          onChange={(e) => setPayment({ ...payment, cardNumber: e.target.value })}
-                          className={`input-field ${validationErrors.cardNumber ? 'border-red-500' : ''}`}
-                        />
-                        {validationErrors.cardNumber && <p className="text-xs text-red-500 mt-1">{validationErrors.cardNumber}</p>}
-                      </div>
-                      <div className="col-span-2">
-                        <label className="block text-sm font-medium mb-1">Name on Card</label>
-                        <input
-                          type="text"
-                          value={payment.cardName}
-                          onChange={(e) => setPayment({ ...payment, cardName: e.target.value })}
-                          className={`input-field ${validationErrors.cardName ? 'border-red-500' : ''}`}
-                        />
-                        {validationErrors.cardName && <p className="text-xs text-red-500 mt-1">{validationErrors.cardName}</p>}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1">Expiry</label>
-                        <input
-                          type="text"
-                          placeholder="MM/YY"
-                          value={payment.expiry}
-                          onChange={(e) => setPayment({ ...payment, expiry: e.target.value })}
-                          className={`input-field ${validationErrors.expiry ? 'border-red-500' : ''}`}
-                        />
-                        {validationErrors.expiry && <p className="text-xs text-red-500 mt-1">{validationErrors.expiry}</p>}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium mb-1">CVV</label>
-                        <input
-                          type="password"
-                          inputMode="numeric"
-                          placeholder="123"
-                          maxLength={4}
-                          value={payment.cvv}
-                          onChange={(e) => setPayment({ ...payment, cvv: e.target.value })}
-                          className={`input-field ${validationErrors.cvv ? 'border-red-500' : ''}`}
-                        />
-                        {validationErrors.cvv && <p className="text-xs text-red-500 mt-1">{validationErrors.cvv}</p>}
-                      </div>
-                    </div>
-                  )}
-
-                  {payment.method === 'upi' && (
-                    <div className="p-4 bg-marvvn-gray-50">
-                      <label className="block text-sm font-medium mb-1">UPI ID</label>
-                      <input
-                        type="text"
-                        placeholder="yourname@upi"
-                        value={payment.upiId}
-                        onChange={(e) => setPayment({ ...payment, upiId: e.target.value })}
-                        className={`input-field ${validationErrors.upiId ? 'border-red-500' : ''}`}
-                      />
-                      {validationErrors.upiId && <p className="text-xs text-red-500 mt-1">{validationErrors.upiId}</p>}
-                    </div>
-                  )}
+            {/* Contact Section */}
+            <div className="border border-marvvn-gray-200 mb-3">
+              <button
+                type="button"
+                onClick={() => setOpenSection(openSection === 'contact' ? null : 'contact')}
+                className="w-full flex items-center justify-between p-4 cursor-pointer"
+              >
+                <div className="flex items-center gap-3">
+                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${
+                    stepIndex[step] > 0 ? 'bg-marvvn-black text-white' : 'border border-marvvn-gray-300 text-marvvn-gray-500'
+                  }`}>
+                    {stepIndex[step] > 0 ? <Check className="w-3 h-3" /> : '1'}
+                  </span>
+                  <span className="text-sm font-semibold text-marvvn-black">Contact information</span>
                 </div>
-                <div className="flex gap-3 mt-6">
-                  <button type="button" onClick={() => setStep('shipping')} className="btn-secondary flex-1 py-3 cursor-pointer">
-                    Back
-                  </button>
-                  <button type="button" onClick={handleNextStep} className="btn-primary flex-1 py-3 cursor-pointer">
-                    Review Order
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {step === 'review' && (
-              <div className="bg-white border p-6">
-                <h2 className="font-medium text-lg mb-6">Review Your Order</h2>
-
-                <div className="space-y-4 mb-6">
-                  <div className="p-4 bg-marvvn-gray-50">
-                    <h3 className="text-sm font-medium mb-2">Shipping Address</h3>
-                    <p className="text-sm text-marvvn-gray-600">
-                      {shipping.firstName} {shipping.lastName}<br />
-                      {shipping.address}<br />
-                      {shipping.city}, {shipping.state} {shipping.pincode}<br />
-                      {shipping.phone}
-                    </p>
+                {openSection === 'contact' ? <ChevronUp className="w-4 h-4 text-marvvn-gray-400" /> : <ChevronDown className="w-4 h-4 text-marvvn-gray-400" />}
+              </button>
+              {openSection === 'contact' && (
+                <div className="px-4 pb-4 pt-0 space-y-3">
+                  <div>
+                    <input
+                      type="email"
+                      placeholder="Email"
+                      value={contact.email}
+                      onChange={(e) => setContact({ ...contact, email: e.target.value })}
+                      className={`w-full px-3 py-2.5 text-sm border ${v.email ? 'border-red-500' : 'border-marvvn-gray-300'} focus:border-marvvn-black focus:outline-none transition-colors`}
+                    />
+                    {v.email && <p className="text-xs text-red-500 mt-1">{v.email}</p>}
                   </div>
-                  <div className="p-4 bg-marvvn-gray-50">
-                    <h3 className="text-sm font-medium mb-2">Payment Method</h3>
-                    <p className="text-sm text-marvvn-gray-600 capitalize">
-                      {payment.method === 'cod' ? 'Cash on Delivery' : payment.method === 'upi' ? `UPI: ${payment.upiId}` : `Card ending in ${payment.cardNumber.slice(-4)}`}
-                    </p>
+                  <div>
+                    <input
+                      type="tel"
+                      placeholder="Phone number"
+                      value={contact.phone}
+                      onChange={(e) => setContact({ ...contact, phone: e.target.value })}
+                      className={`w-full px-3 py-2.5 text-sm border ${v.phone ? 'border-red-500' : 'border-marvvn-gray-300'} focus:border-marvvn-black focus:outline-none transition-colors`}
+                    />
+                    {v.phone && <p className="text-xs text-red-500 mt-1">{v.phone}</p>}
                   </div>
-                </div>
-
-                <div className="space-y-3 mb-6">
-                  {items.map((item) => (
-                    <div key={`${item.product.id}-${item.size}-${item.color}`} className="flex gap-3 items-center">
-                      <div className="w-16 h-20 bg-marvvn-gray-100 flex-shrink-0 relative overflow-hidden">
-                        <Image src={item.product.images?.[0] || '/placeholder.png'} alt={item.product.title} fill sizes="64px" className="object-cover" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{item.product.title}</p>
-                        <p className="text-xs text-marvvn-gray-500">{item.size} / {item.color} x {item.quantity}</p>
-                      </div>
-                      <span className="text-sm font-medium">{formatPrice(item.product.price * item.quantity)}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex gap-3">
-                  <button type="button" onClick={() => setStep('payment')} className="btn-secondary flex-1 py-3 cursor-pointer">
-                    Back
+                  <button type="button" onClick={handleNext} className="w-full bg-marvvn-black text-white py-3 text-sm font-semibold hover:bg-marvvn-gray-900 transition-colors cursor-pointer">
+                    Continue to Shipping
                   </button>
+                </div>
+              )}
+            </div>
+
+            {/* Shipping Section */}
+            <div className="border border-marvvn-gray-200 mb-3">
+              <button
+                type="button"
+                onClick={() => { if (stepIndex[step] >= 1) setOpenSection(openSection === 'shipping' ? null : 'shipping') }}
+                className={`w-full flex items-center justify-between p-4 ${stepIndex[step] >= 1 ? 'cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${
+                    stepIndex[step] > 1 ? 'bg-marvvn-black text-white' : stepIndex[step] === 1 ? 'bg-marvvn-black text-white' : 'border border-marvvn-gray-300 text-marvvn-gray-500'
+                  }`}>
+                    {stepIndex[step] > 1 ? <Check className="w-3 h-3" /> : '2'}
+                  </span>
+                  <span className="text-sm font-semibold text-marvvn-black">Shipping address</span>
+                </div>
+                {openSection === 'shipping' ? <ChevronUp className="w-4 h-4 text-marvvn-gray-400" /> : <ChevronDown className="w-4 h-4 text-marvvn-gray-400" />}
+              </button>
+              {openSection === 'shipping' && (
+                <div className="px-4 pb-4 pt-0 space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      placeholder="First name"
+                      value={shipping.firstName}
+                      onChange={(e) => setShipping({ ...shipping, firstName: e.target.value })}
+                      className={`px-3 py-2.5 text-sm border ${v.firstName ? 'border-red-500' : 'border-marvvn-gray-300'} focus:border-marvvn-black focus:outline-none`}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Last name"
+                      value={shipping.lastName}
+                      onChange={(e) => setShipping({ ...shipping, lastName: e.target.value })}
+                      className={`px-3 py-2.5 text-sm border ${v.lastName ? 'border-red-500' : 'border-marvvn-gray-300'} focus:border-marvvn-black focus:outline-none`}
+                    />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Address"
+                    value={shipping.address}
+                    onChange={(e) => setShipping({ ...shipping, address: e.target.value })}
+                    className={`w-full px-3 py-2.5 text-sm border ${v.address ? 'border-red-500' : 'border-marvvn-gray-300'} focus:border-marvvn-black focus:outline-none`}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Apartment, suite, etc. (optional)"
+                    value={shipping.apartment}
+                    onChange={(e) => setShipping({ ...shipping, apartment: e.target.value })}
+                    className="w-full px-3 py-2.5 text-sm border border-marvvn-gray-300 focus:border-marvvn-black focus:outline-none"
+                  />
+                  <div className="grid grid-cols-3 gap-3">
+                    <input
+                      type="text"
+                      placeholder="City"
+                      value={shipping.city}
+                      onChange={(e) => setShipping({ ...shipping, city: e.target.value })}
+                      className={`col-span-1 px-3 py-2.5 text-sm border ${v.city ? 'border-red-500' : 'border-marvvn-gray-300'} focus:border-marvvn-black focus:outline-none`}
+                    />
+                    <input
+                      type="text"
+                      placeholder="State"
+                      value={shipping.state}
+                      onChange={(e) => setShipping({ ...shipping, state: e.target.value })}
+                      className={`col-span-1 px-3 py-2.5 text-sm border ${v.state ? 'border-red-500' : 'border-marvvn-gray-300'} focus:border-marvvn-black focus:outline-none`}
+                    />
+                    <input
+                      type="text"
+                      placeholder="Pincode"
+                      value={shipping.pincode}
+                      onChange={(e) => setShipping({ ...shipping, pincode: e.target.value })}
+                      className={`col-span-1 px-3 py-2.5 text-sm border ${v.pincode ? 'border-red-500' : 'border-marvvn-gray-300'} focus:border-marvvn-black focus:outline-none`}
+                    />
+                  </div>
+                  {(v.firstName || v.lastName || v.address || v.city || v.state || v.pincode) && (
+                    <p className="text-xs text-red-500">Please fill in all required fields</p>
+                  )}
+                  <button type="button" onClick={handleNext} className="w-full bg-marvvn-black text-white py-3 text-sm font-semibold hover:bg-marvvn-gray-900 transition-colors cursor-pointer">
+                    Continue to Payment
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Payment Section */}
+            <div className="border border-marvvn-gray-200 mb-3">
+              <button
+                type="button"
+                onClick={() => { if (stepIndex[step] >= 2) setOpenSection(openSection === 'payment' ? null : 'payment') }}
+                className={`w-full flex items-center justify-between p-4 ${stepIndex[step] >= 2 ? 'cursor-pointer' : 'opacity-50 cursor-not-allowed'}`}
+              >
+                <div className="flex items-center gap-3">
+                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${
+                    stepIndex[step] >= 2 ? 'bg-marvvn-black text-white' : 'border border-marvvn-gray-300 text-marvvn-gray-500'
+                  }`}>
+                    3
+                  </span>
+                  <span className="text-sm font-semibold text-marvvn-black">Payment</span>
+                </div>
+                {openSection === 'payment' ? <ChevronUp className="w-4 h-4 text-marvvn-gray-400" /> : <ChevronDown className="w-4 h-4 text-marvvn-gray-400" />}
+              </button>
+              {openSection === 'payment' && (
+                <div className="px-4 pb-4 pt-0">
+                  <div className="space-y-2">
+                    {[
+                      { value: 'upi', label: 'UPI / Google Pay / PhonePe', icon: Wallet, desc: 'Pay instantly via UPI' },
+                      { value: 'card', label: 'Credit / Debit Card', icon: CreditCard, desc: 'Visa, Mastercard, RuPay' },
+                      { value: 'cod', label: 'Cash on Delivery', icon: Banknote, desc: 'Pay when you receive' },
+                    ].map((m) => (
+                      <label
+                        key={m.value}
+                        className={`flex items-center gap-3 p-3 border cursor-pointer transition-colors ${
+                          payment.method === m.value ? 'border-marvvn-black bg-marvvn-gray-50' : 'border-marvvn-gray-200 hover:border-marvvn-gray-400'
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="payment"
+                          value={m.value}
+                          checked={payment.method === m.value}
+                          onChange={(e) => setPayment({ ...payment, method: e.target.value as typeof payment.method })}
+                          className="accent-marvvn-black"
+                        />
+                        <m.icon className="w-5 h-5 text-marvvn-gray-500 flex-shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium">{m.label}</p>
+                          <p className="text-[11px] text-marvvn-gray-400">{m.desc}</p>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+
                   <button
                     type="button"
                     onClick={handlePlaceOrder}
                     disabled={isPlacing}
-                    className="btn-primary flex-1 py-3 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="w-full mt-4 bg-marvvn-black text-white py-3.5 text-sm font-semibold hover:bg-marvvn-gray-900 transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     {isPlacing ? (
                       <>
@@ -536,79 +460,146 @@ export default function CheckoutPage() {
                         Placing Order...
                       </>
                     ) : (
-                      'Place Order'
+                      `Place Order — ${formatPrice(total)}`
                     )}
                   </button>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
-          <div className="lg:col-span-1">
-            <div className="bg-white border p-6 sticky top-24">
-              <h2 className="font-medium text-lg mb-4">Order Summary</h2>
+          {/* Right — Order Summary */}
+          <div className="lg:col-span-5">
+            <div className="lg:sticky lg:top-24">
+              {/* Items toggle */}
+              <div className="lg:hidden border border-marvvn-gray-200 mb-3">
+                <button
+                  type="button"
+                  onClick={() => setShowItems(!showItems)}
+                  className="w-full flex items-center justify-between p-4 cursor-pointer"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-marvvn-black">Order summary</span>
+                    <span className="text-xs text-marvvn-gray-400">({items.length} item{items.length > 1 ? 's' : ''})</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-marvvn-black">{formatPrice(total)}</span>
+                    {showItems ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </div>
+                </button>
+                {showItems && (
+                  <div className="px-4 pb-4 space-y-3">
+                    {items.map((item) => (
+                      <div key={`${item.product.id}-${item.size}-${item.color}`} className="flex gap-3">
+                        <div className="w-14 h-16 bg-marvvn-gray-50 relative flex-shrink-0">
+                          <Image src={item.product.images?.[0] || '/placeholder.png'} alt={item.product.title} fill sizes="56px" className="object-cover" />
+                          <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-marvvn-gray-500 text-white text-[10px] font-semibold rounded-full flex items-center justify-center">{item.quantity}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-medium truncate">{item.product.title}</p>
+                          <p className="text-[11px] text-marvvn-gray-400">{item.size}{item.color ? ` / ${item.color}` : ''}</p>
+                        </div>
+                        <span className="text-xs font-medium">{formatPrice(item.product.price * item.quantity)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-              <div className="space-y-2 text-sm max-h-48 overflow-y-auto mb-4">
-                {items.map((item) => (
-                  <div key={`${item.product.id}-${item.size}-${item.color}`} className="flex justify-between">
-                    <span className="text-marvvn-gray-600 truncate mr-2">
-                      {item.product.title} x {item.quantity}
-                    </span>
-                    <span className="flex-shrink-0">{formatPrice(item.product.price * item.quantity)}</span>
+              {/* Desktop Summary */}
+              <div className="hidden lg:block border border-marvvn-gray-200 p-5">
+                <h2 className="text-sm font-semibold text-marvvn-black mb-4">Order summary</h2>
+
+                <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
+                  {items.map((item) => (
+                    <div key={`${item.product.id}-${item.size}-${item.color}`} className="flex gap-3">
+                      <div className="w-14 h-16 bg-marvvn-gray-50 relative flex-shrink-0">
+                        <Image src={item.product.images?.[0] || '/placeholder.png'} alt={item.product.title} fill sizes="56px" className="object-cover" />
+                        <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-marvvn-gray-500 text-white text-[10px] font-semibold rounded-full flex items-center justify-center">{item.quantity}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-medium truncate">{item.product.title}</p>
+                        <p className="text-[11px] text-marvvn-gray-400">{item.size}{item.color ? ` / ${item.color}` : ''}</p>
+                      </div>
+                      <span className="text-xs font-medium">{formatPrice(item.product.price * item.quantity)}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Promo Code */}
+                <div className="border-t border-marvvn-gray-100 pt-3 mb-3">
+                  {promoCode ? (
+                    <div className="flex items-center justify-between bg-marvvn-gray-50 px-3 py-2">
+                      <div className="flex items-center gap-2">
+                        <Tag className="w-3.5 h-3.5 text-green-600" />
+                        <span className="text-xs font-semibold">{promoCode}</span>
+                      </div>
+                      <button type="button" onClick={removePromoCode} className="text-marvvn-gray-400 hover:text-marvvn-red cursor-pointer">
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Discount code"
+                        value={promoInput}
+                        onChange={(e) => { setPromoInput(e.target.value); setPromoError('') }}
+                        className="flex-1 px-3 py-2 text-xs border border-marvvn-gray-300 focus:border-marvvn-black focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          if (!promoInput.trim()) return
+                          const ok = await applyPromoCode(promoInput)
+                          if (!ok) setPromoError('Invalid promo code')
+                          else setPromoInput('')
+                        }}
+                        className="px-3 py-2 text-xs font-medium border border-marvvn-gray-300 hover:border-marvvn-black transition-colors cursor-pointer"
+                      >
+                        Apply
+                      </button>
+                    </div>
+                  )}
+                  {promoError && <p className="text-[11px] text-red-500 mt-1">{promoError}</p>}
+                </div>
+
+                {/* Totals */}
+                <div className="border-t border-marvvn-gray-100 pt-3 space-y-2 text-xs">
+                  <div className="flex justify-between">
+                    <span className="text-marvvn-gray-500">Subtotal</span>
+                    <span>{formatPrice(totalPrice())}</span>
+                  </div>
+                  {discount > 0 && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Discount ({discount}%)</span>
+                      <span>-{formatPrice(totalPrice() - finalPrice())}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span className="text-marvvn-gray-500">Shipping</span>
+                    <span>{shippingCost === 0 ? <span className="text-green-600 font-medium">Free</span> : formatPrice(shippingCost)}</span>
+                  </div>
+                  <div className="flex justify-between pt-2 border-t border-marvvn-gray-100 text-sm font-semibold">
+                    <span>Total</span>
+                    <span>{formatPrice(total)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Trust Badges */}
+              <div className="mt-4 grid grid-cols-3 gap-2">
+                {[
+                  { icon: Truck, label: 'Free Shipping', sub: `On orders above ${formatPrice(freeShippingThreshold)}` },
+                  { icon: ShieldCheck, label: 'Secure Payment', sub: '256-bit SSL encryption' },
+                  { icon: RotateCcw, label: 'Easy Returns', sub: '7-day return policy' },
+                ].map((badge) => (
+                  <div key={badge.label} className="text-center p-3 bg-marvvn-gray-50">
+                    <badge.icon className="w-5 h-5 text-marvvn-gray-400 mx-auto mb-1" />
+                    <p className="text-[10px] font-semibold text-marvvn-black">{badge.label}</p>
+                    <p className="text-[9px] text-marvvn-gray-400 leading-tight">{badge.sub}</p>
                   </div>
                 ))}
-              </div>
-
-              <div className="border-t pt-3 space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-marvvn-gray-600">Subtotal</span>
-                  <span>{formatPrice(totalPrice())}</span>
-                </div>
-
-                {discount > 0 && (
-                  <div className="flex justify-between text-green-600">
-                    <span>Discount ({discount}%)</span>
-                    <span>-{formatPrice(totalPrice() - finalPrice())}</span>
-                  </div>
-                )}
-
-                <div className="flex justify-between">
-                  <span className="text-marvvn-gray-600">Shipping</span>
-                  <span>{shippingCost === 0 ? 'Free' : formatPrice(shippingCost)}</span>
-                </div>
-
-                <div className="border-t pt-2 flex justify-between font-medium text-base">
-                  <span>Total</span>
-                  <span>{formatPrice(total)}</span>
-                </div>
-              </div>
-
-              <div className="mt-4 pt-4 border-t">
-                {promoCode ? (
-                  <div className="flex items-center justify-between px-3 py-2 bg-marvvn-gray-50 border border-marvvn-gray-200">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Tag className="w-4 h-4 text-green-600" />
-                      <span className="font-medium">{promoCode}</span>
-                    </div>
-                    <button type="button" onClick={removePromoCode} className="text-marvvn-gray-400 hover:text-marvvn-red cursor-pointer">
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Promo code"
-                      value={promoInput}
-                      onChange={(e) => { setPromoInput(e.target.value); setPromoError('') }}
-                      className="flex-1 px-3 py-2 text-sm border border-marvvn-gray-300 focus:outline-none focus:border-marvvn-black"
-                    />
-                    <button type="button" onClick={handleApplyPromo} className="px-3 py-2 text-sm font-medium border border-marvvn-gray-300 hover:border-marvvn-black transition-colors cursor-pointer">
-                      Apply
-                    </button>
-                  </div>
-                )}
-                {promoError && <p className="text-xs text-marvvn-red mt-1">{promoError}</p>}
               </div>
             </div>
           </div>
