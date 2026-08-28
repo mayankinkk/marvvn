@@ -5,37 +5,39 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-const slides = [
-  {
-    desktopImage: '/images/banners/hero-1-desktop.svg',
-    mobileImage: '/images/banners/hero-1-mobile.svg',
-    tagline: 'MADE TO MOVE WITH YOU',
-    title: 'FREESTYLE COLLECTION',
-    ctaText: 'Shop Now',
-    ctaLink: '/collections/new-arrivals',
-  },
-  {
-    desktopImage: '/images/banners/hero-2-desktop.svg',
-    mobileImage: '/images/banners/hero-2-mobile.svg',
-    tagline: 'INSPIRED BY YOUR FRIENDLY NEIGHBORHOOD SPIDER-MAN',
-    title: 'SPIDER-MAN COLLECTION',
-    ctaText: 'Shop Women',
-    ctaLink: '/collections/spiderman-women',
-  },
-  {
-    desktopImage: '/images/banners/hero-3-desktop.svg',
-    mobileImage: '/images/banners/hero-3-mobile.svg',
-    tagline: 'MATCHDAY UNIFORM',
-    title: 'RED BULL X MARVVN',
-    ctaText: 'Shop Now',
-    ctaLink: '/collections/red-bull-collection',
-  },
-]
+import { useSettings } from '@/components/SettingsProvider'
 
 export default function HeroBanner() {
+  const settings = useSettings()
   const [current, setCurrent] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+
+  const slides = [
+    {
+      desktopImage: settings.hero_banner_1_image || '/images/banners/hero-1-desktop.svg',
+      mobileImage: settings.hero_banner_1_mobile_image || settings.hero_banner_1_image || '/images/banners/hero-1-mobile.svg',
+      tagline: settings.hero_banner_1_subtitle || 'MADE TO MOVE WITH YOU',
+      title: settings.hero_banner_1_title || 'FREESTYLE COLLECTION',
+      ctaText: 'Shop Now',
+      ctaLink: settings.hero_banner_1_link || '/collections/new-arrivals',
+    },
+    {
+      desktopImage: settings.hero_banner_2_image || '/images/banners/hero-2-desktop.svg',
+      mobileImage: settings.hero_banner_2_mobile_image || settings.hero_banner_2_image || '/images/banners/hero-2-mobile.svg',
+      tagline: settings.hero_banner_2_subtitle || 'INSPIRED BY YOUR FRIENDLY NEIGHBORHOOD SPIDER-MAN',
+      title: settings.hero_banner_2_title || 'SPIDER-MAN COLLECTION',
+      ctaText: 'Shop Women',
+      ctaLink: settings.hero_banner_2_link || '/collections/spiderman-women',
+    },
+    {
+      desktopImage: settings.hero_banner_3_image || '/images/banners/hero-3-desktop.svg',
+      mobileImage: settings.hero_banner_3_mobile_image || settings.hero_banner_3_image || '/images/banners/hero-3-mobile.svg',
+      tagline: settings.hero_banner_3_subtitle || 'MATCHDAY UNIFORM',
+      title: settings.hero_banner_3_title || 'RED BULL X MARVVN',
+      ctaText: 'Shop Now',
+      ctaLink: settings.hero_banner_3_link || '/collections/red-bull-collection',
+    },
+  ]
 
   useEffect(() => {
     if (!isAutoPlaying) return
@@ -43,7 +45,10 @@ export default function HeroBanner() {
       setCurrent((prev) => (prev + 1) % slides.length)
     }, 5000)
     return () => clearInterval(timer)
-  }, [isAutoPlaying])
+  }, [isAutoPlaying, slides.length])
+
+  const hasContent = slides.some(s => s.desktopImage !== '/images/banners/hero-1-desktop.svg' || s.title !== 'FREESTYLE COLLECTION')
+  if (!hasContent) return null
 
   return (
     <section
@@ -66,6 +71,7 @@ export default function HeroBanner() {
               fill
               sizes="100vw"
               className="hidden md:block object-cover"
+              priority={index === 0}
             />
             <Image
               src={slide.mobileImage}
@@ -73,6 +79,7 @@ export default function HeroBanner() {
               fill
               sizes="100vw"
               className="md:hidden object-cover"
+              priority={index === 0}
             />
             <div className="absolute inset-0 bg-black/20" />
             <div className="absolute inset-0 flex items-center">

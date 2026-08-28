@@ -26,6 +26,51 @@ export default function Home() {
   const womenProducts = useMemo(() => products.filter(p => p.category === 'women').slice(0, 12), [products])
   const menProducts = useMemo(() => products.filter(p => p.category === 'men').slice(0, 12), [products])
 
+  const promo1 = {
+    desktopImage: settings.promo_1_image || '/images/banners/promo-1-desktop.svg',
+    mobileImage: settings.promo_1_mobile_image || settings.promo_1_image || '/images/banners/promo-1-mobile.svg',
+    tagline: settings.promo_1_subtitle || 'MADE TO MOVE WITH YOU',
+    title: settings.promo_1_title || 'FREESTYLE COLLECTION',
+    ctaText: 'Shop Now',
+    ctaLink: settings.promo_1_link || '/collections/new-arrivals',
+  }
+
+  const promo2 = {
+    desktopImage: settings.promo_2_image || '/images/banners/promo-2-desktop.svg',
+    mobileImage: settings.promo_2_mobile_image || settings.promo_2_image || '/images/banners/promo-2-mobile.svg',
+    tagline: settings.promo_2_subtitle || 'INSPIRED BY YOUR FRIENDLY NEIGHBORHOOD SPIDER-MAN',
+    title: settings.promo_2_title || 'SPIDER-MAN COLLECTION',
+    ctaText: 'Shop Women',
+    ctaLink: settings.promo_2_link || '/collections/spiderman-women',
+  }
+
+  const promo3 = {
+    desktopImage: settings.promo_3_image || '/images/banners/promo-3-desktop.svg',
+    mobileImage: settings.promo_3_mobile_image || settings.promo_3_image || '/images/banners/promo-3-mobile.svg',
+    tagline: settings.promo_3_subtitle || 'MATCHDAY UNIFORM',
+    title: settings.promo_3_title || 'RED BULL X MARVVN',
+    ctaText: 'Shop Now',
+    ctaLink: settings.promo_3_link || '/collections/red-bull-collection',
+  }
+
+  const promo4 = {
+    desktopImage: settings.promo_4_image || '/images/banners/promo-4-desktop.svg',
+    mobileImage: settings.promo_4_mobile_image || settings.promo_4_image || '/images/banners/promo-4-mobile.svg',
+    tagline: settings.promo_4_subtitle || 'EXPLORE NEW IN',
+    title: settings.promo_4_title || 'EXPLORE NEW IN',
+    ctaText: 'Shop Now',
+    ctaLink: settings.promo_4_link || '/collections/womens-new-arrivals',
+  }
+
+  const promo5 = {
+    desktopImage: settings.promo_5_image || '/images/banners/promo-5-desktop.svg',
+    mobileImage: settings.promo_5_mobile_image || settings.promo_5_image || '/images/banners/promo-5-mobile.svg',
+    tagline: settings.promo_5_subtitle || 'DISCOVER WHAT\'S NEW',
+    title: settings.promo_5_title || 'DISCOVER WHAT\'S NEW',
+    ctaText: 'EXPLORE',
+    ctaLink: settings.promo_5_link || '/collections/mens-new-arrivals',
+  }
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -37,40 +82,19 @@ export default function Home() {
 
         <section className="py-4 lg:py-6">
           <div className="container">
-            <PromoBanner
-              desktopImage="/images/banners/promo-1-desktop.svg"
-              mobileImage="/images/banners/promo-1-mobile.svg"
-              tagline="MADE TO MOVE WITH YOU"
-              title="FREESTYLE COLLECTION"
-              ctaText="Shop Now"
-              ctaLink="/collections/new-arrivals"
-            />
+            <PromoBanner {...promo1} />
           </div>
         </section>
 
         <section className="py-4 lg:py-6">
           <div className="container">
-            <PromoBanner
-              desktopImage="/images/banners/promo-2-desktop.svg"
-              mobileImage="/images/banners/promo-2-mobile.svg"
-              tagline="INSPIRED BY YOUR FRIENDLY NEIGHBORHOOD SPIDER-MAN"
-              title="SPIDER-MAN COLLECTION"
-              ctaText="Shop Women"
-              ctaLink="/collections/spiderman-women"
-            />
+            <PromoBanner {...promo2} />
           </div>
         </section>
 
         <section className="py-4 lg:py-6">
           <div className="container">
-            <PromoBanner
-              desktopImage="/images/banners/promo-3-desktop.svg"
-              mobileImage="/images/banners/promo-3-mobile.svg"
-              tagline="MATCHDAY UNIFORM"
-              title="RED BULL X MARVVN"
-              ctaText="Shop Now"
-              ctaLink="/collections/red-bull-collection"
-            />
+            <PromoBanner {...promo3} />
           </div>
         </section>
 
@@ -88,15 +112,7 @@ export default function Home() {
 
         <section className="py-4 lg:py-6">
           <div className="container">
-            <PromoBanner
-              desktopImage="/images/banners/promo-4-desktop.svg"
-              mobileImage="/images/banners/promo-4-mobile.svg"
-              tagline="EXPLORE NEW IN"
-              title="EXPLORE NEW IN"
-              ctaText="Shop Now"
-              ctaLink="/collections/womens-new-arrivals"
-              reverse
-            />
+            <PromoBanner {...promo4} reverse />
           </div>
         </section>
 
@@ -126,14 +142,7 @@ export default function Home() {
 
         <section className="py-4 lg:py-6">
           <div className="container">
-            <PromoBanner
-              desktopImage="/images/banners/promo-5-desktop.svg"
-              mobileImage="/images/banners/promo-5-mobile.svg"
-              tagline="DISCOVER WHAT'S NEW"
-              title="DISCOVER WHAT'S NEW"
-              ctaText="EXPLORE"
-              ctaLink="/collections/mens-new-arrivals"
-            />
+            <PromoBanner {...promo5} />
           </div>
         </section>
 
