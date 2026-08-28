@@ -6,10 +6,9 @@ import { useRouter, usePathname } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useAuthStore } from '@/lib/auth-store'
-import { useWishlistStore } from '@/lib/wishlist-store'
 import { useCurrency } from '@/lib/hooks/useCurrency'
 import {
-  ChevronRight, User, Package, Heart, LogOut, Settings, CreditCard,
+  ChevronRight, User, Package, Heart, LogOut, Settings,
   Copy, Check, Edit3, Save, X, Lock, Eye, EyeOff, Bell, Mail, MessageCircle,
   Truck, Clock, CheckCircle, ArrowRight, Home, MapPin
 } from 'lucide-react'
@@ -41,7 +40,6 @@ const statusIcons: Record<string, any> = {
 
 export default function AccountPage() {
   const { user, isAuthenticated, loading, logout, fetchUser } = useAuthStore()
-  const { totalItems: wishlistCount } = useWishlistStore()
   const { format } = useCurrency()
   const router = useRouter()
   const pathname = usePathname()
@@ -168,56 +166,6 @@ export default function AccountPage() {
             </div>
           </div>
         </div>
-
-        {/* Stats Row */}
-        {stats && (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <div className="border border-marvvn-gray-200 p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-marvvn-gray-50 flex items-center justify-center">
-                  <Package className="w-5 h-5 text-marvvn-gray-500" />
-                </div>
-                <div>
-                  <p className="text-2xl font-display font-bold">{stats.totalOrders}</p>
-                  <p className="text-xs text-marvvn-gray-500">Total Orders</p>
-                </div>
-              </div>
-            </div>
-            <div className="border border-marvvn-gray-200 p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-marvvn-gray-50 flex items-center justify-center">
-                  <CreditCard className="w-5 h-5 text-marvvn-gray-500" />
-                </div>
-                <div>
-                  <p className="text-2xl font-display font-bold">{format(stats.totalSpent)}</p>
-                  <p className="text-xs text-marvvn-gray-500">Total Spent</p>
-                </div>
-              </div>
-            </div>
-            <div className="border border-marvvn-gray-200 p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-marvvn-gray-50 flex items-center justify-center">
-                  <Truck className="w-5 h-5 text-marvvn-gray-500" />
-                </div>
-                <div>
-                  <p className="text-2xl font-display font-bold">{stats.pendingOrders}</p>
-                  <p className="text-xs text-marvvn-gray-500">Active Orders</p>
-                </div>
-              </div>
-            </div>
-            <div className="border border-marvvn-gray-200 p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-marvvn-gray-50 flex items-center justify-center">
-                  <Heart className="w-5 h-5 text-marvvn-gray-500" />
-                </div>
-                <div>
-                  <p className="text-2xl font-display font-bold">{wishlistCount()}</p>
-                  <p className="text-xs text-marvvn-gray-500">Wishlist</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         <div className="grid lg:grid-cols-4 gap-8">
           {/* Sidebar */}
