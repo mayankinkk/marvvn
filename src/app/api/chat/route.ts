@@ -96,7 +96,15 @@ HOW TO RESPOND:
       systemInstruction,
     })
 
-    const chatHistory = history.map((msg: any) => ({
+    // Gemini requires chat history to start with a 'user' message.
+    // The frontend sends the initial bot greeting first (role: 'assistant'),
+    // so we drop all leading model messages before passing to startChat.
+    const trimmedHistory = history.slice()
+    while (trimmedHistory.length > 0 && trimmedHistory[0].role !== 'user') {
+      trimmedHistory.shift()
+    }
+
+    const chatHistory = trimmedHistory.map((msg: any) => ({
       role: msg.role === 'user' ? 'user' : 'model',
       parts: [{ text: msg.text }],
     }))
