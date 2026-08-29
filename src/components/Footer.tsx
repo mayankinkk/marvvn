@@ -2,17 +2,17 @@
 
 import Link from 'next/link'
 import { Facebook, Twitter, Instagram, Youtube, Send, MapPin, Phone, Mail } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useSettings } from '@/components/SettingsProvider'
 
-const shopLinks = [
+const defaultShopLinks = [
   { label: 'Best Sellers', href: '/collections/best-sellers' },
   { label: 'Special Prices', href: '/collections/special-prices' },
   { label: 'New Arrivals', href: '/collections/new-arrivals' },
   { label: 'Signature', href: '/collections/signature-collection-app' },
 ]
 
-const trendingLinks = [
+const defaultTrendingLinks = [
   { label: 'ACOSTA Collection', href: '/collections/acosta-collection-app' },
   { label: 'Anime Collection', href: '/collections/anime-collection-app' },
   { label: 'Oversized T-shirt', href: '/collections/oversized-t-shirt-men' },
@@ -44,6 +44,14 @@ export default function Footer() {
   const settings = useSettings()
 
   const [subscribing, setSubscribing] = useState(false)
+
+  const shopLinks = useMemo(() => {
+    try { return JSON.parse(settings.footer_shop_links || '[]') } catch { return defaultShopLinks }
+  }, [settings.footer_shop_links])
+
+  const trendingLinks = useMemo(() => {
+    try { return JSON.parse(settings.footer_trending_links || '[]') } catch { return defaultTrendingLinks }
+  }, [settings.footer_trending_links])
 
   const handleNewsletter = async (e: React.FormEvent) => {
     e.preventDefault()

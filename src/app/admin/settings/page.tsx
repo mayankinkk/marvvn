@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Save, Store, Truck, Globe, Palette, Shield, Bell, Search, Loader2, FileText, Download, Newspaper, Plus, X } from 'lucide-react'
 
-type Tab = 'general' | 'shipping' | 'seo' | 'social' | 'notifications' | 'appearance' | 'maintenance' | 'invoice' | 'blog'
+type Tab = 'general' | 'shipping' | 'seo' | 'social' | 'notifications' | 'appearance' | 'maintenance' | 'invoice' | 'blog' | 'footer'
 
 const tabs: { id: Tab; label: string; icon: any }[] = [
   { id: 'general', label: 'General', icon: Store },
@@ -13,6 +13,7 @@ const tabs: { id: Tab; label: string; icon: any }[] = [
   { id: 'seo', label: 'SEO', icon: Search },
   { id: 'social', label: 'Social', icon: Globe },
   { id: 'appearance', label: 'Appearance', icon: Palette },
+  { id: 'footer', label: 'Footer Links', icon: FileText },
   { id: 'notifications', label: 'Notifications', icon: Bell },
   { id: 'maintenance', label: 'Maintenance', icon: Shield },
 ]
@@ -670,6 +671,10 @@ export default function AdminSettingsPage() {
             <BlogTab settings={settings} update={update} />
           )}
 
+          {activeTab === 'footer' && (
+            <FooterLinksTab settings={settings} update={update} />
+          )}
+
           {activeTab === 'maintenance' && (
             <div className="space-y-6">
               <h2 className="font-medium text-lg">Maintenance Mode</h2>
@@ -867,6 +872,116 @@ function Toggle({ label, description, checked, onChange }: {
           }`}
         />
       </button>
+    </div>
+  )
+}
+
+function FooterLinksTab({ settings, update }: { settings: Record<string, string>; update: (k: string, v: string) => void }) {
+  const shopLinks: { label: string; href: string }[] = (() => {
+    try { return JSON.parse(settings.footer_shop_links || '[]') } catch { return [] }
+  })()
+
+  const trendingLinks: { label: string; href: string }[] = (() => {
+    try { return JSON.parse(settings.footer_trending_links || '[]') } catch { return [] }
+  })()
+
+  const addLink = (key: string, links: { label: string; href: string }[]) => {
+    update(key, JSON.stringify([...links, { label: '', href: '' }]))
+  }
+
+  const updateLink = (key: string, links: { label: string; href: string }[], index: number, field: 'label' | 'href', value: string) => {
+    const updated = links.map((l, i) => i === index ? { ...l, [field]: value } : l)
+    update(key, JSON.stringify(updated))
+  }
+
+  const removeLink = (key: string, links: { label: string; href: string }[], index: number) => {
+    update(key, JSON.stringify(links.filter((_, i) => i !== index)))
+  }
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <h2 className="font-medium text-lg">Footer Links</h2>
+        <p className="text-sm text-marvvn-gray-500 mt-1">Edit the Shop and Trending columns in the footer</p>
+      </div>
+
+      {/* Shop Links */}
+      <div className="border p-4 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-medium">Shop Column</h3>
+          <button
+            type="button"
+            onClick={() => addLink('footer_shop_links', shopLinks)}
+            className="text-sm text-marvvn-black hover:underline flex items-center gap-1 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" /> Add Link
+          </button>
+        </div>
+        {shopLinks.map((link, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <input
+              type="text"
+              value={link.label}
+              onChange={(e) => updateLink('footer_shop_links', shopLinks, i, 'label', e.target.value)}
+              className="input-field flex-1"
+              placeholder="Label"
+            />
+            <input
+              type="text"
+              value={link.href}
+              onChange={(e) => updateLink('footer_shop_links', shopLinks, i, 'href', e.target.value)}
+              className="input-field flex-1"
+              placeholder="/collections/..."
+            />
+            <button
+              type="button"
+              onClick={() => removeLink('footer_shop_links', shopLinks, i)}
+              className="p-2 text-marvvn-gray-400 hover:text-red-500 cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* Trending Links */}
+      <div className="border p-4 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="font-medium">Trending Column</h3>
+          <button
+            type="button"
+            onClick={() => addLink('footer_trending_links', trendingLinks)}
+            className="text-sm text-marvvn-black hover:underline flex items-center gap-1 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" /> Add Link
+          </button>
+        </div>
+        {trendingLinks.map((link, i) => (
+          <div key={i} className="flex items-center gap-2">
+            <input
+              type="text"
+              value={link.label}
+              onChange={(e) => updateLink('footer_trending_links', trendingLinks, i, 'label', e.target.value)}
+              className="input-field flex-1"
+              placeholder="Label"
+            />
+            <input
+              type="text"
+              value={link.href}
+              onChange={(e) => updateLink('footer_trending_links', trendingLinks, i, 'href', e.target.value)}
+              className="input-field flex-1"
+              placeholder="/collections/..."
+            />
+            <button
+              type="button"
+              onClick={() => removeLink('footer_trending_links', trendingLinks, i)}
+              className="p-2 text-marvvn-gray-400 hover:text-red-500 cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
