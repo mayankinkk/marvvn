@@ -63,7 +63,7 @@ const DEFAULTS: Record<string, string> = {
   invoice_logo_url: '',
   invoice_gst_number: '',
   invoice_gst_percentage: '12',
-  invoice_footer_text: 'NOT MADE TO FIT IN. | BUILT FOR THE REAL ONES. 🔥',
+  invoice_footer_text: 'NOT MADE TO FIT IN. | BUILT FOR THE REAL ONES.',
   invoice_terms: '',
   invoice_return_policy: 'Return accepted within 3 days of delivery • Product must be unused & undamaged • Delivery charges are non-refundable • Damaged/used products are not accepted • Refund after quality inspection',
   invoice_show_logo: 'true',

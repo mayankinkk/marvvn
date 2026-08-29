@@ -474,118 +474,143 @@ export default function AdminSettingsPage() {
               {/* Live Preview */}
               <div className="border-t pt-6">
                 <h3 className="text-sm font-medium mb-3">Live Preview</h3>
-                <div className="border rounded-lg overflow-hidden bg-white" style={{ fontFamily: 'Arial, sans-serif' }}>
+                <div className="border rounded-lg overflow-hidden bg-white p-6" style={{ fontFamily: 'Segoe UI, Helvetica, Arial, sans-serif', maxWidth: '680px' }}>
                   {/* Header */}
-                  <div style={{ padding: '20px', borderBottom: '3px solid #000' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <div>
-                        {settings.invoice_show_logo !== 'false' && settings.invoice_logo_url ? (
-                          <img src={settings.invoice_logo_url} alt="" style={{ height: '44px', objectFit: 'contain' }} />
-                        ) : (
-                          <span style={{ fontSize: '26px', letterSpacing: '4px', fontWeight: 900, color: '#000' }}>
-                            {settings.store_name || 'MARVVN'}
-                          </span>
-                        )}
-                        <p style={{ fontSize: '11px', color: '#666', margin: '6px 0 0' }}>{settings.store_address || 'Faridabad'}</p>
-                        {settings.invoice_gst_number && <p style={{ fontSize: '11px', color: '#666', margin: '2px 0 0' }}>GSTIN: {settings.invoice_gst_number}</p>}
-                      </div>
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ background: '#000', color: '#fff', padding: '6px 16px', display: 'inline-block', marginBottom: '8px' }}>
-                          <span style={{ fontSize: '14px', fontWeight: 700, letterSpacing: '1.5px' }}>{settings.invoice_invoice_label || 'TAX INVOICE'}</span>
-                        </div>
-                        <p style={{ fontSize: '12px', color: '#333', margin: '4px 0' }}><strong>{settings.invoice_order_label || 'Invoice'} #:</strong> {settings.invoice_prefix || 'INV'}-DEMO123</p>
-                        <p style={{ fontSize: '11px', color: '#666', margin: '2px 0' }}>{new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Customer + Payment */}
-                  <div style={{ display: 'flex', gap: '12px', padding: '16px 20px' }}>
-                    <div style={{ flex: 1, background: '#f9f9f9', border: '1px solid #ddd', padding: '12px' }}>
-                      <p style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '1.5px', color: '#666', margin: '0 0 6px', fontWeight: 700 }}>{settings.invoice_bill_to_label || 'Bill To'}</p>
-                      <p style={{ fontSize: '13px', fontWeight: 700, margin: '0 0 2px' }}>Customer Name</p>
-                      <p style={{ fontSize: '11px', color: '#333', margin: '2px 0' }}>123 Street, City</p>
-                      <p style={{ fontSize: '11px', color: '#333', margin: '2px 0' }}>customer@email.com</p>
-                    </div>
-                    <div style={{ flex: 0.5, background: '#f9f9f9', border: '1px solid #ddd', padding: '12px' }}>
-                      <p style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '1.5px', color: '#666', margin: '0 0 6px', fontWeight: 700 }}>{settings.invoice_payment_label || 'Payment Details'}</p>
-                      <p style={{ fontSize: '11px', color: '#333', margin: '2px 0' }}><strong>{settings.invoice_payment_method_label || 'Method'}:</strong> Online</p>
-                      <p style={{ fontSize: '11px', margin: '4px 0 0' }}>
-                        <span style={{ border: '1px solid #000', padding: '2px 8px', fontSize: '10px', fontWeight: 700 }}>{settings.invoice_paid_label || 'PAID'}</span>
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Product Table */}
-                  <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #000' }}>
-                    <thead>
-                      <tr style={{ background: '#000' }}>
-                        {(settings.invoice_product_label || 'Product').split('|')[0] && (
-                          <th style={{ padding: '10px 8px', textAlign: 'left', fontSize: '10px', textTransform: 'uppercase', color: '#fff', letterSpacing: '0.5px', fontWeight: 600 }}>{settings.invoice_product_label || 'Product'}</th>
-                        )}
-                        <th style={{ padding: '10px 8px', textAlign: 'center', fontSize: '10px', textTransform: 'uppercase', color: '#fff', letterSpacing: '0.5px', fontWeight: 600 }}>{settings.invoice_variant_label || 'Variant'}</th>
-                        <th style={{ padding: '10px 8px', textAlign: 'center', fontSize: '10px', textTransform: 'uppercase', color: '#fff', letterSpacing: '0.5px', fontWeight: 600 }}>{settings.invoice_qty_label || 'Qty'}</th>
-                        <th style={{ padding: '10px 8px', textAlign: 'right', fontSize: '10px', textTransform: 'uppercase', color: '#fff', letterSpacing: '0.5px', fontWeight: 600 }}>{settings.invoice_rate_label || 'Rate'}</th>
-                        <th style={{ padding: '10px 8px', textAlign: 'right', fontSize: '10px', textTransform: 'uppercase', color: '#fff', letterSpacing: '0.5px', fontWeight: 600 }}>{settings.invoice_amount_label || 'Amount'}</th>
-                      </tr>
-                    </thead>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
                     <tbody>
                       <tr>
-                        <td style={{ padding: '10px 8px', fontSize: '12px', fontWeight: 600 }}>Demo Product</td>
-                        <td style={{ padding: '10px 8px', textAlign: 'center', fontSize: '11px', color: '#333' }}>Black / M</td>
-                        <td style={{ padding: '10px 8px', textAlign: 'center', fontSize: '12px', fontWeight: 600 }}>2</td>
-                        <td style={{ padding: '10px 8px', textAlign: 'right', fontSize: '12px', color: '#333' }}>₹999</td>
-                        <td style={{ padding: '10px 8px', textAlign: 'right', fontSize: '12px', fontWeight: 600 }}>₹1,998</td>
+                        <td style={{ verticalAlign: 'top', paddingBottom: '16px', borderBottom: '2px solid #000' }}>
+                          {settings.invoice_show_logo !== 'false' && settings.invoice_logo_url ? (
+                            <img src={settings.invoice_logo_url} alt="" style={{ height: '36px', objectFit: 'contain' }} />
+                          ) : (
+                            <div style={{ fontSize: '24px', fontWeight: 900, letterSpacing: '3px', color: '#000' }}>{settings.store_name || 'MARVVN'}</div>
+                          )}
+                          <div style={{ fontSize: '10px', color: '#555', marginTop: '5px', lineHeight: 1.6 }}>
+                            {settings.store_address || 'Faridabad'}
+                            {settings.invoice_gst_number && <><br/>GSTIN: {settings.invoice_gst_number}</>}
+                          </div>
+                        </td>
+                        <td style={{ verticalAlign: 'top', textAlign: 'right', paddingBottom: '16px', borderBottom: '2px solid #000' }}>
+                          <div style={{ fontSize: '18px', fontWeight: 800, letterSpacing: '2px', color: '#000', marginBottom: '5px' }}>{settings.invoice_invoice_label || 'TAX INVOICE'}</div>
+                          <table style={{ marginLeft: 'auto', borderCollapse: 'collapse' }}>
+                            <tbody>
+                              <tr>
+                                <td style={{ fontSize: '10px', color: '#666', padding: '2px 8px 2px 0', textAlign: 'right' }}>Invoice #</td>
+                                <td style={{ fontSize: '11px', fontWeight: 600, padding: '2px 0', textAlign: 'right' }}>{settings.invoice_prefix || 'INV'}-DEMO123</td>
+                              </tr>
+                              <tr>
+                                <td style={{ fontSize: '10px', color: '#666', padding: '2px 8px 2px 0', textAlign: 'right' }}>Order #</td>
+                                <td style={{ fontSize: '11px', fontWeight: 600, padding: '2px 0', textAlign: 'right' }}>A1B2C3D4</td>
+                              </tr>
+                              <tr>
+                                <td style={{ fontSize: '10px', color: '#666', padding: '2px 8px 2px 0', textAlign: 'right' }}>Date</td>
+                                <td style={{ fontSize: '10px', padding: '2px 0', textAlign: 'right' }}>{new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </td>
                       </tr>
                     </tbody>
                   </table>
 
-                  {/* Summary */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px 20px', gap: '16px' }}>
-                    <div style={{ flex: 1, background: '#f9f9f9', border: '1px solid #ddd', padding: '14px' }}>
-                      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                        <tbody>
-                          <tr><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#333' }}>{settings.invoice_subtotal_label || 'Subtotal'}</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#333', width: '80px' }}>₹1,998</td></tr>
-                          <tr><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#333' }}>{settings.invoice_discount_label || 'Coupon'} (MARVVN10)</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#333' }}>-₹200</td></tr>
-                          <tr><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#333' }}>{settings.invoice_shipping_label || 'Shipping'}</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#333' }}>{settings.invoice_free_label || 'FREE'}</td></tr>
-                          {settings.invoice_show_gst !== 'false' && settings.invoice_gst_number && (
-                            <tr><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#333' }}>{settings.invoice_gst_label || 'GST'} ({settings.invoice_gst_percentage || '12'}%)</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#333' }}>₹240</td></tr>
-                          )}
-                        </tbody>
-                        <tfoot>
-                          <tr style={{ borderTop: '2px solid #000' }}>
-                            <td style={{ padding: '8px 0', textAlign: 'right', fontSize: '14px', fontWeight: 800 }}>{settings.invoice_total_label || 'TOTAL'}</td>
-                            <td style={{ padding: '8px 0', textAlign: 'right', fontSize: '14px', fontWeight: 800, color: '#000' }}>₹2,238</td>
-                          </tr>
-                        </tfoot>
-                      </table>
-                      <div style={{ marginTop: '8px', border: '1px solid #000', padding: '6px 10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <div>
-                          <div style={{ fontSize: '11px', fontWeight: 700, color: '#000' }}>{settings.invoice_coupon_label || 'Coupon Applied'}: MARVVN10</div>
-                          <div style={{ fontSize: '10px', color: '#555' }}>{settings.invoice_discount_label || 'You saved'} ₹200</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div style={{ textAlign: 'center', flexShrink: 0 }}>
-                      <div style={{ width: '80px', height: '80px', background: '#f5f5f5', border: '1px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', color: '#999' }}>QR</div>
-                      <p style={{ fontSize: '9px', color: '#666', margin: '4px 0 0' }}>Scan to view order</p>
-                    </div>
+                  {/* Bill To + Payment */}
+                  <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
+                    <tbody>
+                      <tr>
+                        <td style={{ verticalAlign: 'top', width: '60%', paddingRight: '16px' }}>
+                          <div style={{ fontSize: '8px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#888', marginBottom: '4px' }}>{settings.invoice_bill_to_label || 'Bill To'}</div>
+                          <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '2px' }}>Customer Name</div>
+                          <div style={{ fontSize: '11px', color: '#333', lineHeight: 1.6 }}>123 Street, City, State 123456<br/>customer@email.com</div>
+                        </td>
+                        <td style={{ verticalAlign: 'top', width: '40%' }}>
+                          <div style={{ fontSize: '8px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#888', marginBottom: '4px' }}>{settings.invoice_payment_label || 'Payment Details'}</div>
+                          <div style={{ fontSize: '11px', color: '#666', marginBottom: '3px' }}><strong>{settings.invoice_payment_method_label || 'Method'}:</strong> Online</div>
+                          <span style={{ fontSize: '10px', fontWeight: 700, border: '1px solid #000', padding: '2px 6px', letterSpacing: '0.5px' }}>{settings.invoice_paid_label || 'PAID'}</span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  {/* Product Table */}
+                  <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
+                    <thead>
+                      <tr style={{ background: '#000', color: '#fff' }}>
+                        <th style={{ padding: '8px 6px', textAlign: 'left', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{settings.invoice_product_label || 'Product'}</th>
+                        <th style={{ padding: '8px 6px', textAlign: 'center', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{settings.invoice_variant_label || 'Variant'}</th>
+                        <th style={{ padding: '8px 6px', textAlign: 'center', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{settings.invoice_qty_label || 'Qty'}</th>
+                        <th style={{ padding: '8px 6px', textAlign: 'right', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{settings.invoice_rate_label || 'Rate'}</th>
+                        <th style={{ padding: '8px 6px', textAlign: 'right', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{settings.invoice_amount_label || 'Amount'}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style={{ borderBottom: '1px solid #e5e5e5' }}>
+                        <td style={{ padding: '8px 6px', fontSize: '12px', fontWeight: 600 }}>Demo Product</td>
+                        <td style={{ padding: '8px 6px', textAlign: 'center', fontSize: '11px', color: '#444' }}>Black / M</td>
+                        <td style={{ padding: '8px 6px', textAlign: 'center', fontSize: '12px', fontWeight: 600 }}>2</td>
+                        <td style={{ padding: '8px 6px', textAlign: 'right', fontSize: '12px', color: '#444' }}>₹999</td>
+                        <td style={{ padding: '8px 6px', textAlign: 'right', fontSize: '12px', fontWeight: 600 }}>₹1,998</td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  {/* Totals */}
+                  <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '16px' }}>
+                    <tbody>
+                      <tr>
+                        <td style={{ width: '55%' }}></td>
+                        <td style={{ width: '45%' }}>
+                          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                            <tbody>
+                              <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>{settings.invoice_subtotal_label || 'Subtotal'}</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>₹1,998</td></tr>
+                              <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>{settings.invoice_discount_label || 'Coupon'} (MARVVN10)</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>-₹200</td></tr>
+                              <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>{settings.invoice_shipping_label || 'Shipping'}</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>{settings.invoice_free_label || 'FREE'}</td></tr>
+                              {settings.invoice_show_gst !== 'false' && settings.invoice_gst_number && (
+                                <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>{settings.invoice_gst_label || 'GST'} ({settings.invoice_gst_percentage || '12'}%)</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>₹240</td></tr>
+                              )}
+                              <tr style={{ borderTop: '2px solid #000' }}>
+                                <td style={{ padding: '8px 0', fontSize: '13px', fontWeight: 800 }}>{settings.invoice_total_label || 'TOTAL'}</td>
+                                <td style={{ padding: '8px 0', textAlign: 'right', fontSize: '13px', fontWeight: 800 }}>₹2,238</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  {/* Coupon */}
+                  <div style={{ border: '1px solid #000', padding: '8px 12px', marginBottom: '16px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#000' }}>{settings.invoice_coupon_label || 'Coupon Applied'}: MARVVN10</div>
+                    <div style={{ fontSize: '10px', color: '#555', marginTop: '1px' }}>{settings.invoice_discount_label || 'You saved'} ₹200</div>
                   </div>
 
-                  {/* Return Policy */}
-                  <div style={{ margin: '0 20px 16px', border: '1px solid #000', padding: '10px 14px' }}>
-                    <p style={{ fontSize: '10px', fontWeight: 700, color: '#000', margin: '0 0 4px' }}>Return Policy</p>
-                    <p style={{ fontSize: '10px', color: '#333', margin: 0, lineHeight: 1.6 }}>{settings.invoice_return_policy || '3 days return • Unused & undamaged • Non-refundable shipping • Quality inspection required'}</p>
-                  </div>
+                  {/* Return Policy + QR */}
+                  <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '16px' }}>
+                    <tbody>
+                      <tr>
+                        <td style={{ verticalAlign: 'top', width: '65%', paddingRight: '16px' }}>
+                          <div style={{ fontSize: '8px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#888', marginBottom: '4px' }}>Return Policy</div>
+                          <div style={{ fontSize: '10px', color: '#333', lineHeight: 1.7, borderLeft: '2px solid #000', paddingLeft: '10px' }}>
+                            {settings.invoice_return_policy || '3 days return • Unused & undamaged • Non-refundable shipping • Quality inspection required'}
+                          </div>
+                        </td>
+                        <td style={{ verticalAlign: 'top', width: '35%', textAlign: 'right' }}>
+                          <div style={{ width: '80px', height: '80px', border: '1px solid #ddd', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', color: '#999' }}>QR</div>
+                          <div style={{ fontSize: '8px', color: '#888', marginTop: '3px' }}>Scan to view order</div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
 
                   {/* Footer */}
-                  <div style={{ padding: '14px 20px', borderTop: '2px solid #000', textAlign: 'center' }}>
+                  <div style={{ borderTop: '2px solid #000', paddingTop: '12px', textAlign: 'center' }}>
                     {settings.invoice_terms && (
-                      <p style={{ fontSize: '9px', color: '#666', margin: '0 0 4px' }}>{settings.invoice_terms}</p>
+                      <div style={{ fontSize: '9px', color: '#888', marginBottom: '4px' }}>{settings.invoice_terms}</div>
                     )}
-                    <p style={{ fontSize: '12px', fontWeight: 800, letterSpacing: '1.5px', color: '#000', margin: '0 0 2px', textTransform: 'uppercase' }}>
-                      {settings.invoice_footer_text || 'NOT MADE TO FIT IN. | BUILT FOR THE REAL ONES. 🔥'}
-                    </p>
+                    <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '1.5px', color: '#000', textTransform: 'uppercase', marginBottom: '3px' }}>
+                      {settings.invoice_footer_text || 'NOT MADE TO FIT IN. | BUILT FOR THE REAL ONES.'}
+                    </div>
+                    <div style={{ fontSize: '9px', color: '#aaa' }}>{settings.store_name || 'MARVVN'}</div>
                   </div>
                 </div>
               </div>
