@@ -28,7 +28,26 @@ export default function AdminSettingsPage() {
   useEffect(() => {
     fetch('/api/admin/settings')
       .then((res) => res.json())
-      .then((data) => { setSettings(data.settings || {}); setLoading(false) })
+      .then((data) => {
+        const defaults: Record<string, string> = {
+          footer_shop_links: JSON.stringify([
+            { label: 'Best Sellers', href: '/collections/best-sellers' },
+            { label: 'Special Prices', href: '/collections/special-prices' },
+            { label: 'New Arrivals', href: '/collections/new-arrivals' },
+            { label: 'Signature', href: '/collections/signature-collection-app' },
+          ]),
+          footer_trending_links: JSON.stringify([
+            { label: 'ACOSTA Collection', href: '/collections/acosta-collection-app' },
+            { label: 'Anime Collection', href: '/collections/anime-collection-app' },
+            { label: 'Oversized T-shirt', href: '/collections/oversized-t-shirt-men' },
+            { label: 'Bottoms for Women', href: '/collections/womens-bottoms' },
+            { label: 'Bottoms for Men', href: '/collections/mens-bottoms' },
+            { label: 'Sweatshirts & Hoodies', href: '/collections/sweatshirts-hoodies' },
+          ]),
+        }
+        setSettings({ ...defaults, ...(data.settings || {}) })
+        setLoading(false)
+      })
       .catch(() => setLoading(false))
   }, [])
 
