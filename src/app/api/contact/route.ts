@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(request: Request) {
-  const supabase = createClient()
+  const supabase = createAdminClient()
 
   const body = await request.json()
   const { name, email, subject, message } = body
@@ -25,9 +25,7 @@ export async function POST(request: Request) {
     })
 
   if (error) {
-    if (error.code === '42P01') {
-      return NextResponse.json({ success: true, message: 'Message received! We\'ll get back to you soon.' })
-    }
+    console.error('Contact form error:', error)
     return NextResponse.json({ error: 'Failed to send message' }, { status: 500 })
   }
 
