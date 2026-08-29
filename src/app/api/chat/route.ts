@@ -56,7 +56,7 @@ PRICING:
 
 SHIPPING:
 - Free shipping on orders above ₹999
-- ₹99 shipping fee for orders below ₹999
+- ₹65 shipping fee for orders below ₹999
 - Ships within 48 hours
 - Delivery in 5-7 business days across India
 

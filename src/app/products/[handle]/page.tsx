@@ -17,6 +17,7 @@ import { formatPrice, calculateDiscount, cn } from '@/lib/utils'
 import { useCartStore } from '@/lib/store'
 import { useWishlistStore } from '@/lib/wishlist-store'
 import { useAuthStore } from '@/lib/auth-store'
+import { useSettings } from '@/components/SettingsProvider'
 import { FlashSaleTimer, CrossSellProducts, SizeRecommendations } from '@/components/ProductExtras'
 
 export default function ProductPage() {
@@ -32,6 +33,7 @@ export default function ProductPage() {
   const { format, symbol } = useCurrency()
   const { toggleItem, isInWishlist } = useWishlistStore()
   const { user } = useAuthStore()
+  const settings = useSettings()
   const [stockAlertSigned, setStockAlertSigned] = useState(false)
   const [stockAlertEmail, setStockAlertEmail] = useState('')
 
@@ -311,11 +313,11 @@ export default function ProductPage() {
             <div className="border-t pt-6 space-y-4">
               <div className="flex items-center gap-3 text-sm">
                 <Truck className="w-5 h-5 text-marvvn-gray-400" />
-                <span>Free shipping on orders over {symbol}1,499</span>
+                <span>Free shipping on orders over {symbol}{settings.free_shipping_threshold || '999'}</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <RotateCcw className="w-5 h-5 text-marvvn-gray-400" />
-                <span>7-day easy returns</span>
+                <span>3-day easy returns</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <Shield className="w-5 h-5 text-marvvn-gray-400" />
