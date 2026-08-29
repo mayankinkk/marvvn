@@ -325,7 +325,7 @@ export default function ProductPage() {
               </div>
               <div className="flex items-center gap-3 text-sm">
                 <RotateCcw className="w-5 h-5 text-marvvn-gray-400" />
-                <span>Shipping fee deducted from refund on free-shipping orders</span>
+                <span>Applicable shipping charges will be deducted from refunds for returned free-shipping orders.</span>
               </div>
             </div>
           </div>
