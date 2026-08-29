@@ -91,9 +91,7 @@ export default function ProductPage() {
   const handleAddToCart = () => {
     const size = selectedSize || product.sizes[0]
     const color = selectedColor || product.colors[0]
-    for (let i = 0; i < quantity; i++) {
-      addItem(product, size, color)
-    }
+    addItem(product, size, color, quantity)
     toggleCart()
   }
 

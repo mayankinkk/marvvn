@@ -10,7 +10,7 @@ interface CartStore {
   isOpen: boolean
   promoCode: string
   discount: number
-  addItem: (product: Product, size: string, color: string) => void
+  addItem: (product: Product, size: string, color: string, qty?: number) => void
   removeItem: (productId: string, size: string, color: string) => void
   updateQuantity: (productId: string, size: string, color: string, quantity: number) => void
   clearCart: () => void
@@ -33,13 +33,15 @@ async function syncToServer(items: CartItem[]) {
       size: item.size,
       color: item.color,
     }))
-    for (const item of serializable) {
-      await fetch('/api/cart', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(item),
-      })
-    }
+    await Promise.all(
+      serializable.map((item) =>
+        fetch('/api/cart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(item),
+        })
+      )
+    )
   } catch (e) {
     console.error('Cart sync failed:', e)
   }
@@ -53,7 +55,7 @@ export const useCartStore = create<CartStore>()(
       promoCode: '',
       discount: 0,
 
-      addItem: (product, size, color) => {
+      addItem: (product: Product, size: string, color: string, qty: number = 1) => {
         const existing = get().items.find(
           (item) => item.product.id === product.id && item.size === size && item.color === color
         )
@@ -62,11 +64,11 @@ export const useCartStore = create<CartStore>()(
         if (existing) {
           newItems = get().items.map((item) =>
             item.product.id === product.id && item.size === size && item.color === color
-              ? { ...item, quantity: item.quantity + 1 }
+              ? { ...item, quantity: Math.min(99, item.quantity + qty) }
               : item
           )
         } else {
-          newItems = [...get().items, { product, quantity: 1, size, color }]
+          newItems = [...get().items, { product, quantity: Math.min(99, qty), size, color }]
         }
 
         set({ items: newItems })

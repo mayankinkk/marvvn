@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { sendOrderConfirmation } from '@/lib/email'
 import { sendWhatsAppOrderNotification } from '@/lib/whatsapp'
-import { decrementStock } from '@/lib/inventory'
 
 export async function GET() {
   const supabase = createClient()
@@ -14,7 +14,7 @@ export async function GET() {
 
   const { data: orders, error } = await supabase
     .from('orders')
-    .select('*, order_items(*)')
+    .select('*, order_items(*, products(id, title, images, handle))')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 
@@ -46,21 +46,33 @@ export async function POST(request: Request) {
   const productIds = items.map((item: any) => item.productId)
   const { data: products, error: productsError } = await supabase
     .from('products')
-    .select('id, price')
+    .select('id, price, stock')
     .in('id', productIds)
 
   if (productsError) {
     return NextResponse.json({ error: 'Failed to validate products' }, { status: 500 })
   }
 
-  const productMap = new Map(products?.map((p: any) => [p.id, p.price]) || [])
+  const productMap = new Map(products?.map((p: any) => [p.id, p]) || [])
+
+  // Check stock availability for all items
+  for (const item of items) {
+    const product = productMap.get(item.productId)
+    if (!product) {
+      return NextResponse.json({ error: `Product ${item.productId} not found` }, { status: 400 })
+    }
+    const quantity = Math.max(1, Math.min(99, parseInt(item.quantity) || 1))
+    if (product.stock !== undefined && product.stock < quantity) {
+      return NextResponse.json({
+        error: `Insufficient stock for "${product.title || 'product'}". Only ${product.stock} available.`,
+      }, { status: 400 })
+    }
+  }
 
   let serverTotal = 0
   const orderItems = items.map((item: any) => {
-    const serverPrice = productMap.get(item.productId)
-    if (serverPrice === undefined) {
-      throw new Error(`Product ${item.productId} not found`)
-    }
+    const product = productMap.get(item.productId)
+    const serverPrice = product!.price
     const quantity = Math.max(1, Math.min(99, parseInt(item.quantity) || 1))
     serverTotal += serverPrice * quantity
     return {
@@ -76,15 +88,26 @@ export async function POST(request: Request) {
   if (promoCode) {
     const { data: coupon } = await supabase
       .from('coupons')
-      .select('discount_value, discount_type, min_cart')
+      .select('discount_value, discount_type, min_cart, max_uses, used_count, expires_at')
       .eq('code', promoCode.toUpperCase())
       .eq('is_active', true)
       .single()
 
-    if (coupon && serverTotal >= (coupon.min_cart || 0)) {
-      discount = coupon.discount_type === 'percentage'
-        ? (serverTotal * coupon.discount_value) / 100
-        : coupon.discount_value
+    if (coupon) {
+      // Check expiry
+      if (coupon.expires_at && new Date(coupon.expires_at) < new Date()) {
+        return NextResponse.json({ error: 'This coupon has expired' }, { status: 400 })
+      }
+      // Check max uses
+      if (coupon.max_uses && coupon.used_count >= coupon.max_uses) {
+        return NextResponse.json({ error: 'This coupon has reached its usage limit' }, { status: 400 })
+      }
+      // Check minimum cart value
+      if (serverTotal >= (coupon.min_cart || 0)) {
+        discount = coupon.discount_type === 'percentage'
+          ? (serverTotal * coupon.discount_value) / 100
+          : coupon.discount_value
+      }
     }
   }
 
@@ -125,7 +148,6 @@ export async function POST(request: Request) {
   const { data: profile } = await supabase.from('profiles').select('name, email').eq('id', user.id).single()
 
   if (profile?.email) {
-    const productIds = items.map((item: any) => item.productId)
     const { data: productDetails } = await supabase.from('products').select('id, title').in('id', productIds)
     const titleMap = new Map(productDetails?.map((p: any) => [p.id, p.title]) || [])
 
@@ -136,21 +158,57 @@ export async function POST(request: Request) {
       items: items.map((item: any) => ({
         title: titleMap.get(item.productId) || 'Product',
         quantity: item.quantity,
-        price: productMap.get(item.productId) || 0,
+        price: productMap.get(item.productId)?.price || 0,
         size: item.size,
         color: item.color,
       })),
       total: finalTotal,
       shippingAddress: shippingAddress,
-      }).catch(console.error)
+    }).catch(console.error)
   }
 
+  // Atomic stock decrement using admin client to bypass RLS
+  const admin = createAdminClient()
   for (const item of orderItems) {
-    decrementStock(item.product_id, item.quantity).catch(console.error)
+    const { error: stockError } = await admin
+      .rpc('decrement_stock', { p_product_id: item.product_id, p_quantity: item.quantity })
+      .single()
+
+    // Fallback to manual decrement if RPC doesn't exist
+    if (stockError) {
+      const { data: product } = await admin
+        .from('products')
+        .select('stock')
+        .eq('id', item.product_id)
+        .single()
+
+      if (product && (product.stock || 0) >= item.quantity) {
+        await admin
+          .from('products')
+          .update({ stock: (product.stock || 0) - item.quantity })
+          .eq('id', item.product_id)
+          .lte('stock', product.stock!)
+      }
+    }
+  }
+
+  // Increment coupon usage
+  if (promoCode && discount > 0) {
+    const { data: coupon } = await admin
+      .from('coupons')
+      .select('used_count')
+      .eq('code', promoCode.toUpperCase())
+      .single()
+
+    if (coupon) {
+      await admin
+        .from('coupons')
+        .update({ used_count: (coupon.used_count || 0) + 1 })
+        .eq('code', promoCode.toUpperCase())
+    }
   }
 
   if (shippingAddress.phone) {
-    const productIds = items.map((item: any) => item.productId)
     const { data: whatsappProducts } = await supabase.from('products').select('id, title').in('id', productIds)
     const whatsappTitleMap = new Map(whatsappProducts?.map((p: any) => [p.id, p.title]) || [])
 
