@@ -32,7 +32,6 @@ export async function GET(request: Request) {
   const subtotal = order.order_items?.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0) || 0
   const gstAmount = gstNumber ? Math.round(subtotal * gstPercentage / 100) : 0
   const discount = order.discount || 0
-  const total = order.total
 
   const invoice = {
     orderId: order.id,
@@ -48,10 +47,33 @@ export async function GET(request: Request) {
       showLogo: settings.invoice_show_logo !== 'false',
       gst: gstNumber ? { number: gstNumber, percentage: gstPercentage } : null,
       showGst: settings.invoice_show_gst !== 'false',
-      primaryColor: settings.invoice_primary_color || '#000000',
-      secondaryColor: settings.invoice_secondary_color || '#666666',
       footerText: settings.invoice_footer_text || 'NOT MADE TO FIT IN. | BUILT FOR THE REAL ONES. 🔥',
       terms: settings.invoice_terms || '',
+      returnPolicy: settings.invoice_return_policy || '',
+      couponLabel: settings.invoice_coupon_label || '',
+      subtotalLabel: settings.invoice_subtotal_label || '',
+      discountLabel: settings.invoice_discount_label || '',
+      shippingLabel: settings.invoice_shipping_label || '',
+      gstLabel: settings.invoice_gst_label || '',
+      totalLabel: settings.invoice_total_label || '',
+      paidLabel: settings.invoice_paid_label || '',
+      pendingLabel: settings.invoice_pending_label || '',
+      failedLabel: settings.invoice_failed_label || '',
+      paymentMethodLabel: settings.invoice_payment_method_label || '',
+      codLabel: settings.invoice_cod_label || '',
+      onlineLabel: settings.invoice_online_label || '',
+      billToLabel: settings.invoice_bill_to_label || '',
+      paymentLabel: settings.invoice_payment_label || '',
+      invoiceLabel: settings.invoice_invoice_label || '',
+      orderLabel: settings.invoice_order_label || '',
+      orderDateLabel: settings.invoice_order_date_label || '',
+      invoiceDateLabel: settings.invoice_invoice_date_label || '',
+      productLabel: settings.invoice_product_label || '',
+      variantLabel: settings.invoice_variant_label || '',
+      qtyLabel: settings.invoice_qty_label || '',
+      rateLabel: settings.invoice_rate_label || '',
+      amountLabel: settings.invoice_amount_label || '',
+      freeLabel: settings.invoice_free_label || '',
     },
     customer: {
       name: `${shipping.firstName || ''} ${shipping.lastName || ''}`.trim(),
@@ -78,7 +100,7 @@ export async function GET(request: Request) {
     discount,
     shippingFee,
     promoCode: order.promo_code || null,
-    total,
+    total: order.total,
     paymentMethod: order.payment_method,
     paymentStatus: order.payment_status,
     siteUrl: settings.site_url || 'https://marvvn.online',

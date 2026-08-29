@@ -385,43 +385,12 @@ export default function AdminSettingsPage() {
                   onChange={(v) => update('invoice_prefix', v)}
                   placeholder="INV"
                 />
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Primary Color</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      value={settings.invoice_primary_color || '#000000'}
-                      onChange={(e) => update('invoice_primary_color', e.target.value)}
-                      className="w-10 h-10 rounded border cursor-pointer"
-                    />
-                    <input
-                      type="text"
-                      value={settings.invoice_primary_color || '#000000'}
-                      onChange={(e) => update('invoice_primary_color', e.target.value)}
-                      className="input-field flex-1 font-mono"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Secondary Color</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="color"
-                      value={settings.invoice_secondary_color || '#666666'}
-                      onChange={(e) => update('invoice_secondary_color', e.target.value)}
-                      className="w-10 h-10 rounded border cursor-pointer"
-                    />
-                    <input
-                      type="text"
-                      value={settings.invoice_secondary_color || '#666666'}
-                      onChange={(e) => update('invoice_secondary_color', e.target.value)}
-                      className="input-field flex-1 font-mono"
-                    />
-                  </div>
-                </div>
+                <Field
+                  label="Site URL (for QR code)"
+                  value={settings.site_url || 'https://marvvn.online'}
+                  onChange={(v) => update('site_url', v)}
+                  placeholder="https://marvvn.online"
+                />
               </div>
 
               <div className="flex items-center gap-6">
@@ -440,24 +409,66 @@ export default function AdminSettingsPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Footer Text</label>
+                <label className="block text-sm font-medium mb-1">Footer Tagline</label>
                 <input
                   type="text"
                   value={settings.invoice_footer_text || ''}
                   onChange={(e) => update('invoice_footer_text', e.target.value)}
                   className="input-field w-full"
-                  placeholder="Thank you for shopping with MARVVN!"
+                  placeholder="NOT MADE TO FIT IN. | BUILT FOR THE REAL ONES. 🔥"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Terms & Conditions</label>
+                <label className="block text-sm font-medium mb-1">Terms & Conditions (below footer)</label>
                 <textarea
                   value={settings.invoice_terms || ''}
                   onChange={(e) => update('invoice_terms', e.target.value)}
-                  className="input-field w-full min-h-[80px]"
-                  placeholder="Return policy, warranty info..."
+                  className="input-field w-full min-h-[60px]"
+                  placeholder="Optional fine print below the tagline"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Return Policy</label>
+                <textarea
+                  value={settings.invoice_return_policy || ''}
+                  onChange={(e) => update('invoice_return_policy', e.target.value)}
+                  className="input-field w-full min-h-[80px]"
+                  placeholder="Return accepted within 3 days..."
+                />
+              </div>
+
+              {/* Editable Labels */}
+              <div className="border-t pt-4">
+                <h3 className="text-sm font-medium mb-3">Editable Labels</h3>
+                <p className="text-xs text-marvvn-gray-500 mb-4">Customize every text on the invoice. Leave blank for defaults.</p>
+                <div className="grid md:grid-cols-3 gap-3">
+                  <Field label="Invoice Title" value={settings.invoice_invoice_label || ''} onChange={(v) => update('invoice_invoice_label', v)} placeholder="TAX INVOICE" />
+                  <Field label="Order Label" value={settings.invoice_order_label || ''} onChange={(v) => update('invoice_order_label', v)} placeholder="Order" />
+                  <Field label="Invoice Label" value={settings.invoice_order_date_label || ''} onChange={(v) => update('invoice_order_date_label', v)} placeholder="Order Date" />
+                  <Field label="Invoice Date Label" value={settings.invoice_invoice_date_label || ''} onChange={(v) => update('invoice_invoice_date_label', v)} placeholder="Invoice Date" />
+                  <Field label="Bill To Label" value={settings.invoice_bill_to_label || ''} onChange={(v) => update('invoice_bill_to_label', v)} placeholder="Bill To" />
+                  <Field label="Payment Label" value={settings.invoice_payment_label || ''} onChange={(v) => update('invoice_payment_label', v)} placeholder="Payment Details" />
+                  <Field label="Method Label" value={settings.invoice_payment_method_label || ''} onChange={(v) => update('invoice_payment_method_label', v)} placeholder="Method" />
+                  <Field label="Paid Label" value={settings.invoice_paid_label || ''} onChange={(v) => update('invoice_paid_label', v)} placeholder="PAID" />
+                  <Field label="Pending Label" value={settings.invoice_pending_label || ''} onChange={(v) => update('invoice_pending_label', v)} placeholder="PENDING" />
+                  <Field label="Failed Label" value={settings.invoice_failed_label || ''} onChange={(v) => update('invoice_failed_label', v)} placeholder="FAILED" />
+                  <Field label="COD Label" value={settings.invoice_cod_label || ''} onChange={(v) => update('invoice_cod_label', v)} placeholder="Cash on Delivery" />
+                  <Field label="Online Label" value={settings.invoice_online_label || ''} onChange={(v) => update('invoice_online_label', v)} placeholder="Online Payment" />
+                  <Field label="Product Header" value={settings.invoice_product_label || ''} onChange={(v) => update('invoice_product_label', v)} placeholder="Product" />
+                  <Field label="Variant Header" value={settings.invoice_variant_label || ''} onChange={(v) => update('invoice_variant_label', v)} placeholder="Variant" />
+                  <Field label="Qty Header" value={settings.invoice_qty_label || ''} onChange={(v) => update('invoice_qty_label', v)} placeholder="Qty" />
+                  <Field label="Rate Header" value={settings.invoice_rate_label || ''} onChange={(v) => update('invoice_rate_label', v)} placeholder="Rate" />
+                  <Field label="Amount Header" value={settings.invoice_amount_label || ''} onChange={(v) => update('invoice_amount_label', v)} placeholder="Amount" />
+                  <Field label="Subtotal Label" value={settings.invoice_subtotal_label || ''} onChange={(v) => update('invoice_subtotal_label', v)} placeholder="Subtotal" />
+                  <Field label="Discount Label" value={settings.invoice_discount_label || ''} onChange={(v) => update('invoice_discount_label', v)} placeholder="Discount" />
+                  <Field label="Coupon Label" value={settings.invoice_coupon_label || ''} onChange={(v) => update('invoice_coupon_label', v)} placeholder="Coupon Applied" />
+                  <Field label="Shipping Label" value={settings.invoice_shipping_label || ''} onChange={(v) => update('invoice_shipping_label', v)} placeholder="Shipping" />
+                  <Field label="Free Label" value={settings.invoice_free_label || ''} onChange={(v) => update('invoice_free_label', v)} placeholder="FREE" />
+                  <Field label="GST Label" value={settings.invoice_gst_label || ''} onChange={(v) => update('invoice_gst_label', v)} placeholder="GST" />
+                  <Field label="Total Label" value={settings.invoice_total_label || ''} onChange={(v) => update('invoice_total_label', v)} placeholder="TOTAL" />
+                </div>
               </div>
 
               {/* Live Preview */}
@@ -465,61 +476,65 @@ export default function AdminSettingsPage() {
                 <h3 className="text-sm font-medium mb-3">Live Preview</h3>
                 <div className="border rounded-lg overflow-hidden bg-white" style={{ fontFamily: 'Arial, sans-serif' }}>
                   {/* Header */}
-                  <div style={{ padding: '20px', borderBottom: `3px solid ${settings.invoice_primary_color || '#000'}` }}>
+                  <div style={{ padding: '20px', borderBottom: '3px solid #000' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                       <div>
                         {settings.invoice_show_logo !== 'false' && settings.invoice_logo_url ? (
                           <img src={settings.invoice_logo_url} alt="" style={{ height: '44px', objectFit: 'contain' }} />
                         ) : (
-                          <span style={{ fontSize: '26px', letterSpacing: '4px', fontWeight: 900, color: settings.invoice_primary_color || '#000' }}>
+                          <span style={{ fontSize: '26px', letterSpacing: '4px', fontWeight: 900, color: '#000' }}>
                             {settings.store_name || 'MARVVN'}
                           </span>
                         )}
-                        <p style={{ fontSize: '11px', color: '#888', margin: '6px 0 0' }}>{settings.store_address || 'Faridabad'}</p>
-                        {settings.invoice_gst_number && <p style={{ fontSize: '11px', color: '#888', margin: '2px 0 0' }}>GSTIN: {settings.invoice_gst_number}</p>}
+                        <p style={{ fontSize: '11px', color: '#666', margin: '6px 0 0' }}>{settings.store_address || 'Faridabad'}</p>
+                        {settings.invoice_gst_number && <p style={{ fontSize: '11px', color: '#666', margin: '2px 0 0' }}>GSTIN: {settings.invoice_gst_number}</p>}
                       </div>
                       <div style={{ textAlign: 'right' }}>
-                        <div style={{ background: settings.invoice_primary_color || '#000', color: '#fff', padding: '6px 16px', borderRadius: '4px', display: 'inline-block', marginBottom: '8px' }}>
-                          <span style={{ fontSize: '14px', fontWeight: 700, letterSpacing: '1.5px' }}>TAX INVOICE</span>
+                        <div style={{ background: '#000', color: '#fff', padding: '6px 16px', display: 'inline-block', marginBottom: '8px' }}>
+                          <span style={{ fontSize: '14px', fontWeight: 700, letterSpacing: '1.5px' }}>{settings.invoice_invoice_label || 'TAX INVOICE'}</span>
                         </div>
-                        <p style={{ fontSize: '12px', color: '#555', margin: '4px 0' }}><strong>Invoice #:</strong> {settings.invoice_prefix || 'INV'}-DEMO123</p>
-                        <p style={{ fontSize: '11px', color: '#888', margin: '2px 0' }}>{new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                        <p style={{ fontSize: '12px', color: '#333', margin: '4px 0' }}><strong>{settings.invoice_order_label || 'Invoice'} #:</strong> {settings.invoice_prefix || 'INV'}-DEMO123</p>
+                        <p style={{ fontSize: '11px', color: '#666', margin: '2px 0' }}>{new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Customer + Payment */}
                   <div style={{ display: 'flex', gap: '12px', padding: '16px 20px' }}>
-                    <div style={{ flex: 1, background: '#fafafa', borderRadius: '8px', padding: '12px' }}>
-                      <p style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '1.5px', color: settings.invoice_secondary_color || '#666', margin: '0 0 6px', fontWeight: 700 }}>Bill To</p>
+                    <div style={{ flex: 1, background: '#f9f9f9', border: '1px solid #ddd', padding: '12px' }}>
+                      <p style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '1.5px', color: '#666', margin: '0 0 6px', fontWeight: 700 }}>{settings.invoice_bill_to_label || 'Bill To'}</p>
                       <p style={{ fontSize: '13px', fontWeight: 700, margin: '0 0 2px' }}>Customer Name</p>
-                      <p style={{ fontSize: '11px', color: '#555', margin: '2px 0' }}>123 Street, City</p>
-                      <p style={{ fontSize: '11px', color: '#555', margin: '2px 0' }}>customer@email.com</p>
+                      <p style={{ fontSize: '11px', color: '#333', margin: '2px 0' }}>123 Street, City</p>
+                      <p style={{ fontSize: '11px', color: '#333', margin: '2px 0' }}>customer@email.com</p>
                     </div>
-                    <div style={{ flex: 0.5, background: '#fafafa', borderRadius: '8px', padding: '12px' }}>
-                      <p style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '1.5px', color: settings.invoice_secondary_color || '#666', margin: '0 0 6px', fontWeight: 700 }}>Payment</p>
-                      <p style={{ fontSize: '11px', color: '#555', margin: '2px 0' }}><strong>Method:</strong> Online</p>
+                    <div style={{ flex: 0.5, background: '#f9f9f9', border: '1px solid #ddd', padding: '12px' }}>
+                      <p style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '1.5px', color: '#666', margin: '0 0 6px', fontWeight: 700 }}>{settings.invoice_payment_label || 'Payment Details'}</p>
+                      <p style={{ fontSize: '11px', color: '#333', margin: '2px 0' }}><strong>{settings.invoice_payment_method_label || 'Method'}:</strong> Online</p>
                       <p style={{ fontSize: '11px', margin: '4px 0 0' }}>
-                        <span style={{ background: '#16a34a15', color: '#16a34a', padding: '2px 8px', borderRadius: '12px', fontSize: '10px', fontWeight: 700 }}>PAID</span>
+                        <span style={{ border: '1px solid #000', padding: '2px 8px', fontSize: '10px', fontWeight: 700 }}>{settings.invoice_paid_label || 'PAID'}</span>
                       </p>
                     </div>
                   </div>
 
                   {/* Product Table */}
-                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #000' }}>
                     <thead>
-                      <tr style={{ background: settings.invoice_primary_color || '#000' }}>
-                        {['Product', 'Variant', 'Qty', 'Rate', 'Amount'].map(h => (
-                          <th key={h} style={{ padding: '10px 8px', textAlign: h === 'Product' ? 'left' : h === 'Amount' || h === 'Rate' ? 'right' : 'center', fontSize: '10px', textTransform: 'uppercase', color: '#fff', letterSpacing: '0.5px', fontWeight: 600 }}>{h}</th>
-                        ))}
+                      <tr style={{ background: '#000' }}>
+                        {(settings.invoice_product_label || 'Product').split('|')[0] && (
+                          <th style={{ padding: '10px 8px', textAlign: 'left', fontSize: '10px', textTransform: 'uppercase', color: '#fff', letterSpacing: '0.5px', fontWeight: 600 }}>{settings.invoice_product_label || 'Product'}</th>
+                        )}
+                        <th style={{ padding: '10px 8px', textAlign: 'center', fontSize: '10px', textTransform: 'uppercase', color: '#fff', letterSpacing: '0.5px', fontWeight: 600 }}>{settings.invoice_variant_label || 'Variant'}</th>
+                        <th style={{ padding: '10px 8px', textAlign: 'center', fontSize: '10px', textTransform: 'uppercase', color: '#fff', letterSpacing: '0.5px', fontWeight: 600 }}>{settings.invoice_qty_label || 'Qty'}</th>
+                        <th style={{ padding: '10px 8px', textAlign: 'right', fontSize: '10px', textTransform: 'uppercase', color: '#fff', letterSpacing: '0.5px', fontWeight: 600 }}>{settings.invoice_rate_label || 'Rate'}</th>
+                        <th style={{ padding: '10px 8px', textAlign: 'right', fontSize: '10px', textTransform: 'uppercase', color: '#fff', letterSpacing: '0.5px', fontWeight: 600 }}>{settings.invoice_amount_label || 'Amount'}</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr>
                         <td style={{ padding: '10px 8px', fontSize: '12px', fontWeight: 600 }}>Demo Product</td>
-                        <td style={{ padding: '10px 8px', textAlign: 'center', fontSize: '11px', color: '#555' }}>Black / M</td>
+                        <td style={{ padding: '10px 8px', textAlign: 'center', fontSize: '11px', color: '#333' }}>Black / M</td>
                         <td style={{ padding: '10px 8px', textAlign: 'center', fontSize: '12px', fontWeight: 600 }}>2</td>
-                        <td style={{ padding: '10px 8px', textAlign: 'right', fontSize: '12px', color: '#555' }}>₹999</td>
+                        <td style={{ padding: '10px 8px', textAlign: 'right', fontSize: '12px', color: '#333' }}>₹999</td>
                         <td style={{ padding: '10px 8px', textAlign: 'right', fontSize: '12px', fontWeight: 600 }}>₹1,998</td>
                       </tr>
                     </tbody>
@@ -527,49 +542,48 @@ export default function AdminSettingsPage() {
 
                   {/* Summary */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px 20px', gap: '16px' }}>
-                    <div style={{ flex: 1, background: '#fafafa', borderRadius: '8px', padding: '14px' }}>
+                    <div style={{ flex: 1, background: '#f9f9f9', border: '1px solid #ddd', padding: '14px' }}>
                       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                         <tbody>
-                          <tr><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#555' }}>Subtotal</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#555', width: '80px' }}>₹1,998</td></tr>
-                          <tr><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#16a34a' }}>Coupon (MARVVN10)</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#16a34a' }}>-₹200</td></tr>
-                          <tr><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#555' }}>Shipping</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#16a34a' }}>FREE</td></tr>
+                          <tr><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#333' }}>{settings.invoice_subtotal_label || 'Subtotal'}</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#333', width: '80px' }}>₹1,998</td></tr>
+                          <tr><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#333' }}>{settings.invoice_discount_label || 'Coupon'} (MARVVN10)</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#333' }}>-₹200</td></tr>
+                          <tr><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#333' }}>{settings.invoice_shipping_label || 'Shipping'}</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#333' }}>{settings.invoice_free_label || 'FREE'}</td></tr>
                           {settings.invoice_show_gst !== 'false' && settings.invoice_gst_number && (
-                            <tr><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#555' }}>GST ({settings.invoice_gst_percentage || '12'}%)</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#555' }}>₹240</td></tr>
+                            <tr><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#333' }}>{settings.invoice_gst_label || 'GST'} ({settings.invoice_gst_percentage || '12'}%)</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#333' }}>₹240</td></tr>
                           )}
                         </tbody>
                         <tfoot>
-                          <tr style={{ borderTop: `2px solid ${settings.invoice_primary_color || '#000'}` }}>
-                            <td style={{ padding: '8px 0', textAlign: 'right', fontSize: '14px', fontWeight: 800 }}>TOTAL</td>
-                            <td style={{ padding: '8px 0', textAlign: 'right', fontSize: '14px', fontWeight: 800, color: settings.invoice_primary_color || '#000' }}>₹2,238</td>
+                          <tr style={{ borderTop: '2px solid #000' }}>
+                            <td style={{ padding: '8px 0', textAlign: 'right', fontSize: '14px', fontWeight: 800 }}>{settings.invoice_total_label || 'TOTAL'}</td>
+                            <td style={{ padding: '8px 0', textAlign: 'right', fontSize: '14px', fontWeight: 800, color: '#000' }}>₹2,238</td>
                           </tr>
                         </tfoot>
                       </table>
-                      <div style={{ marginTop: '8px', background: '#16a34a10', border: '1px solid #16a34a30', borderRadius: '6px', padding: '6px 10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ fontSize: '14px' }}>🎟️</span>
+                      <div style={{ marginTop: '8px', border: '1px solid #000', padding: '6px 10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <div>
-                          <div style={{ fontSize: '11px', fontWeight: 700, color: '#16a34a' }}>Coupon Applied: MARVVN10</div>
-                          <div style={{ fontSize: '10px', color: '#555' }}>You saved ₹200</div>
+                          <div style={{ fontSize: '11px', fontWeight: 700, color: '#000' }}>{settings.invoice_coupon_label || 'Coupon Applied'}: MARVVN10</div>
+                          <div style={{ fontSize: '10px', color: '#555' }}>{settings.invoice_discount_label || 'You saved'} ₹200</div>
                         </div>
                       </div>
                     </div>
                     <div style={{ textAlign: 'center', flexShrink: 0 }}>
-                      <div style={{ width: '80px', height: '80px', background: '#f5f5f5', borderRadius: '8px', border: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', color: '#999' }}>QR</div>
-                      <p style={{ fontSize: '9px', color: '#888', margin: '4px 0 0' }}>Scan to view order</p>
+                      <div style={{ width: '80px', height: '80px', background: '#f5f5f5', border: '1px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', color: '#999' }}>QR</div>
+                      <p style={{ fontSize: '9px', color: '#666', margin: '4px 0 0' }}>Scan to view order</p>
                     </div>
                   </div>
 
                   {/* Return Policy */}
-                  <div style={{ margin: '0 20px 16px', background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '8px', padding: '10px 14px' }}>
-                    <p style={{ fontSize: '10px', fontWeight: 700, color: '#92400e', margin: '0 0 4px' }}>Return Policy</p>
-                    <p style={{ fontSize: '10px', color: '#78350f', margin: 0, lineHeight: 1.6 }}>3 days return • Unused &amp; undamaged • Non-refundable shipping • Quality inspection required</p>
+                  <div style={{ margin: '0 20px 16px', border: '1px solid #000', padding: '10px 14px' }}>
+                    <p style={{ fontSize: '10px', fontWeight: 700, color: '#000', margin: '0 0 4px' }}>Return Policy</p>
+                    <p style={{ fontSize: '10px', color: '#333', margin: 0, lineHeight: 1.6 }}>{settings.invoice_return_policy || '3 days return • Unused & undamaged • Non-refundable shipping • Quality inspection required'}</p>
                   </div>
 
                   {/* Footer */}
-                  <div style={{ padding: '14px 20px', borderTop: '1px solid #eee', textAlign: 'center' }}>
+                  <div style={{ padding: '14px 20px', borderTop: '2px solid #000', textAlign: 'center' }}>
                     {settings.invoice_terms && (
-                      <p style={{ fontSize: '9px', color: '#999', margin: '0 0 4px' }}>{settings.invoice_terms}</p>
+                      <p style={{ fontSize: '9px', color: '#666', margin: '0 0 4px' }}>{settings.invoice_terms}</p>
                     )}
-                    <p style={{ fontSize: '12px', fontWeight: 800, letterSpacing: '1.5px', color: settings.invoice_primary_color || '#000', margin: '0 0 2px', textTransform: 'uppercase' }}>
+                    <p style={{ fontSize: '12px', fontWeight: 800, letterSpacing: '1.5px', color: '#000', margin: '0 0 2px', textTransform: 'uppercase' }}>
                       {settings.invoice_footer_text || 'NOT MADE TO FIT IN. | BUILT FOR THE REAL ONES. 🔥'}
                     </p>
                   </div>
