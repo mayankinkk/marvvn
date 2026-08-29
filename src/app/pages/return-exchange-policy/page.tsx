@@ -17,76 +17,71 @@ export default function ReturnExchangePolicyPage() {
         <nav className="flex items-center gap-2 text-xs text-marvvn-gray-500 mb-6">
           <Link href="/" className="hover:text-marvvn-black">Home</Link>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-marvvn-black">Return & Exchange Policy</span>
+          <span className="text-marvvn-black">Return & Refund Policy</span>
         </nav>
 
         <div className="max-w-3xl">
-          <h1 className="text-2xl lg:text-3xl font-display font-medium mb-8">Return & Exchange Policy</h1>
+          <h1 className="text-2xl lg:text-3xl font-display font-medium mb-8">Return & Refund Policy</h1>
+          <p className="text-xs text-marvvn-gray-400 mb-6">Last Updated: August, 2026</p>
 
           <div className="space-y-6 text-sm text-marvvn-gray-600 leading-relaxed">
-            <section>
-              <h2 className="text-lg font-medium text-marvvn-black mb-3">7-Day Easy Returns</h2>
-              <p>
-                We want you to love your MARVVN purchase. If you&apos;re not completely satisfied,
-                you can return or exchange your item within 7 days of delivery.
-              </p>
-            </section>
+            <p>
+              At MARVVN, we want you to be satisfied with your purchase. Please read our return and
+              refund policy carefully before placing an order.
+            </p>
 
             <section>
-              <h2 className="text-lg font-medium text-marvvn-black mb-3">Eligibility</h2>
+              <h2 className="text-lg font-medium text-marvvn-black mb-3">1. Return Period</h2>
               <ul className="list-disc pl-5 space-y-2">
-                <li>Items must be unworn, unwashed, and in original condition</li>
-                <li>All tags must be attached</li>
-                <li>Items must be in original packaging</li>
-                <li>Sale items are eligible for exchange only</li>
-                <li>Accessories and caps are non-returnable</li>
+                <li>Returns are accepted within 3 days of delivery only.</li>
+                <li>Return requests submitted after 3 days will not be accepted.</li>
+                <li>Products must be unused, unworn, unwashed, and in their original condition.</li>
+                <li>The product must be returned with its original tags, packaging, and accessories.</li>
               </ul>
             </section>
 
             <section>
-              <h2 className="text-lg font-medium text-marvvn-black mb-3">How to Initiate a Return</h2>
-              <ol className="list-decimal pl-5 space-y-2">
-                <li>Log in to your account and go to &quot;Orders&quot;</li>
-                <li>Select the order containing the item you want to return</li>
-                <li>Click &quot;Return Item&quot; and select your reason</li>
-                <li>Pack the item securely in its original packaging</li>
-                <li>We&apos;ll arrange a pickup from your address</li>
-              </ol>
-            </section>
-
-            <section>
-              <h2 className="text-lg font-medium text-marvvn-black mb-3">Refund Process</h2>
-              <p>
-                Once we receive and inspect the returned item, your refund will be processed within 
-                5-7 business days. The refund will be credited to your original payment method.
-              </p>
-              <ul className="list-disc pl-5 space-y-2 mt-2">
-                <li>Credit/Debit Card: 5-7 business days</li>
-                <li>UPI: 3-5 business days</li>
-                <li>Net Banking: 5-7 business days</li>
-                <li>Store Credit: Instant</li>
+              <h2 className="text-lg font-medium text-marvvn-black mb-3">2. Refund Policy</h2>
+              <ul className="list-disc pl-5 space-y-2">
+                <li>After receiving and inspecting the returned product, MARVVN will process the refund if it meets our return conditions.</li>
+                <li>Only the product price will be refunded.</li>
+                <li>Original delivery/shipping charges are non-refundable.</li>
+                <li>Any applicable return shipping charges may be deducted from the refund amount.</li>
               </ul>
             </section>
 
             <section>
-              <h2 className="text-lg font-medium text-marvvn-black mb-3">Exchanges</h2>
+              <h2 className="text-lg font-medium text-marvvn-black mb-3">3. Damaged or Used Products</h2>
+              <ul className="list-disc pl-5 space-y-2">
+                <li>Damaged, worn, washed, stained, altered, or used products will not be accepted for return.</li>
+                <li>If a product is received damaged or defective, the customer must contact MARVVN within 24 hours of delivery with clear photos/videos as proof.</li>
+              </ul>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-medium text-marvvn-black mb-3">4. Exchange</h2>
               <p>
-                Want a different size or color? We&apos;re happy to exchange your item. Exchanges are 
-                subject to availability. If the desired variant is out of stock, we&apos;ll process 
-                a refund instead.
+                MARVVN currently does not offer exchanges. Eligible returns will be processed for a refund only.
               </p>
             </section>
 
             <section>
-              <h2 className="text-lg font-medium text-marvvn-black mb-3">Damaged or Defective Items</h2>
+              <h2 className="text-lg font-medium text-marvvn-black mb-3">5. Refund Processing</h2>
               <p>
-                If you received a damaged or defective item, please contact us within 48 hours of 
-                delivery at{' '}
-                <a href={`mailto:${storeEmail}`} className="underline hover:text-marvvn-black">{storeEmail}</a>
-                {' '}with photos of the damage. We&apos;ll arrange an immediate replacement or refund.
+                Once the returned product passes our quality inspection, the eligible refund will be initiated
+                to the original payment method. Processing time may vary depending on the payment provider or bank.
+              </p>
+            </section>
+
+            <section>
+              <h2 className="text-lg font-medium text-marvvn-black mb-3">6. Final Decision</h2>
+              <p>
+                MARVVN reserves the right to reject a return if the product does not meet the conditions mentioned above.
               </p>
             </section>
           </div>
+
+          <p className="text-xs text-marvvn-gray-400 mt-10">MARVVN — Not Made To Fit In</p>
         </div>
       </main>
       <Footer />
