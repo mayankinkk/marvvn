@@ -56,14 +56,11 @@ export async function middleware(request: NextRequest) {
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseKey) {
-    const r = NextResponse.next()
-    r.headers.set('x-mw-status', 'no-env')
-    return r
+    return NextResponse.next()
   }
 
   // ── Step 1: Check maintenance mode ──────────────────────────────────────
   let maintenanceOn = false
-  let fetchStatus = 'not-attempted'
 
   try {
     const restUrl = `${supabaseUrl}/rest/v1/store_settings?key=eq.maintenance_mode&select=value`
@@ -82,26 +79,17 @@ export async function middleware(request: NextRequest) {
     })
     clearTimeout(timeoutId)
 
-    fetchStatus = `http-${res.status}`
-
     if (res.ok) {
       const rows = await res.json()
-      const val = rows?.[0]?.value
-      fetchStatus = `ok-val-${val}`
-      maintenanceOn = val === 'true'
+      maintenanceOn = rows?.[0]?.value === 'true'
     }
-  } catch (e: unknown) {
-    fetchStatus = `error-${e instanceof Error ? e.message.slice(0, 30) : 'unknown'}`
+  } catch {
     // Cannot reach Supabase — don't enforce maintenance
-    const r = NextResponse.next()
-    r.headers.set('x-mw-status', fetchStatus)
-    return r
+    return NextResponse.next()
   }
 
   if (!maintenanceOn) {
-    const r = NextResponse.next()
-    r.headers.set('x-mw-status', `pass-${fetchStatus}`)
-    return r
+    return NextResponse.next()
   }
 
   // ── Step 2: Maintenance is ON — check if request is from an admin ────────
