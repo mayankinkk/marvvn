@@ -13,25 +13,28 @@ const faqCategories = (symbol: string, threshold: string, fee: string, codLimit:
   {
     category: 'Orders & Shipping',
     items: [
-      { q: 'How long does shipping take?', a: 'Standard shipping takes 3-5 business days within India. Express shipping (available at checkout) delivers within 1-2 business days.' },
-      { q: 'How can I track my order?', a: 'Once your order is shipped, you\'ll receive a tracking link via email and SMS. You can also track your order from your account dashboard.' },
-      { q: 'What are the shipping charges?', a: `We offer free shipping on orders above ${symbol}${threshold}. For orders below ${symbol}${threshold}, a flat shipping fee of ${symbol}${fee} applies.` },
+      { q: 'How long does shipping take?', a: 'Standard shipping takes 3-5 business days within India. Express shipping (available at checkout) delivers within 1-2 business days. Delivery times may vary depending on your location.' },
+      { q: 'How can I track my order?', a: 'Once your order is shipped, you\'ll receive a tracking link via email and WhatsApp. You can also track your order from your account dashboard under "Orders".' },
+      { q: 'What are the shipping charges?', a: `We offer free shipping on orders above ${symbol}${threshold}. For orders below ${symbol}${threshold}, a flat shipping fee of ${symbol}${fee} applies. Shipping charges are non-refundable.` },
       { q: 'Do you ship internationally?', a: 'Currently, we only ship within India. We\'re working on expanding to international shipping soon.' },
+      { q: 'What if my order is delayed?', a: 'If your order hasn\'t arrived within the expected timeframe, please contact us at marvvnclothing@gmail.com with your order ID. We\'ll investigate and get back to you within 24 hours.' },
     ]
   },
   {
     category: 'Returns & Exchanges',
     items: [
-      { q: 'What is your return policy?', a: 'We offer a 7-day easy return policy. Items must be unworn, unwashed, and in original packaging with tags attached.' },
-      { q: 'How do I initiate a return?', a: 'You can initiate a return from your account dashboard under "Orders" or contact our support team.' },
-      { q: 'When will I receive my refund?', a: 'Refunds are processed within 5-7 business days after we receive the returned item. The amount will be credited to your original payment method.' },
-      { q: 'Can I exchange an item?', a: 'Yes! You can exchange for a different size or color within 7 days of delivery, subject to availability.' },
+      { q: 'What is your return policy?', a: 'We accept returns within 3 days of delivery. The product must be unused, undamaged, and in its original condition with tags attached. Delivery charges are non-refundable. Damaged or used products are not accepted. Refunds are processed after a quality inspection.' },
+      { q: 'How do I initiate a return?', a: 'Go to your account dashboard, navigate to "Orders", find the delivered order, and click "Return". Enter your reason and submit. Our team will review your request within 24-48 hours.' },
+      { q: 'When will I receive my refund?', a: 'After we receive and inspect the returned item, your refund will be credited to your original payment method within 5-7 business days. You\'ll receive an email confirmation once the refund is processed.' },
+      { q: 'Can I exchange an item?', a: 'MARVVN currently does not offer direct exchanges. If you need a different size or color, please return the original item and place a new order for the desired variant.' },
+      { q: 'What if I receive a damaged or defective item?', a: 'Contact us within 24 hours of delivery with photos or videos of the damage. We\'ll arrange a replacement or full refund. Do not use the product after noticing the defect.' },
+      { q: 'Are return shipping charges refunded?', a: 'No, delivery charges are non-refundable. Return shipping costs may also be deducted from your refund amount depending on the reason for return.' },
     ]
   },
   {
     category: 'Products & Sizing',
     items: [
-      { q: 'How do I find my size?', a: 'Check our size guide on each product page. Our oversized tees run large — if you\'re between sizes, we recommend sizing down for a regular fit.' },
+      { q: 'How do I find my size?', a: 'Check our size guide on each product page. Our oversized tees run large — if you\'re between sizes, we recommend sizing down for a regular fit. You can also check the "Most Ordered Size" indicator on product pages.' },
       { q: 'Are your products genuine?', a: 'Absolutely! 100% of our products are genuine and designed in-house. We use premium fabrics and quality construction.' },
       { q: 'How do I care for my MARVVN clothes?', a: 'Machine wash cold with similar colors. Tumble dry low. Do not bleach or iron on print. Turn inside out before washing to preserve the design.' },
     ]
@@ -39,9 +42,10 @@ const faqCategories = (symbol: string, threshold: string, fee: string, codLimit:
   {
     category: 'Payment & Promos',
     items: [
-      { q: 'What payment methods do you accept?', a: `We accept UPI, credit/debit cards, net banking, and Cash on Delivery (COD) for orders up to ${symbol}${codLimit}.` },
-      { q: 'How do I use a promo code?', a: 'Enter your promo code at checkout or in the cart drawer. Click "Apply" and the discount will be reflected in your total.' },
-      { q: 'Can I use multiple promo codes?', a: 'Only one promo code can be applied per order. Choose the one that gives you the best discount!' },
+      { q: 'What payment methods do you accept?', a: `We accept UPI, credit/debit cards, net banking, and Cash on Delivery (COD) for orders up to ${symbol}${codLimit}. All online payments are processed securely via Razorpay.` },
+      { q: 'How do I use a promo code?', a: 'Enter your promo code at checkout or in the cart drawer. Click "Apply" and the discount will be reflected in your total. Only one promo code can be used per order.' },
+      { q: 'Is COD available for all orders?', a: `COD is available for orders up to ${symbol}${codLimit}. For orders above this amount, please choose an online payment method.` },
+      { q: 'What if my payment fails?', a: 'If your payment fails, the amount will not be deducted. If money was debited but the order wasn\'t placed, it will be auto-refunded within 5-7 business days. Contact us if it doesn\'t.' },
     ]
   },
 ]
