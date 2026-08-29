@@ -460,11 +460,22 @@ export default function AdminSettingsPage() {
                   <Field label="Discount" value={settings.inv_discount_label || ''} onChange={(v) => update('inv_discount_label', v)} placeholder="Discount" />
                   <Field label="Shipping" value={settings.inv_shipping_label || ''} onChange={(v) => update('inv_shipping_label', v)} placeholder="Shipping" />
                   <Field label="Free Label" value={settings.inv_free_label || ''} onChange={(v) => update('inv_free_label', v)} placeholder="FREE" />
-                  <Field label="Total" value={settings.inv_total_label || ''} onChange={(v) => update('inv_total_label', v)} placeholder="TOTAL" />
                   <Field label="Coupon Label" value={settings.inv_coupon_label || ''} onChange={(v) => update('inv_coupon_label', v)} placeholder="Coupon Applied" />
                   <Field label="You Saved" value={settings.inv_you_saved_label || ''} onChange={(v) => update('inv_you_saved_label', v)} placeholder="You saved" />
                   <Field label="Return Policy Header" value={settings.inv_return_policy_label || ''} onChange={(v) => update('inv_return_policy_label', v)} placeholder="Return Policy" />
                   <Field label="QR Scan Text" value={settings.inv_scan_label || ''} onChange={(v) => update('inv_scan_label', v)} placeholder="Scan to view order online" />
+                </div>
+              </div>
+
+              {/* Demo Preview Values */}
+              <div className="border-t pt-4">
+                <h3 className="text-sm font-medium mb-3">Preview Demo Values</h3>
+                <p className="text-xs text-marvvn-gray-500 mb-4">Edit the demo amounts to see how your invoice looks with different order values.</p>
+                <div className="grid md:grid-cols-4 gap-3">
+                  <Field label="Demo Subtotal (₹)" value={settings.inv_demo_subtotal || '1998'} onChange={(v) => update('inv_demo_subtotal', v)} type="number" />
+                  <Field label="Demo Discount (₹)" value={settings.inv_demo_discount || '200'} onChange={(v) => update('inv_demo_discount', v)} type="number" />
+                  <Field label="Demo Coupon Code" value={settings.inv_demo_coupon || 'MARVVN10'} onChange={(v) => update('inv_demo_coupon', v)} />
+                  <Field label="Demo GST (₹)" value={settings.inv_demo_gst || '240'} onChange={(v) => update('inv_demo_gst', v)} type="number" />
                 </div>
               </div>
 
@@ -558,15 +569,15 @@ export default function AdminSettingsPage() {
                         <td style={{ width: '45%' }}>
                           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <tbody>
-                              <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>{settings.inv_subtotal_label || 'Subtotal'}</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>₹1,998</td></tr>
-                              <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>{settings.inv_discount_label || 'Discount'} (MARVVN10)</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>-₹200</td></tr>
+                              <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>{settings.inv_subtotal_label || 'Subtotal'}</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>₹{parseInt(settings.inv_demo_subtotal || '1998').toLocaleString('en-IN')}</td></tr>
+                              <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>{settings.inv_discount_label || 'Discount'} ({settings.inv_demo_coupon || 'MARVVN10'})</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>-₹{parseInt(settings.inv_demo_discount || '200').toLocaleString('en-IN')}</td></tr>
                               <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>{settings.inv_shipping_label || 'Shipping'}</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>{settings.inv_free_label || 'FREE'}</td></tr>
                               {settings.invoice_show_gst !== 'false' && settings.invoice_gst_number && (
-                                <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>GST ({settings.invoice_gst_percentage || '12'}%)</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>₹240</td></tr>
+                                <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>GST ({settings.invoice_gst_percentage || '12'}%)</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>₹{parseInt(settings.inv_demo_gst || '240').toLocaleString('en-IN')}</td></tr>
                               )}
                               <tr style={{ borderTop: '2px solid #000' }}>
-                                <td style={{ padding: '8px 0', fontSize: '13px', fontWeight: 800 }}>{settings.inv_total_label || 'TOTAL'}</td>
-                                <td style={{ padding: '8px 0', textAlign: 'right', fontSize: '13px', fontWeight: 800 }}>₹2,238</td>
+                                <td style={{ padding: '8px 0', fontSize: '13px', fontWeight: 800 }}>TOTAL</td>
+                                <td style={{ padding: '8px 0', textAlign: 'right', fontSize: '13px', fontWeight: 800 }}>₹{(() => { const sub = parseInt(settings.inv_demo_subtotal || '1998'); const disc = parseInt(settings.inv_demo_discount || '200'); const gst = settings.invoice_show_gst !== 'false' && settings.invoice_gst_number ? parseInt(settings.inv_demo_gst || '240') : 0; return (sub - disc + gst).toLocaleString('en-IN'); })()}</td>
                               </tr>
                             </tbody>
                           </table>
@@ -577,8 +588,8 @@ export default function AdminSettingsPage() {
 
                   {/* Coupon */}
                   <div style={{ border: '1px solid #000', padding: '8px 12px', marginBottom: '16px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#000' }}>{settings.inv_coupon_label || 'Coupon Applied'}: MARVVN10</div>
-                    <div style={{ fontSize: '10px', color: '#555', marginTop: '1px' }}>{settings.inv_you_saved_label || 'You saved'} ₹200</div>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#000' }}>{settings.inv_coupon_label || 'Coupon Applied'}: {settings.inv_demo_coupon || 'MARVVN10'}</div>
+                    <div style={{ fontSize: '10px', color: '#555', marginTop: '1px' }}>{settings.inv_you_saved_label || 'You saved'} ₹{parseInt(settings.inv_demo_discount || '200').toLocaleString('en-IN')}</div>
                   </div>
 
                   {/* Return Policy + QR */}
