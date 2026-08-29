@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   if (!(await isAdmin(supabase))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const body = await request.json()
-  const { handle, title, excerpt, content, image, author, tags, published } = body
+  const { handle, title, excerpt, content, image, author, tags, published, category } = body
 
   if (!handle || !title || !excerpt || !image) {
     return NextResponse.json({ error: 'Handle, title, excerpt, and image are required' }, { status: 400 })
@@ -43,6 +43,7 @@ export async function POST(request: Request) {
       author: author || 'MARVVN',
       tags: tags || [],
       published: published !== false,
+      category: category || null,
     })
     .select()
     .single()
@@ -61,7 +62,7 @@ export async function PUT(request: Request) {
   if (!(await isAdmin(supabase))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const body = await request.json()
-  const { id, handle, title, excerpt, content, image, author, tags, published } = body
+  const { id, handle, title, excerpt, content, image, author, tags, published, category } = body
 
   if (!id) return NextResponse.json({ error: 'Blog ID is required' }, { status: 400 })
 
@@ -74,6 +75,7 @@ export async function PUT(request: Request) {
   if (author !== undefined) updates.author = author
   if (tags !== undefined) updates.tags = tags
   if (published !== undefined) updates.published = published
+  if (category !== undefined) updates.category = category || null
 
   const { data, error } = await supabase
     .from('blogs')

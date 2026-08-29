@@ -30,6 +30,7 @@ const ALLOWED_KEYS = new Set([
   'inv_demo_discount', 'inv_demo_coupon', 'inv_demo_gst',
   'inv_demo_name', 'inv_demo_address', 'inv_demo_email', 'inv_demo_phone',
   'inv_demo_product', 'inv_demo_variant', 'inv_demo_qty', 'inv_demo_rate',
+  'blog_page_heading', 'blog_page_subtitle', 'blog_categories',
 ])
 
 const DEFAULTS: Record<string, string> = {
@@ -102,6 +103,15 @@ const DEFAULTS: Record<string, string> = {
   inv_demo_variant: 'Black / M',
   inv_demo_qty: '2',
   inv_demo_rate: '999',
+  blog_page_heading: 'Our Blog',
+  blog_page_subtitle: 'Stories, style guides, and behind-the-scenes from the MARVVN world',
+  blog_categories: JSON.stringify([
+    { slug: 'style-guide', label: 'Style Guide' },
+    { slug: 'brand-story', label: 'Brand Story' },
+    { slug: 'streetwear', label: 'Streetwear' },
+    { slug: 'behind-the-scenes', label: 'Behind the Scenes' },
+    { slug: 'collaborations', label: 'Collaborations' },
+  ]),
   mega_menu: JSON.stringify([
     {
       title: 'Women',

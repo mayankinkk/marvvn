@@ -1,14 +1,15 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Save, Store, Truck, Globe, Palette, Shield, Bell, Search, Loader2, FileText, Download } from 'lucide-react'
+import { Save, Store, Truck, Globe, Palette, Shield, Bell, Search, Loader2, FileText, Download, Newspaper, Plus, X } from 'lucide-react'
 
-type Tab = 'general' | 'shipping' | 'seo' | 'social' | 'notifications' | 'appearance' | 'maintenance' | 'invoice'
+type Tab = 'general' | 'shipping' | 'seo' | 'social' | 'notifications' | 'appearance' | 'maintenance' | 'invoice' | 'blog'
 
 const tabs: { id: Tab; label: string; icon: any }[] = [
   { id: 'general', label: 'General', icon: Store },
   { id: 'shipping', label: 'Shipping', icon: Truck },
   { id: 'invoice', label: 'Invoice', icon: FileText },
+  { id: 'blog', label: 'Blog Page', icon: Newspaper },
   { id: 'seo', label: 'SEO', icon: Search },
   { id: 'social', label: 'Social', icon: Globe },
   { id: 'appearance', label: 'Appearance', icon: Palette },
@@ -665,6 +666,10 @@ export default function AdminSettingsPage() {
             </div>
           )}
 
+          {activeTab === 'blog' && (
+            <BlogTab settings={settings} update={update} />
+          )}
+
           {activeTab === 'maintenance' && (
             <div className="space-y-6">
               <h2 className="font-medium text-lg">Maintenance Mode</h2>
@@ -690,6 +695,133 @@ export default function AdminSettingsPage() {
               </div>
             </div>
           )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function BlogTab({ settings, update }: { settings: Record<string, string>; update: (k: string, v: string) => void }) {
+  const categories: { slug: string; label: string }[] = (() => {
+    try { return JSON.parse(settings.blog_categories || '[]') } catch { return [] }
+  })()
+
+  const addCategory = () => {
+    const updated = [...categories, { slug: '', label: '' }]
+    update('blog_categories', JSON.stringify(updated))
+  }
+
+  const updateCategory = (index: number, field: 'slug' | 'label', value: string) => {
+    const updated = categories.map((c, i) => {
+      if (i !== index) return c
+      if (field === 'label') {
+        const slug = value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+        return { ...c, label: value, slug }
+      }
+      return { ...c, slug: value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') }
+    })
+    update('blog_categories', JSON.stringify(updated))
+  }
+
+  const removeCategory = (index: number) => {
+    const updated = categories.filter((_, i) => i !== index)
+    update('blog_categories', JSON.stringify(updated))
+  }
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h2 className="font-medium text-lg">Blog Page</h2>
+        <p className="text-sm text-marvvn-gray-500 mt-1">Customize the public blogs listing page</p>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Page Heading</label>
+        <input
+          type="text"
+          value={settings.blog_page_heading || ''}
+          onChange={(e) => update('blog_page_heading', e.target.value)}
+          className="input-field w-full"
+          placeholder="Our Blog"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">Page Subtitle</label>
+        <textarea
+          value={settings.blog_page_subtitle || ''}
+          onChange={(e) => update('blog_page_subtitle', e.target.value)}
+          className="input-field w-full"
+          rows={2}
+          placeholder="Stories, style guides, and behind-the-scenes from the MARVVN world"
+        />
+      </div>
+
+      <div className="border-t pt-4">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h3 className="text-sm font-medium">Category Tabs</h3>
+            <p className="text-xs text-marvvn-gray-500 mt-0.5">Manage the filter tabs shown on the blog page</p>
+          </div>
+          <button
+            type="button"
+            onClick={addCategory}
+            className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 border border-marvvn-gray-200 rounded hover:bg-marvvn-gray-50 transition-colors cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Add Category
+          </button>
+        </div>
+
+        {categories.length === 0 ? (
+          <p className="text-sm text-marvvn-gray-400 py-4 text-center">No categories yet. Add one to get started.</p>
+        ) : (
+          <div className="space-y-2">
+            {categories.map((cat, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={cat.label}
+                  onChange={(e) => updateCategory(i, 'label', e.target.value)}
+                  className="input-field flex-1"
+                  placeholder="Category name"
+                />
+                <input
+                  type="text"
+                  value={cat.slug}
+                  onChange={(e) => updateCategory(i, 'slug', e.target.value)}
+                  className="input-field w-40 font-mono text-xs"
+                  placeholder="slug"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeCategory(i)}
+                  className="p-1.5 hover:bg-red-50 rounded cursor-pointer"
+                >
+                  <X className="w-4 h-4 text-marvvn-gray-400 hover:text-marvvn-red" />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Preview */}
+      <div className="border-t pt-4">
+        <h3 className="text-sm font-medium mb-3">Preview</h3>
+        <div className="border rounded-lg p-6 bg-white">
+          <div className="text-center mb-6">
+            <h4 className="text-2xl font-display font-medium mb-2">{settings.blog_page_heading || 'Our Blog'}</h4>
+            <p className="text-sm text-marvvn-gray-500 max-w-md mx-auto">{settings.blog_page_subtitle || 'Stories, style guides, and behind-the-scenes from the MARVVN world'}</p>
+          </div>
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            <span className="px-4 py-2 text-sm font-medium bg-marvvn-black text-white">All Posts</span>
+            {categories.map((cat, i) => (
+              <span key={i} className="px-4 py-2 text-sm font-medium bg-marvvn-gray-100 text-marvvn-gray-600">
+                {cat.label || 'Untitled'}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
     </div>

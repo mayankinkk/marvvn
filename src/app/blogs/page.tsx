@@ -22,8 +22,7 @@ interface BlogPost {
   created_at?: string
 }
 
-const CATEGORIES = [
-  { slug: 'all', label: 'All Posts' },
+const DEFAULT_CATEGORIES = [
   { slug: 'style-guide', label: 'Style Guide' },
   { slug: 'brand-story', label: 'Brand Story' },
   { slug: 'streetwear', label: 'Streetwear' },
@@ -35,6 +34,9 @@ export default function BlogsPage() {
   const [posts, setPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState('all')
+  const [heading, setHeading] = useState('Our Blog')
+  const [subtitle, setSubtitle] = useState('Stories, style guides, and behind-the-scenes from the MARVVN world')
+  const [categories, setCategories] = useState(DEFAULT_CATEGORIES)
 
   useEffect(() => {
     fetch('/api/blogs')
@@ -51,6 +53,20 @@ export default function BlogsPage() {
         setPosts(defaultBlogPosts)
         setLoading(false)
       })
+
+    fetch('/api/settings')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.blog_page_heading) setHeading(data.blog_page_heading)
+        if (data.blog_page_subtitle) setSubtitle(data.blog_page_subtitle)
+        if (data.blog_categories) {
+          try {
+            const parsed = JSON.parse(data.blog_categories)
+            if (Array.isArray(parsed) && parsed.length > 0) setCategories(parsed)
+          } catch {}
+        }
+      })
+      .catch(() => {})
   }, [])
 
   const filteredPosts = activeCategory === 'all'
@@ -68,13 +84,23 @@ export default function BlogsPage() {
         </nav>
 
         <div className="text-center mb-10">
-          <h1 className="text-3xl lg:text-4xl font-display font-medium mb-3">Our Blog</h1>
-          <p className="text-marvvn-gray-500 max-w-lg mx-auto">Stories, style guides, and behind-the-scenes from the MARVVN world</p>
+          <h1 className="text-3xl lg:text-4xl font-display font-medium mb-3">{heading}</h1>
+          <p className="text-marvvn-gray-500 max-w-lg mx-auto">{subtitle}</p>
         </div>
 
         {/* Category Tabs */}
         <div className="flex items-center justify-center gap-2 mb-10 flex-wrap">
-          {CATEGORIES.map(cat => (
+          <button
+            onClick={() => setActiveCategory('all')}
+            className={`px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${
+              activeCategory === 'all'
+                ? 'bg-marvvn-black text-white'
+                : 'bg-marvvn-gray-100 text-marvvn-gray-600 hover:bg-marvvn-gray-200'
+            }`}
+          >
+            All Posts
+          </button>
+          {categories.map(cat => (
             <button
               key={cat.slug}
               onClick={() => setActiveCategory(cat.slug)}

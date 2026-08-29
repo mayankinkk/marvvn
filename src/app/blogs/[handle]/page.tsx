@@ -19,7 +19,30 @@ interface BlogPost {
   date: string
   author: string
   tags: string[]
+  category?: string
   created_at?: string
+}
+
+function renderMarkdown(md: string): string {
+  if (!md) return ''
+  return md
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/^### (.+)$/gm, '<h3 class="text-lg font-semibold mt-6 mb-3 text-marvvn-black">$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2 class="text-xl font-bold mt-8 mb-3 text-marvvn-black">$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1 class="text-2xl font-bold mt-10 mb-4 text-marvvn-black">$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong class="font-semibold text-marvvn-black">$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`(.+?)`/g, '<code class="bg-marvvn-gray-100 px-1.5 py-0.5 text-sm rounded font-mono">$1</code>')
+    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="max-w-full my-4 rounded" />')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="underline text-marvvn-black hover:text-marvvn-gray-600 transition-colors">$1</a>')
+    .replace(/^&gt; (.+)$/gm, '<blockquote class="border-l-4 border-marvvn-gray-300 pl-4 italic text-marvvn-gray-500 my-3">$1</blockquote>')
+    .replace(/^[-*] (.+)$/gm, '<li class="ml-4 list-disc text-marvvn-gray-600 leading-relaxed">$1</li>')
+    .replace(/^(\d+)\. (.+)$/gm, '<li class="ml-4 list-decimal text-marvvn-gray-600 leading-relaxed">$2</li>')
+    .replace(/(<li[^>]*>.*<\/li>\n?)+/g, (match) => `<ul class="my-3 space-y-1">${match}</ul>`)
+    .replace(/\n{2,}/g, '</p><p class="my-3 text-marvvn-gray-600 leading-relaxed">')
+    .replace(/\n/g, '<br/>')
 }
 
 export default function BlogPostPage() {
@@ -41,7 +64,15 @@ export default function BlogPostPage() {
         const found = allPosts.find((p: BlogPost) => p.handle === handle)
         if (found) {
           setPost(found)
-          setRelatedPosts(allPosts.filter((p: BlogPost) => p.handle !== handle).slice(0, 2))
+          const related = allPosts
+            .filter((p: BlogPost) => p.handle !== handle)
+            .sort((a: BlogPost, b: BlogPost) => {
+              const aMatch = a.category === found.category || a.tags.some(t => found.tags.includes(t)) ? 1 : 0
+              const bMatch = b.category === found.category || b.tags.some(t => found.tags.includes(t)) ? 1 : 0
+              return bMatch - aMatch
+            })
+            .slice(0, 2)
+          setRelatedPosts(related)
         } else {
           const fallback = defaultBlogPosts.find((p) => p.handle === handle)
           if (fallback) {
@@ -112,7 +143,10 @@ export default function BlogPostPage() {
 
           <div className="prose prose-sm max-w-none">
             {post.content ? (
-              <div dangerouslySetInnerHTML={{ __html: post.content }} className="text-marvvn-gray-600 leading-relaxed" />
+              <div
+                className="text-marvvn-gray-600 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content) }}
+              />
             ) : (
               <>
                 <p className="text-marvvn-gray-600 leading-relaxed mb-4">{post.excerpt}</p>
