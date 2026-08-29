@@ -20,7 +20,6 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
 
 /** Read the Supabase access token from cookies (handles chunked SSR format) */
 function getSupabaseToken(request: NextRequest): string | null {
-  // Try direct single cookie first (older format)
   const projectRef = 'vowubjguzgdbaircgdwq'
   const singleKey = `sb-${projectRef}-auth-token`
   const single = request.cookies.get(singleKey)?.value
@@ -33,7 +32,6 @@ function getSupabaseToken(request: NextRequest): string | null {
     }
   }
 
-  // Try chunked format (newer @supabase/ssr format: .0, .1, ...)
   const chunks: string[] = []
   for (let i = 0; i < 10; i++) {
     const chunk = request.cookies.get(`${singleKey}.${i}`)?.value
@@ -58,46 +56,60 @@ export async function middleware(request: NextRequest) {
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseKey) {
-    return NextResponse.next()
+    const r = NextResponse.next()
+    r.headers.set('x-mw-status', 'no-env')
+    return r
   }
 
   // ── Step 1: Check maintenance mode ──────────────────────────────────────
   let maintenanceOn = false
+  let fetchStatus = 'not-attempted'
+
   try {
     const restUrl = `${supabaseUrl}/rest/v1/store_settings?key=eq.maintenance_mode&select=value`
     const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 3000)
+    const timeoutId = setTimeout(() => controller.abort(), 4000)
+
     const res = await fetch(restUrl, {
       headers: {
         apikey: supabaseKey,
         Authorization: `Bearer ${supabaseKey}`,
+        'Content-Type': 'application/json',
       },
       signal: controller.signal,
+      cache: 'no-store',
     })
-    clearTimeout(timeout)
+    clearTimeout(timeoutId)
+
+    fetchStatus = `http-${res.status}`
+
     if (res.ok) {
       const rows = await res.json()
-      maintenanceOn = rows?.[0]?.value === 'true'
+      const val = rows?.[0]?.value
+      fetchStatus = `ok-val-${val}`
+      maintenanceOn = val === 'true'
     }
-  } catch {
+  } catch (e: unknown) {
+    fetchStatus = `error-${e instanceof Error ? e.message.slice(0, 30) : 'unknown'}`
     // Cannot reach Supabase — don't enforce maintenance
-    return NextResponse.next()
+    const r = NextResponse.next()
+    r.headers.set('x-mw-status', fetchStatus)
+    return r
   }
 
   if (!maintenanceOn) {
-    return NextResponse.next()
+    const r = NextResponse.next()
+    r.headers.set('x-mw-status', `pass-${fetchStatus}`)
+    return r
   }
 
   // ── Step 2: Maintenance is ON — check if request is from an admin ────────
-  // Read access token from cookies (no extra network call needed)
   const accessToken = getSupabaseToken(request)
 
   if (!accessToken) {
-    // Not logged in → maintenance page
     return NextResponse.rewrite(new URL('/maintenance', request.url))
   }
 
-  // Decode JWT to get user id (no network call — just local decode)
   const payload = decodeJwtPayload(accessToken)
   const userId = payload?.sub as string | undefined
 
@@ -109,20 +121,20 @@ export async function middleware(request: NextRequest) {
   try {
     const profileUrl = `${supabaseUrl}/rest/v1/profiles?id=eq.${userId}&select=is_admin`
     const controller2 = new AbortController()
-    const timeout2 = setTimeout(() => controller2.abort(), 3000)
+    const timeoutId2 = setTimeout(() => controller2.abort(), 3000)
     const profileRes = await fetch(profileUrl, {
       headers: {
         apikey: supabaseKey,
-        Authorization: `Bearer ${accessToken}`, // use user's own token
+        Authorization: `Bearer ${accessToken}`,
       },
       signal: controller2.signal,
+      cache: 'no-store',
     })
-    clearTimeout(timeout2)
+    clearTimeout(timeoutId2)
 
     if (profileRes.ok) {
       const profiles = await profileRes.json()
       if (profiles?.[0]?.is_admin === true) {
-        // Admin — let through
         return NextResponse.next()
       }
     }
