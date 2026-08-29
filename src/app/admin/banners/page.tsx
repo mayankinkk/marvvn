@@ -27,21 +27,6 @@ const bannerGroups: BannerGroup[] = [
     keys: { image: 'hero_banner_3_image', mobileImage: 'hero_banner_3_mobile_image', title: 'hero_banner_3_title', subtitle: 'hero_banner_3_subtitle', link: 'hero_banner_3_link' },
   },
   {
-    id: 'promo-1',
-    label: 'Promo Banner 1',
-    keys: { image: 'promo_1_image', mobileImage: 'promo_1_mobile_image', title: 'promo_1_title', subtitle: 'promo_1_subtitle', link: 'promo_1_link' },
-  },
-  {
-    id: 'promo-2',
-    label: 'Promo Banner 2',
-    keys: { image: 'promo_2_image', mobileImage: 'promo_2_mobile_image', title: 'promo_2_title', subtitle: 'promo_2_subtitle', link: 'promo_2_link' },
-  },
-  {
-    id: 'promo-3',
-    label: 'Promo Banner 3',
-    keys: { image: 'promo_3_image', mobileImage: 'promo_3_mobile_image', title: 'promo_3_title', subtitle: 'promo_3_subtitle', link: 'promo_3_link' },
-  },
-  {
     id: 'promo-4',
     label: 'Promo Banner 4',
     keys: { image: 'promo_4_image', mobileImage: 'promo_4_mobile_image', title: 'promo_4_title', subtitle: 'promo_4_subtitle', link: 'promo_4_link' },
