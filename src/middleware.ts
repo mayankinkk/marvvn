@@ -66,7 +66,7 @@ export async function middleware(request: NextRequest) {
   let fetchStatus = 'not-attempted'
 
   try {
-    const restUrl = `${supabaseUrl}/rest/v1/store_settings?key=eq.maintenance_mode&select=value&_t=${Date.now()}`
+    const restUrl = `${supabaseUrl}/rest/v1/store_settings?key=eq.maintenance_mode&select=value`
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 4000)
 
@@ -75,6 +75,7 @@ export async function middleware(request: NextRequest) {
         apikey: supabaseKey,
         Authorization: `Bearer ${supabaseKey}`,
         'Content-Type': 'application/json',
+        'X-Cache-Bust': Date.now().toString(),
       },
       signal: controller.signal,
       cache: 'no-store',
