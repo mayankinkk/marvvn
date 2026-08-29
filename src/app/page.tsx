@@ -36,15 +36,6 @@ export default function Home() {
     ctaLink: settings.promo_4_link || '/collections/womens-new-arrivals',
   }
 
-  const promo5 = {
-    desktopImage: settings.promo_5_image || '/images/banners/promo-5-desktop.svg',
-    mobileImage: settings.promo_5_mobile_image || settings.promo_5_image || '/images/banners/promo-5-mobile.svg',
-    tagline: settings.promo_5_subtitle || 'DISCOVER WHAT\'S NEW',
-    title: settings.promo_5_title || 'DISCOVER WHAT\'S NEW',
-    ctaText: 'EXPLORE',
-    ctaLink: settings.promo_5_link || '/collections/mens-new-arrivals',
-  }
-
   return (
     <div className="min-h-screen">
       <Header />
@@ -93,12 +84,6 @@ export default function Home() {
               ctaLink="/collections/women"
             />
             {!loading && <ProductGrid products={womenProducts} columns={4} />}
-          </div>
-        </section>
-
-        <section className="py-4 lg:py-6">
-          <div className="container">
-            <PromoBanner {...promo5} />
           </div>
         </section>
 

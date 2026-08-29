@@ -32,11 +32,6 @@ const bannerGroups: BannerGroup[] = [
     keys: { image: 'promo_4_image', mobileImage: 'promo_4_mobile_image', title: 'promo_4_title', subtitle: 'promo_4_subtitle', link: 'promo_4_link' },
   },
   {
-    id: 'promo-5',
-    label: 'Promo Banner 5',
-    keys: { image: 'promo_5_image', mobileImage: 'promo_5_mobile_image', title: 'promo_5_title', subtitle: 'promo_5_subtitle', link: 'promo_5_link' },
-  },
-  {
     id: 'shop-gender',
     label: 'Shop By Gender',
     keys: { image: 'shop_mens_image', mobileImage: 'shop_womens_image', title: '', subtitle: '', link: '' },
