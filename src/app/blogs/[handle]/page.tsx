@@ -7,7 +7,7 @@ import { useParams } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { blogPosts as defaultBlogPosts } from '@/lib/data'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, Share2, MessageCircle, Twitter, Link2, Check } from 'lucide-react'
 
 interface BlogPost {
   id: string
@@ -51,6 +51,7 @@ export default function BlogPostPage() {
   const [post, setPost] = useState<BlogPost | null>(null)
   const [relatedPosts, setRelatedPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     fetch('/api/blogs')
@@ -71,13 +72,13 @@ export default function BlogPostPage() {
               const bMatch = b.category === found.category || b.tags.some(t => found.tags.includes(t)) ? 1 : 0
               return bMatch - aMatch
             })
-            .slice(0, 2)
+            .slice(0, 3)
           setRelatedPosts(related)
         } else {
           const fallback = defaultBlogPosts.find((p) => p.handle === handle)
           if (fallback) {
             setPost(fallback)
-            setRelatedPosts(defaultBlogPosts.filter((p) => p.handle !== handle).slice(0, 2))
+            setRelatedPosts(defaultBlogPosts.filter((p) => p.handle !== handle).slice(0, 3))
           }
         }
         setLoading(false)
@@ -86,7 +87,7 @@ export default function BlogPostPage() {
         const fallback = defaultBlogPosts.find((p) => p.handle === handle)
         if (fallback) {
           setPost(fallback)
-          setRelatedPosts(defaultBlogPosts.filter((p) => p.handle !== handle).slice(0, 2))
+          setRelatedPosts(defaultBlogPosts.filter((p) => p.handle !== handle).slice(0, 3))
         }
         setLoading(false)
       })
@@ -174,12 +175,46 @@ export default function BlogPostPage() {
               </span>
             ))}
           </div>
+
+          {/* Share Buttons */}
+          <div className="flex items-center gap-3 mt-8 pt-6 border-t border-marvvn-gray-100">
+            <span className="flex items-center gap-1.5 text-xs text-marvvn-gray-400">
+              <Share2 className="w-3.5 h-3.5" /> Share
+            </span>
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(`${post.title} - https://marvvn.online/blogs/${post.handle}`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-marvvn-gray-100 text-marvvn-gray-600 hover:bg-green-50 hover:text-green-700 transition-colors"
+            >
+              <MessageCircle className="w-3.5 h-3.5" /> WhatsApp
+            </a>
+            <a
+              href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(`https://marvvn.online/blogs/${post.handle}`)}&text=${encodeURIComponent(post.title)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-marvvn-gray-100 text-marvvn-gray-600 hover:bg-blue-50 hover:text-blue-700 transition-colors"
+            >
+              <Twitter className="w-3.5 h-3.5" /> Twitter
+            </a>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(`https://marvvn.online/blogs/${post.handle}`)
+                setCopied(true)
+                setTimeout(() => setCopied(false), 2000)
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-marvvn-gray-100 text-marvvn-gray-600 hover:bg-marvvn-gray-200 transition-colors cursor-pointer"
+            >
+              {copied ? <Check className="w-3.5 h-3.5 text-green-600" /> : <Link2 className="w-3.5 h-3.5" />}
+              {copied ? 'Copied!' : 'Copy Link'}
+            </button>
+          </div>
         </article>
 
         {relatedPosts.length > 0 && (
-          <section className="mt-16 max-w-3xl mx-auto">
+          <section className="mt-16 max-w-5xl mx-auto">
             <h2 className="text-xl font-display font-medium mb-6">You May Also Like</h2>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-3 gap-6">
               {relatedPosts.map((rp) => (
                 <Link
                   key={rp.id}
