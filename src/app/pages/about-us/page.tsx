@@ -55,22 +55,7 @@ export default function AboutUsPage() {
             </p>
 
             <div className="bg-marvvn-black text-white p-8 mt-8">
-              <p className="text-xl font-display font-bold text-center">MARVAAN — Born from a journey. Created for everyone.</p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-6 pt-8">
-              <div className="text-center">
-                <p className="text-3xl font-display font-bold mb-2">50K+</p>
-                <p className="text-sm text-marvvn-gray-500">Happy Customers</p>
-              </div>
-              <div className="text-center">
-                <p className="text-3xl font-display font-bold mb-2">500+</p>
-                <p className="text-sm text-marvvn-gray-500">Products</p>
-              </div>
-              <div className="text-center">
-                <p className="text-3xl font-display font-bold mb-2">4.8</p>
-                <p className="text-sm text-marvvn-gray-500">Average Rating</p>
-              </div>
+              <p className="text-xl font-display font-bold text-center">NOT MADE TO FIT IN</p>
             </div>
           </div>
         </div>
