@@ -14,27 +14,30 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    const projectRef = new URL(supabaseUrl).hostname.split('.')[0]
     const restUrl = `${supabaseUrl}/rest/v1/store_settings?key=eq.maintenance_mode&select=value`
+
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 3000)
 
     const res = await fetch(restUrl, {
       headers: {
         apikey: supabaseKey,
         Authorization: `Bearer ${supabaseKey}`,
       },
+      signal: controller.signal,
     })
+    clearTimeout(timeout)
 
     if (res.ok) {
       const rows = await res.json()
       const maintenanceValue = rows?.[0]?.value
 
       if (maintenanceValue === 'true') {
+        const projectRef = new URL(supabaseUrl).hostname.split('.')[0]
         const sessionCookie = request.cookies.get(`sb-${projectRef}-auth-token`)
 
         if (!sessionCookie) {
-          const maintenanceUrl = request.nextUrl.clone()
-          maintenanceUrl.pathname = '/maintenance'
-          return NextResponse.rewrite(maintenanceUrl)
+          return NextResponse.rewrite(new URL('/maintenance', request.url))
         }
       }
     }
