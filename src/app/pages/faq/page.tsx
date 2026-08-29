@@ -42,10 +42,11 @@ const faqCategories = (symbol: string, threshold: string, fee: string, codLimit:
   {
     category: 'Payment & Promos',
     items: [
-      { q: 'What payment methods do you accept?', a: `We accept UPI, credit/debit cards, net banking, and Cash on Delivery (COD) for orders up to ${symbol}${codLimit}. All online payments are processed securely via Razorpay.` },
+      { q: 'What payment methods do you accept?', a: `We accept UPI, credit/debit cards, net banking, and Cash on Delivery (COD) for orders up to ${symbol}${codLimit}. For COD orders, shipping charges must be paid online at checkout — the remaining product amount is paid on delivery.` },
       { q: 'How do I use a promo code?', a: 'Enter your promo code at checkout or in the cart drawer. Click "Apply" and the discount will be reflected in your total. Only one promo code can be used per order.' },
-      { q: 'Is COD available for all orders?', a: `COD is available for orders up to ${symbol}${codLimit}. For orders above this amount, please choose an online payment method.` },
+      { q: 'Is COD available for all orders?', a: `Yes, COD is available for orders up to ${symbol}${codLimit}. For COD orders, you\'ll need to pay the shipping charges (${symbol}${fee}) online at checkout first. The remaining product amount is paid in cash when you receive your order. If your order is above ${symbol}${threshold} (free shipping threshold), no advance payment is needed — you pay the full amount in cash on delivery.` },
       { q: 'What if my payment fails?', a: 'If your payment fails, the amount will not be deducted. If money was debited but the order wasn\'t placed, it will be auto-refunded within 5-7 business days. Contact us if it doesn\'t.' },
+      { q: 'Why do I need to pay shipping charges separately for COD?', a: `For COD orders, shipping charges (${symbol}${fee}) must be paid online at checkout to confirm your order. This ensures your order is processed and shipped immediately. The remaining product amount is paid in cash when your order is delivered. If your order total is above ${symbol}${threshold}, shipping is free and you pay nothing until delivery.` },
     ]
   },
 ]
