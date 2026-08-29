@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Plus, Edit, Trash2, Search } from 'lucide-react'
+import { Plus, Edit, Trash2, Search, CheckSquare, Square, X, DollarSign, Tag, Star, Package } from 'lucide-react'
 import { formatPrice } from '@/lib/utils'
 import { Product } from '@/lib/types'
 import Image from 'next/image'
@@ -12,6 +12,10 @@ export default function AdminProductsPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
   const [deleting, setDeleting] = useState<string | null>(null)
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [bulkAction, setBulkAction] = useState<string | null>(null)
+  const [bulkValue, setBulkValue] = useState('')
+  const [bulkSaving, setBulkSaving] = useState(false)
 
   useEffect(() => {
     fetch('/api/admin/products')
@@ -30,6 +34,7 @@ export default function AdminProductsPage() {
       const res = await fetch(`/api/admin/products/${id}`, { method: 'DELETE' })
       if (res.ok) {
         setProducts(products.filter((p) => p.id !== id))
+        setSelected(prev => { const n = new Set(prev); n.delete(id); return n })
       } else {
         alert('Failed to delete product')
       }
@@ -43,6 +48,69 @@ export default function AdminProductsPage() {
     p.title.toLowerCase().includes(search.toLowerCase()) ||
     p.handle.toLowerCase().includes(search.toLowerCase())
   )
+
+  const toggleSelectAll = () => {
+    if (selected.size === filtered.length) {
+      setSelected(new Set())
+    } else {
+      setSelected(new Set(filtered.map(p => p.id)))
+    }
+  }
+
+  const toggleSelect = (id: string) => {
+    setSelected(prev => {
+      const n = new Set(prev)
+      if (n.has(id)) n.delete(id)
+      else n.add(id)
+      return n
+    })
+  }
+
+  const executeBulkAction = async () => {
+    if (!bulkAction || selected.size === 0) return
+
+    if (bulkAction === 'delete') {
+      if (!confirm(`Delete ${selected.size} products?`)) return
+    }
+
+    setBulkSaving(true)
+    try {
+      const res = await fetch('/api/admin/products/bulk', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ids: Array.from(selected),
+          action: bulkAction,
+          value: bulkAction === 'price' ? parseFloat(bulkValue) :
+                 bulkAction === 'compare_at_price' ? (bulkValue ? parseFloat(bulkValue) : null) :
+                 bulkAction === 'is_new' || bulkAction === 'is_bestseller' ? bulkValue === 'true' :
+                 bulkValue,
+        }),
+      })
+
+      if (res.ok) {
+        if (bulkAction === 'delete') {
+          setProducts(products.filter(p => !selected.has(p.id)))
+        } else {
+          setProducts(products.map(p => {
+            if (!selected.has(p.id)) return p
+            const updated = { ...p }
+            if (bulkAction === 'price') updated.price = parseFloat(bulkValue)
+            if (bulkAction === 'compare_at_price') updated.compareAtPrice = bulkValue ? parseFloat(bulkValue) : undefined
+            if (bulkAction === 'badge') updated.badge = (bulkValue as 'new' | 'sale' | 'bestseller') || null
+            if (bulkAction === 'is_new') updated.isNew = bulkValue === 'true'
+            if (bulkAction === 'is_bestseller') updated.isBestseller = bulkValue === 'true'
+            if (bulkAction === 'category') updated.category = bulkValue as 'men' | 'women' | 'accessories'
+            return updated
+          }))
+        }
+        setSelected(new Set())
+        setBulkAction(null)
+        setBulkValue('')
+      }
+    } catch {}
+    setBulkSaving(false)
+  }
 
   if (loading) {
     return (
@@ -75,11 +143,128 @@ export default function AdminProductsPage() {
         </div>
       </div>
 
+      {/* Bulk Action Bar */}
+      {selected.size > 0 && (
+        <div className="bg-marvvn-black text-white rounded-xl p-4 mb-4 flex items-center gap-4 flex-wrap">
+          <span className="text-sm font-medium">{selected.size} selected</span>
+          <div className="flex items-center gap-2 flex-wrap">
+            <select
+              value={bulkAction || ''}
+              onChange={(e) => { setBulkAction(e.target.value || null); setBulkValue('') }}
+              className="bg-white/10 border border-white/20 text-white text-sm px-3 py-1.5 rounded-lg focus:outline-none"
+            >
+              <option value="">Choose action...</option>
+              <option value="price">Update Price</option>
+              <option value="compare_at_price">Set Compare Price</option>
+              <option value="badge">Set Badge</option>
+              <option value="is_new">Mark as New</option>
+              <option value="is_bestseller">Mark as Bestseller</option>
+              <option value="category">Change Category</option>
+              <option value="delete">Delete Selected</option>
+            </select>
+
+            {bulkAction === 'price' && (
+              <input
+                type="number"
+                value={bulkValue}
+                onChange={(e) => setBulkValue(e.target.value)}
+                placeholder="New price"
+                className="bg-white/10 border border-white/20 text-white text-sm px-3 py-1.5 rounded-lg focus:outline-none w-32"
+              />
+            )}
+            {bulkAction === 'compare_at_price' && (
+              <input
+                type="number"
+                value={bulkValue}
+                onChange={(e) => setBulkValue(e.target.value)}
+                placeholder="Compare price (0 to clear)"
+                className="bg-white/10 border border-white/20 text-white text-sm px-3 py-1.5 rounded-lg focus:outline-none w-44"
+              />
+            )}
+            {bulkAction === 'badge' && (
+              <select
+                value={bulkValue}
+                onChange={(e) => setBulkValue(e.target.value)}
+                className="bg-white/10 border border-white/20 text-white text-sm px-3 py-1.5 rounded-lg focus:outline-none"
+              >
+                <option value="">No Badge</option>
+                <option value="new">New</option>
+                <option value="sale">Sale</option>
+                <option value="bestseller">Bestseller</option>
+              </select>
+            )}
+            {bulkAction === 'is_new' && (
+              <select
+                value={bulkValue}
+                onChange={(e) => setBulkValue(e.target.value)}
+                className="bg-white/10 border border-white/20 text-white text-sm px-3 py-1.5 rounded-lg focus:outline-none"
+              >
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+              </select>
+            )}
+            {bulkAction === 'is_bestseller' && (
+              <select
+                value={bulkValue}
+                onChange={(e) => setBulkValue(e.target.value)}
+                className="bg-white/10 border border-white/20 text-white text-sm px-3 py-1.5 rounded-lg focus:outline-none"
+              >
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+              </select>
+            )}
+            {bulkAction === 'category' && (
+              <input
+                type="text"
+                value={bulkValue}
+                onChange={(e) => setBulkValue(e.target.value)}
+                placeholder="Category name"
+                className="bg-white/10 border border-white/20 text-white text-sm px-3 py-1.5 rounded-lg focus:outline-none"
+              />
+            )}
+
+            {bulkAction && bulkAction !== 'delete' && (
+              <button
+                onClick={executeBulkAction}
+                disabled={bulkSaving || (bulkAction !== 'is_new' && bulkAction !== 'is_bestseller' && bulkAction !== 'delete' && !bulkValue)}
+                className="px-4 py-1.5 bg-white text-marvvn-black text-sm font-medium rounded-lg hover:bg-marvvn-gray-100 transition-colors cursor-pointer disabled:opacity-50"
+              >
+                {bulkSaving ? 'Applying...' : 'Apply'}
+              </button>
+            )}
+            {bulkAction === 'delete' && (
+              <button
+                onClick={executeBulkAction}
+                disabled={bulkSaving}
+                className="px-4 py-1.5 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 transition-colors cursor-pointer disabled:opacity-50"
+              >
+                {bulkSaving ? 'Deleting...' : 'Delete All'}
+              </button>
+            )}
+          </div>
+          <button
+            onClick={() => { setSelected(new Set()); setBulkAction(null); setBulkValue('') }}
+            className="ml-auto p-1 hover:bg-white/10 rounded cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       <div className="bg-white border overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b text-left text-marvvn-gray-500">
+                <th className="px-4 py-3 font-medium w-10">
+                  <button onClick={toggleSelectAll} className="cursor-pointer">
+                    {selected.size === filtered.length && filtered.length > 0 ? (
+                      <CheckSquare className="w-4 h-4 text-marvvn-black" />
+                    ) : (
+                      <Square className="w-4 h-4 text-marvvn-gray-400" />
+                    )}
+                  </button>
+                </th>
                 <th className="px-4 py-3 font-medium">Product</th>
                 <th className="px-4 py-3 font-medium">Category</th>
                 <th className="px-4 py-3 font-medium">Price</th>
@@ -89,7 +274,16 @@ export default function AdminProductsPage() {
             </thead>
             <tbody>
               {filtered.map((product) => (
-                <tr key={product.id} className="border-b last:border-0 hover:bg-marvvn-gray-50">
+                <tr key={product.id} className={`border-b last:border-0 hover:bg-marvvn-gray-50 ${selected.has(product.id) ? 'bg-marvvn-gray-50' : ''}`}>
+                  <td className="px-4 py-3">
+                    <button onClick={() => toggleSelect(product.id)} className="cursor-pointer">
+                      {selected.has(product.id) ? (
+                        <CheckSquare className="w-4 h-4 text-marvvn-black" />
+                      ) : (
+                        <Square className="w-4 h-4 text-marvvn-gray-400" />
+                      )}
+                    </button>
+                  </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-14 bg-marvvn-gray-100 flex-shrink-0 overflow-hidden">
