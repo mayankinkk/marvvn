@@ -77,6 +77,8 @@ RULES:
 - If customer asks about a specific product, guide them to the website
 - Never share internal pricing, costs, or margins`
 
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: Request) {
   try {
     const { message, history = [] } = await request.json()
@@ -87,13 +89,12 @@ export async function POST(request: Request) {
 
     const apiKey = process.env.GEMINI_API_KEY
     if (!apiKey) {
-      return NextResponse.json({ error: 'Chat service not configured' }, { status: 500 })
+      return NextResponse.json({ reply: 'Chat service is not configured yet. Please WhatsApp us at +91 7578017237 📱' })
     }
-
-    const supabase = createClient()
 
     let productContext = ''
     try {
+      const supabase = createClient()
       const { data: products } = await supabase
         .from('products')
         .select('title, handle, price, compare_at_price, category, collection, sizes, colors, is_new, is_bestseller')
@@ -104,21 +105,23 @@ export async function POST(request: Request) {
         const productList = products.map((p: any) =>
           `${p.title} | ₹${p.price}${p.compare_at_price ? ` (was ₹${p.compare_at_price})` : ''} | ${p.category} | Sizes: ${(p.sizes || []).join(',')} | Colors: ${(p.colors || []).join(',')}${p.is_new ? ' | NEW' : ''}${p.is_bestseller ? ' | BESTSELLER' : ''}`
         ).join('\n')
-        productContext = `\n\nCURRENT PRODUCT CATALOG (show these when customers ask for products):\n${productList}`
+        productContext = `\n\nCURRENT PRODUCT CATALOG:\n${productList}`
       }
     } catch {}
 
     const genAI = new GoogleGenerativeAI(apiKey)
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.0-flash-lite',
       systemInstruction: SYSTEM_PROMPT + productContext,
     })
 
+    const chatHistory = history.map((msg: any) => ({
+      role: msg.role === 'user' ? 'user' : 'model',
+      parts: [{ text: msg.text }],
+    }))
+
     const chat = model.startChat({
-      history: history.map((msg: any) => ({
-        role: msg.role === 'user' ? 'user' : 'model',
-        parts: [{ text: msg.text }],
-      })),
+      history: chatHistory,
       generationConfig: {
         maxOutputTokens: 300,
         temperature: 0.7,
@@ -130,10 +133,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ reply: response })
   } catch (error: any) {
-    console.error('Chat error:', error?.message)
-    return NextResponse.json(
-      { reply: "Sorry, I'm having trouble right now. Please try again or reach us on WhatsApp at +91 7578017237 📱" },
-      { status: 200 }
-    )
+    console.error('Chat API error:', error?.message || error)
+    return NextResponse.json({
+      reply: "Sorry, I'm having trouble right now. Please try again or reach us on WhatsApp at +91 7578017237 📱"
+    })
   }
 }
