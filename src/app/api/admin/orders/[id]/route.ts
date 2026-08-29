@@ -41,11 +41,12 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   }
 
   const body = await request.json()
-  const { status, payment_status } = body
+  const { status, payment_status, notes } = body
 
   const updateData: any = { updated_at: new Date().toISOString() }
   if (status) updateData.status = status
   if (payment_status) updateData.payment_status = payment_status
+  if (notes !== undefined) updateData.notes = notes
 
   // Get current order to append to status_history
   const { data: currentOrder } = await supabase

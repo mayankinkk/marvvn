@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { ArrowLeft, Save, Package, CheckCircle, Truck, MapPin, XCircle, Clock } from 'lucide-react'
+import { ArrowLeft, Save, Package, CheckCircle, Truck, MapPin, XCircle, Clock, StickyNote } from 'lucide-react'
 import { formatPrice } from '@/lib/utils'
 import Image from 'next/image'
 
@@ -32,6 +32,7 @@ export default function AdminOrderDetailPage() {
   const [saving, setSaving] = useState(false)
   const [status, setStatus] = useState('')
   const [paymentStatus, setPaymentStatus] = useState('')
+  const [notes, setNotes] = useState('')
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
@@ -42,6 +43,7 @@ export default function AdminOrderDetailPage() {
           setOrder(data.order)
           setStatus(data.order.status)
           setPaymentStatus(data.order.payment_status)
+          setNotes(data.order.notes || '')
         }
         setLoading(false)
       })
@@ -55,7 +57,7 @@ export default function AdminOrderDetailPage() {
       const res = await fetch(`/api/admin/orders/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status, payment_status: paymentStatus }),
+        body: JSON.stringify({ status, payment_status: paymentStatus, notes }),
       })
       if (res.ok) {
         const data = await res.json()
@@ -230,6 +232,22 @@ export default function AdminOrderDetailPage() {
                 <p className="text-xs text-emerald-600 text-center font-medium">Order updated. Customer notified via email + WhatsApp.</p>
               )}
             </div>
+          </div>
+
+          {/* Internal Notes */}
+          <div className="bg-white rounded-xl border border-gray-100 p-5">
+            <div className="flex items-center gap-2 mb-3">
+              <StickyNote className="w-4 h-4 text-gray-400" />
+              <h2 className="text-sm font-semibold text-gray-900">Internal Notes</h2>
+            </div>
+            <p className="text-xs text-gray-400 mb-3">Private notes about this order (not visible to customer)</p>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:border-gray-900 focus:outline-none resize-none"
+              rows={3}
+              placeholder="e.g. Customer called, delayed shipping by 2 days..."
+            />
           </div>
 
           {/* Order Summary */}
