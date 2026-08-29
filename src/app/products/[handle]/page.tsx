@@ -195,7 +195,7 @@ export default function ProductPage() {
               <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
                 {stockAlertSigned ? (
                   <p className="text-sm text-amber-700 flex items-center gap-2">
-                    <Bell className="w-4 h-4" /> You'll be notified when this is back in stock!
+                    <Bell className="w-4 h-4" /> You&apos;ll be notified when this is back in stock!
                   </p>
                 ) : (
                   <div className="space-y-2">
