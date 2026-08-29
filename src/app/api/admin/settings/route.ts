@@ -27,7 +27,9 @@ const ALLOWED_KEYS = new Set([
   'inv_product_label', 'inv_variant_label', 'inv_qty_label', 'inv_rate_label', 'inv_amount_label',
   'inv_subtotal_label', 'inv_discount_label', 'inv_shipping_label', 'inv_free_label', 'inv_total_label',
   'inv_coupon_label', 'inv_you_saved_label', 'inv_return_policy_label', 'inv_scan_label',
-  'inv_demo_subtotal', 'inv_demo_discount', 'inv_demo_coupon', 'inv_demo_gst',
+  'inv_demo_discount', 'inv_demo_coupon', 'inv_demo_gst',
+  'inv_demo_name', 'inv_demo_address', 'inv_demo_email', 'inv_demo_phone',
+  'inv_demo_product', 'inv_demo_variant', 'inv_demo_qty', 'inv_demo_rate',
 ])
 
 const DEFAULTS: Record<string, string> = {
@@ -89,10 +91,17 @@ const DEFAULTS: Record<string, string> = {
   inv_you_saved_label: 'You saved',
   inv_return_policy_label: 'Return Policy',
   inv_scan_label: 'Scan to view order online',
-  inv_demo_subtotal: '1998',
   inv_demo_discount: '200',
   inv_demo_coupon: 'MARVVN10',
   inv_demo_gst: '240',
+  inv_demo_name: 'Rahul Sharma',
+  inv_demo_address: '45 MG Road, Sector 14',
+  inv_demo_email: 'rahul@gmail.com',
+  inv_demo_phone: '9876543210',
+  inv_demo_product: 'MARVVN Oversized Tee',
+  inv_demo_variant: 'Black / M',
+  inv_demo_qty: '2',
+  inv_demo_rate: '999',
   mega_menu: JSON.stringify([
     {
       title: 'Women',

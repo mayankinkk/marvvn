@@ -470,12 +470,21 @@ export default function AdminSettingsPage() {
               {/* Demo Preview Values */}
               <div className="border-t pt-4">
                 <h3 className="text-sm font-medium mb-3">Preview Demo Values</h3>
-                <p className="text-xs text-marvvn-gray-500 mb-4">Edit the demo amounts to see how your invoice looks with different order values.</p>
-                <div className="grid md:grid-cols-4 gap-3">
-                  <Field label="Demo Subtotal (₹)" value={settings.inv_demo_subtotal || '1998'} onChange={(v) => update('inv_demo_subtotal', v)} type="number" />
-                  <Field label="Demo Discount (₹)" value={settings.inv_demo_discount || '200'} onChange={(v) => update('inv_demo_discount', v)} type="number" />
-                  <Field label="Demo Coupon Code" value={settings.inv_demo_coupon || 'MARVVN10'} onChange={(v) => update('inv_demo_coupon', v)} />
-                  <Field label="Demo GST (₹)" value={settings.inv_demo_gst || '240'} onChange={(v) => update('inv_demo_gst', v)} type="number" />
+                <p className="text-xs text-marvvn-gray-500 mb-4">Edit all demo values to see how your invoice looks with real data.</p>
+                <div className="grid md:grid-cols-3 gap-3">
+                  <Field label="Customer Name" value={settings.inv_demo_name || ''} onChange={(v) => update('inv_demo_name', v)} placeholder="Rahul Sharma" />
+                  <Field label="Customer Address" value={settings.inv_demo_address || ''} onChange={(v) => update('inv_demo_address', v)} placeholder="45 MG Road, Sector 14" />
+                  <Field label="Customer Email" value={settings.inv_demo_email || ''} onChange={(v) => update('inv_demo_email', v)} placeholder="rahul@gmail.com" />
+                  <Field label="Customer Phone" value={settings.inv_demo_phone || ''} onChange={(v) => update('inv_demo_phone', v)} placeholder="9876543210" />
+                  <Field label="Product Name" value={settings.inv_demo_product || ''} onChange={(v) => update('inv_demo_product', v)} placeholder="MARVVN Oversized Tee" />
+                  <Field label="Variant (Color / Size)" value={settings.inv_demo_variant || ''} onChange={(v) => update('inv_demo_variant', v)} placeholder="Black / M" />
+                  <Field label="Quantity" value={settings.inv_demo_qty || ''} onChange={(v) => update('inv_demo_qty', v)} type="number" />
+                  <Field label="Rate (₹)" value={settings.inv_demo_rate || ''} onChange={(v) => update('inv_demo_rate', v)} type="number" />
+                </div>
+                <div className="grid md:grid-cols-4 gap-3 mt-3">
+                  <Field label="Coupon Code" value={settings.inv_demo_coupon || ''} onChange={(v) => update('inv_demo_coupon', v)} />
+                  <Field label="Discount (₹)" value={settings.inv_demo_discount || ''} onChange={(v) => update('inv_demo_discount', v)} type="number" />
+                  <Field label="GST (₹)" value={settings.inv_demo_gst || ''} onChange={(v) => update('inv_demo_gst', v)} type="number" />
                 </div>
               </div>
 
@@ -527,8 +536,8 @@ export default function AdminSettingsPage() {
                       <tr>
                         <td style={{ verticalAlign: 'top', width: '60%', paddingRight: '16px' }}>
                           <div style={{ fontSize: '8px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#888', marginBottom: '4px' }}>{settings.inv_bill_to_label || 'Bill To'}</div>
-                          <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '2px' }}>Customer Name</div>
-                          <div style={{ fontSize: '11px', color: '#333', lineHeight: 1.6 }}>123 Street, City, State 123456<br/>customer@email.com</div>
+                          <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '2px' }}>{settings.inv_demo_name || 'Customer Name'}</div>
+                          <div style={{ fontSize: '11px', color: '#333', lineHeight: 1.6 }}>{settings.inv_demo_address || '123 Street, City, State 123456'}<br/>{settings.inv_demo_email || 'customer@email.com'}<br/>{settings.inv_demo_phone || '9876543210'}</div>
                         </td>
                         <td style={{ verticalAlign: 'top', width: '40%' }}>
                           <div style={{ fontSize: '8px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#888', marginBottom: '4px' }}>{settings.inv_payment_label || 'Payment Details'}</div>
@@ -552,11 +561,11 @@ export default function AdminSettingsPage() {
                     </thead>
                     <tbody>
                       <tr style={{ borderBottom: '1px solid #e5e5e5' }}>
-                        <td style={{ padding: '8px 6px', fontSize: '12px', fontWeight: 600 }}>Demo Product</td>
-                        <td style={{ padding: '8px 6px', textAlign: 'center', fontSize: '11px', color: '#444' }}>Black / M</td>
-                        <td style={{ padding: '8px 6px', textAlign: 'center', fontSize: '12px', fontWeight: 600 }}>2</td>
-                        <td style={{ padding: '8px 6px', textAlign: 'right', fontSize: '12px', color: '#444' }}>₹999</td>
-                        <td style={{ padding: '8px 6px', textAlign: 'right', fontSize: '12px', fontWeight: 600 }}>₹1,998</td>
+                        <td style={{ padding: '8px 6px', fontSize: '12px', fontWeight: 600 }}>{settings.inv_demo_product || 'Demo Product'}</td>
+                        <td style={{ padding: '8px 6px', textAlign: 'center', fontSize: '11px', color: '#444' }}>{settings.inv_demo_variant || 'Black / M'}</td>
+                        <td style={{ padding: '8px 6px', textAlign: 'center', fontSize: '12px', fontWeight: 600 }}>{settings.inv_demo_qty || '2'}</td>
+                        <td style={{ padding: '8px 6px', textAlign: 'right', fontSize: '12px', color: '#444' }}>₹{parseInt(settings.inv_demo_rate || '999').toLocaleString('en-IN')}</td>
+                        <td style={{ padding: '8px 6px', textAlign: 'right', fontSize: '12px', fontWeight: 600 }}>₹{(parseInt(settings.inv_demo_qty || '2') * parseInt(settings.inv_demo_rate || '999')).toLocaleString('en-IN')}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -569,7 +578,7 @@ export default function AdminSettingsPage() {
                         <td style={{ width: '45%' }}>
                           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <tbody>
-                              <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>{settings.inv_subtotal_label || 'Subtotal'}</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>₹{parseInt(settings.inv_demo_subtotal || '1998').toLocaleString('en-IN')}</td></tr>
+                              <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>{settings.inv_subtotal_label || 'Subtotal'}</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>₹{(parseInt(settings.inv_demo_qty || '2') * parseInt(settings.inv_demo_rate || '999')).toLocaleString('en-IN')}</td></tr>
                               <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>{settings.inv_discount_label || 'Discount'} ({settings.inv_demo_coupon || 'MARVVN10'})</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>-₹{parseInt(settings.inv_demo_discount || '200').toLocaleString('en-IN')}</td></tr>
                               <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>{settings.inv_shipping_label || 'Shipping'}</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>{settings.inv_free_label || 'FREE'}</td></tr>
                               {settings.invoice_show_gst !== 'false' && settings.invoice_gst_number && (
@@ -577,7 +586,7 @@ export default function AdminSettingsPage() {
                               )}
                               <tr style={{ borderTop: '2px solid #000' }}>
                                 <td style={{ padding: '8px 0', fontSize: '13px', fontWeight: 800 }}>TOTAL</td>
-                                <td style={{ padding: '8px 0', textAlign: 'right', fontSize: '13px', fontWeight: 800 }}>₹{(() => { const sub = parseInt(settings.inv_demo_subtotal || '1998'); const disc = parseInt(settings.inv_demo_discount || '200'); const gst = settings.invoice_show_gst !== 'false' && settings.invoice_gst_number ? parseInt(settings.inv_demo_gst || '240') : 0; return (sub - disc + gst).toLocaleString('en-IN'); })()}</td>
+                                <td style={{ padding: '8px 0', textAlign: 'right', fontSize: '13px', fontWeight: 800 }}>₹{(() => { const sub = parseInt(settings.inv_demo_qty || '2') * parseInt(settings.inv_demo_rate || '999'); const disc = parseInt(settings.inv_demo_discount || '200'); const gst = settings.invoice_show_gst !== 'false' && settings.invoice_gst_number ? parseInt(settings.inv_demo_gst || '240') : 0; return (sub - disc + gst).toLocaleString('en-IN'); })()}</td>
                               </tr>
                             </tbody>
                           </table>
