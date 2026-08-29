@@ -1,15 +1,10 @@
-import { Truck, CreditCard, Flag, Gem } from 'lucide-react'
+import { Truck, Flag, Gem } from 'lucide-react'
 
 const features = [
   {
     icon: Truck,
     title: 'SHIPPING WITHIN 48 HOURS',
     description: 'Your order will be shipped within 48 hours from the time since order is placed!',
-  },
-  {
-    icon: CreditCard,
-    title: '5% OFF',
-    description: '5% OFF on Pre-paid orders.',
   },
   {
     icon: Flag,
@@ -27,7 +22,7 @@ export default function FeaturesBar() {
   return (
     <section className="border-y border-marvvn-gray-100 bg-marvvn-gray-50">
       <div className="container py-8 lg:py-12">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+        <div className="grid grid-cols-3 gap-6 lg:gap-8">
           {features.map((feature) => (
             <div key={feature.title} className="text-center">
               <feature.icon className="w-8 h-8 mx-auto mb-3 text-marvvn-black" strokeWidth={1.5} />
