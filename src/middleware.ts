@@ -66,7 +66,7 @@ export async function middleware(request: NextRequest) {
   let fetchStatus = 'not-attempted'
 
   try {
-    const restUrl = `${supabaseUrl}/rest/v1/store_settings?key=eq.maintenance_mode&select=value`
+    const restUrl = `${supabaseUrl}/rest/v1/store_settings?key=eq.maintenance_mode&select=value&_t=${Date.now()}`
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 4000)
 
