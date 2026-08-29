@@ -92,7 +92,7 @@ HOW TO RESPOND:
 
     const genAI = new GoogleGenerativeAI(apiKey)
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-3.6-flash',
       systemInstruction,
     })
 
@@ -114,9 +114,11 @@ HOW TO RESPOND:
 
     return NextResponse.json({ reply: response })
   } catch (error: any) {
-    console.error('Chat API error:', error?.message || error?.stack || JSON.stringify(error))
+    const detail = error?.message || error?.status || JSON.stringify(error)
+    console.error('Chat API error:', detail)
     return NextResponse.json({
-      reply: "Sorry, I'm having trouble right now. Please try again or reach us on WhatsApp at +91 7578017237 📱"
+      reply: `Sorry, I'm having trouble right now. Please try again or reach us on WhatsApp at +91 7578017237 📱`,
+      _debug: detail,
     })
   }
 }
