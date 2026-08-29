@@ -10,42 +10,21 @@ interface Review {
   rating: number
 }
 
-const defaultReviews: Review[] = [
-  {
-    id: '1',
-    name: 'Tamchi Nyakum',
-    text: 'It was so much worthy than buying a ₹1400 t-shirt from H&M or Zara. The quality was better and was the aesthetic!',
-    rating: 5,
-  },
-  {
-    id: '2',
-    name: 'Saumya Raj',
-    text: 'I Just love it. The quality is premium and i bought XS and it fits me best. I have been dying to get a billie ellish tee in India but always worried about quality but you can surely go for this one.',
-    rating: 5,
-  },
-  {
-    id: '3',
-    name: 'Ansh Jadli',
-    text: 'Change your name to quality.com I swear i lovedddddddd the quality so so so much Thanks MARVVN',
-    rating: 5,
-  },
-]
-
 export default function ReviewsSection() {
-  const [reviews, setReviews] = useState<Review[]>(defaultReviews)
+  const [reviews, setReviews] = useState<Review[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetch('/api/reviews')
       .then((res) => res.json())
       .then((data) => {
-        if (data.reviews && data.reviews.length > 0) {
-          setReviews(data.reviews)
-        }
+        setReviews(data.reviews || [])
         setLoading(false)
       })
       .catch(() => setLoading(false))
   }, [])
+
+  if (loading || reviews.length === 0) return null
 
   return (
     <section className="py-12 lg:py-20 bg-marvvn-gray-50">
