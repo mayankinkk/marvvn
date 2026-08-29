@@ -1,5 +1,13 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createServiceClient } from '@supabase/supabase-js'
+
+function getServiceClient() {
+  return createServiceClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 async function isAdmin(supabase: any) {
   const { data: { user } } = await supabase.auth.getUser()
@@ -218,7 +226,8 @@ export async function GET() {
   const supabase = createClient()
   if (!(await isAdmin(supabase))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-  const { data, error } = await supabase.from('store_settings').select('*')
+  const serviceClient = getServiceClient()
+  const { data, error } = await serviceClient.from('store_settings').select('*')
   if (error) {
     return NextResponse.json({ settings: DEFAULTS })
   }
@@ -255,7 +264,8 @@ export async function PUT(request: Request) {
     value: String(value),
   }))
 
-  const { error } = await supabase
+  const serviceClient = getServiceClient()
+  const { error } = await serviceClient
     .from('store_settings')
     .upsert(updates, { onConflict: 'key' })
 
