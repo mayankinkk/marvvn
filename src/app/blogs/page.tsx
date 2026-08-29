@@ -6,7 +6,7 @@ import Image from 'next/image'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { blogPosts as defaultBlogPosts } from '@/lib/data'
-import { ChevronRight, Clock, User, Tag } from 'lucide-react'
+import { ChevronRight, Clock, User, Search, X } from 'lucide-react'
 
 interface BlogPost {
   id: string
@@ -30,10 +30,14 @@ const DEFAULT_CATEGORIES = [
   { slug: 'collaborations', label: 'Collaborations' },
 ]
 
+const POSTS_PER_PAGE = 6
+
 export default function BlogsPage() {
   const [posts, setPosts] = useState<BlogPost[]>([])
   const [loading, setLoading] = useState(true)
   const [activeCategory, setActiveCategory] = useState('all')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [visibleCount, setVisibleCount] = useState(POSTS_PER_PAGE)
   const [heading, setHeading] = useState('Our Blog')
   const [subtitle, setSubtitle] = useState('Stories, style guides, and behind-the-scenes from the MARVVN world')
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES)
@@ -69,9 +73,29 @@ export default function BlogsPage() {
       .catch(() => {})
   }, [])
 
-  const filteredPosts = activeCategory === 'all'
-    ? posts
-    : posts.filter(p => p.category === activeCategory || p.tags.includes(activeCategory))
+  const filteredPosts = posts.filter(p => {
+    const matchesCategory = activeCategory === 'all' || p.category === activeCategory || p.tags.includes(activeCategory)
+    if (!searchQuery.trim()) return matchesCategory
+    const q = searchQuery.toLowerCase()
+    const matchesSearch = p.title.toLowerCase().includes(q) ||
+      p.excerpt.toLowerCase().includes(q) ||
+      p.tags.some(t => t.toLowerCase().includes(q)) ||
+      p.author.toLowerCase().includes(q)
+    return matchesCategory && matchesSearch
+  })
+
+  const visiblePosts = filteredPosts.slice(0, visibleCount)
+  const hasMore = visibleCount < filteredPosts.length
+
+  const handleCategoryChange = (slug: string) => {
+    setActiveCategory(slug)
+    setVisibleCount(POSTS_PER_PAGE)
+  }
+
+  const handleSearch = (value: string) => {
+    setSearchQuery(value)
+    setVisibleCount(POSTS_PER_PAGE)
+  }
 
   return (
     <div className="min-h-screen">
@@ -88,10 +112,32 @@ export default function BlogsPage() {
           <p className="text-marvvn-gray-500 max-w-lg mx-auto">{subtitle}</p>
         </div>
 
+        {/* Search */}
+        <div className="max-w-md mx-auto mb-8">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-marvvn-gray-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => handleSearch(e.target.value)}
+              placeholder="Search posts..."
+              className="w-full pl-10 pr-10 py-2.5 text-sm border border-marvvn-gray-200 focus:border-marvvn-black focus:outline-none"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => handleSearch('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+              >
+                <X className="w-4 h-4 text-marvvn-gray-400 hover:text-marvvn-black" />
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Category Tabs */}
         <div className="flex items-center justify-center gap-2 mb-10 flex-wrap">
           <button
-            onClick={() => setActiveCategory('all')}
+            onClick={() => handleCategoryChange('all')}
             className={`px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${
               activeCategory === 'all'
                 ? 'bg-marvvn-black text-white'
@@ -103,7 +149,7 @@ export default function BlogsPage() {
           {categories.map(cat => (
             <button
               key={cat.slug}
-              onClick={() => setActiveCategory(cat.slug)}
+              onClick={() => handleCategoryChange(cat.slug)}
               className={`px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${
                 activeCategory === cat.slug
                   ? 'bg-marvvn-black text-white'
@@ -127,55 +173,70 @@ export default function BlogsPage() {
           </div>
         ) : filteredPosts.length === 0 ? (
           <div className="text-center py-20">
-            <p className="text-marvvn-gray-400 mb-4">No posts in this category yet</p>
-            <button onClick={() => setActiveCategory('all')} className="text-sm font-medium text-marvvn-black hover:underline cursor-pointer">
+            <p className="text-marvvn-gray-400 mb-4">
+              {searchQuery ? `No posts matching "${searchQuery}"` : 'No posts in this category yet'}
+            </p>
+            <button onClick={() => { setActiveCategory('all'); setSearchQuery('') }} className="text-sm font-medium text-marvvn-black hover:underline cursor-pointer">
               View all posts
             </button>
           </div>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredPosts.map((post) => (
-              <Link
-                key={post.id}
-                href={`/blogs/${post.handle}`}
-                className="group border border-marvvn-gray-100 hover:shadow-lg transition-all duration-300"
-              >
-                <div className="aspect-[16/9] bg-marvvn-gray-50 overflow-hidden relative">
-                  <Image
-                    src={post.image}
-                    alt={post.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  {post.category && (
-                    <span className="absolute top-3 left-3 bg-white/90 backdrop-blur px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider">
-                      {post.category.replace('-', ' ')}
-                    </span>
-                  )}
-                </div>
-                <div className="p-4">
-                  <div className="flex items-center gap-3 text-[11px] text-marvvn-gray-400 mb-2">
-                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{post.date}</span>
-                    <span className="flex items-center gap-1"><User className="w-3 h-3" />{post.author}</span>
+          <>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {visiblePosts.map((post) => (
+                <Link
+                  key={post.id}
+                  href={`/blogs/${post.handle}`}
+                  className="group border border-marvvn-gray-100 hover:shadow-lg transition-all duration-300"
+                >
+                  <div className="aspect-[16/9] bg-marvvn-gray-50 overflow-hidden relative">
+                    <Image
+                      src={post.image}
+                      alt={post.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    {post.category && (
+                      <span className="absolute top-3 left-3 bg-white/90 backdrop-blur px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider">
+                        {post.category.replace('-', ' ')}
+                      </span>
+                    )}
                   </div>
-                  <h2 className="text-sm font-medium group-hover:text-marvvn-gray-600 transition-colors line-clamp-2 mb-2">
-                    {post.title}
-                  </h2>
-                  <p className="text-xs text-marvvn-gray-500 line-clamp-2">{post.excerpt}</p>
-                  {post.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 mt-3">
-                      {post.tags.slice(0, 3).map(tag => (
-                        <span key={tag} className="text-[10px] text-marvvn-gray-400 bg-marvvn-gray-50 px-2 py-0.5">
-                          #{tag}
-                        </span>
-                      ))}
+                  <div className="p-4">
+                    <div className="flex items-center gap-3 text-[11px] text-marvvn-gray-400 mb-2">
+                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{post.date}</span>
+                      <span className="flex items-center gap-1"><User className="w-3 h-3" />{post.author}</span>
                     </div>
-                  )}
-                </div>
-              </Link>
-            ))}
-          </div>
+                    <h2 className="text-sm font-medium group-hover:text-marvvn-gray-600 transition-colors line-clamp-2 mb-2">
+                      {post.title}
+                    </h2>
+                    <p className="text-xs text-marvvn-gray-500 line-clamp-2">{post.excerpt}</p>
+                    {post.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mt-3">
+                        {post.tags.slice(0, 3).map(tag => (
+                          <span key={tag} className="text-[10px] text-marvvn-gray-400 bg-marvvn-gray-50 px-2 py-0.5">
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {hasMore && (
+              <div className="text-center mt-10">
+                <button
+                  onClick={() => setVisibleCount(visibleCount + POSTS_PER_PAGE)}
+                  className="px-8 py-3 text-sm font-medium border border-marvvn-black hover:bg-marvvn-black hover:text-white transition-colors cursor-pointer"
+                >
+                  Load More ({filteredPosts.length - visibleCount} remaining)
+                </button>
+              </div>
+            )}
+          </>
         )}
       </main>
       <Footer />
