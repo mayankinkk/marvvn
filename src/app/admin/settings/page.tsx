@@ -439,6 +439,35 @@ export default function AdminSettingsPage() {
                 />
               </div>
 
+              {/* Editable Labels */}
+              <div className="border-t pt-4">
+                <h3 className="text-sm font-medium mb-3">Labels</h3>
+                <p className="text-xs text-marvvn-gray-500 mb-4">Customize every text label on the invoice. Leave blank for defaults.</p>
+                <div className="grid md:grid-cols-3 gap-3">
+                  <Field label="Invoice Title" value={settings.inv_invoice_label || ''} onChange={(v) => update('inv_invoice_label', v)} placeholder="TAX INVOICE" />
+                  <Field label="Order Label" value={settings.inv_order_label || ''} onChange={(v) => update('inv_order_label', v)} placeholder="Order" />
+                  <Field label="Date Label" value={settings.inv_date_label || ''} onChange={(v) => update('inv_date_label', v)} placeholder="Date" />
+                  <Field label="Bill To" value={settings.inv_bill_to_label || ''} onChange={(v) => update('inv_bill_to_label', v)} placeholder="Bill To" />
+                  <Field label="Payment Label" value={settings.inv_payment_label || ''} onChange={(v) => update('inv_payment_label', v)} placeholder="Payment Details" />
+                  <Field label="Method Label" value={settings.inv_method_label || ''} onChange={(v) => update('inv_method_label', v)} placeholder="Method" />
+                  <Field label="Status Label" value={settings.inv_status_label || ''} onChange={(v) => update('inv_status_label', v)} placeholder="Status" />
+                  <Field label="Product Header" value={settings.inv_product_label || ''} onChange={(v) => update('inv_product_label', v)} placeholder="Product" />
+                  <Field label="Variant Header" value={settings.inv_variant_label || ''} onChange={(v) => update('inv_variant_label', v)} placeholder="Variant" />
+                  <Field label="Qty Header" value={settings.inv_qty_label || ''} onChange={(v) => update('inv_qty_label', v)} placeholder="Qty" />
+                  <Field label="Rate Header" value={settings.inv_rate_label || ''} onChange={(v) => update('inv_rate_label', v)} placeholder="Rate" />
+                  <Field label="Amount Header" value={settings.inv_amount_label || ''} onChange={(v) => update('inv_amount_label', v)} placeholder="Amount" />
+                  <Field label="Subtotal" value={settings.inv_subtotal_label || ''} onChange={(v) => update('inv_subtotal_label', v)} placeholder="Subtotal" />
+                  <Field label="Discount" value={settings.inv_discount_label || ''} onChange={(v) => update('inv_discount_label', v)} placeholder="Discount" />
+                  <Field label="Shipping" value={settings.inv_shipping_label || ''} onChange={(v) => update('inv_shipping_label', v)} placeholder="Shipping" />
+                  <Field label="Free Label" value={settings.inv_free_label || ''} onChange={(v) => update('inv_free_label', v)} placeholder="FREE" />
+                  <Field label="Total" value={settings.inv_total_label || ''} onChange={(v) => update('inv_total_label', v)} placeholder="TOTAL" />
+                  <Field label="Coupon Label" value={settings.inv_coupon_label || ''} onChange={(v) => update('inv_coupon_label', v)} placeholder="Coupon Applied" />
+                  <Field label="You Saved" value={settings.inv_you_saved_label || ''} onChange={(v) => update('inv_you_saved_label', v)} placeholder="You saved" />
+                  <Field label="Return Policy Header" value={settings.inv_return_policy_label || ''} onChange={(v) => update('inv_return_policy_label', v)} placeholder="Return Policy" />
+                  <Field label="QR Scan Text" value={settings.inv_scan_label || ''} onChange={(v) => update('inv_scan_label', v)} placeholder="Scan to view order online" />
+                </div>
+              </div>
+
               {/* Live Preview */}
               <div className="border-t pt-6">
                 <h3 className="text-sm font-medium mb-3">Live Preview</h3>
@@ -459,19 +488,19 @@ export default function AdminSettingsPage() {
                           </div>
                         </td>
                         <td style={{ verticalAlign: 'top', textAlign: 'right', paddingBottom: '16px', borderBottom: '2px solid #000' }}>
-                          <div style={{ fontSize: '18px', fontWeight: 800, letterSpacing: '2px', color: '#000', marginBottom: '5px' }}>TAX INVOICE</div>
+                          <div style={{ fontSize: '18px', fontWeight: 800, letterSpacing: '2px', color: '#000', marginBottom: '5px' }}>{settings.inv_invoice_label || 'TAX INVOICE'}</div>
                           <table style={{ marginLeft: 'auto', borderCollapse: 'collapse' }}>
                             <tbody>
                               <tr>
-                                <td style={{ fontSize: '10px', color: '#666', padding: '2px 8px 2px 0', textAlign: 'right' }}>Invoice #</td>
+                                <td style={{ fontSize: '10px', color: '#666', padding: '2px 8px 2px 0', textAlign: 'right' }}>{settings.inv_order_label || 'Order'} #</td>
                                 <td style={{ fontSize: '11px', fontWeight: 600, padding: '2px 0', textAlign: 'right' }}>{settings.invoice_prefix || 'INV'}-DEMO123</td>
                               </tr>
                               <tr>
-                                <td style={{ fontSize: '10px', color: '#666', padding: '2px 8px 2px 0', textAlign: 'right' }}>Order #</td>
+                                <td style={{ fontSize: '10px', color: '#666', padding: '2px 8px 2px 0', textAlign: 'right' }}>{settings.inv_order_label || 'Order'} #</td>
                                 <td style={{ fontSize: '11px', fontWeight: 600, padding: '2px 0', textAlign: 'right' }}>A1B2C3D4</td>
                               </tr>
                               <tr>
-                                <td style={{ fontSize: '10px', color: '#666', padding: '2px 8px 2px 0', textAlign: 'right' }}>Date</td>
+                                <td style={{ fontSize: '10px', color: '#666', padding: '2px 8px 2px 0', textAlign: 'right' }}>{settings.inv_date_label || 'Date'}</td>
                                 <td style={{ fontSize: '10px', padding: '2px 0', textAlign: 'right' }}>{new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
                               </tr>
                             </tbody>
@@ -486,14 +515,14 @@ export default function AdminSettingsPage() {
                     <tbody>
                       <tr>
                         <td style={{ verticalAlign: 'top', width: '60%', paddingRight: '16px' }}>
-                          <div style={{ fontSize: '8px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#888', marginBottom: '4px' }}>Bill To</div>
+                          <div style={{ fontSize: '8px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#888', marginBottom: '4px' }}>{settings.inv_bill_to_label || 'Bill To'}</div>
                           <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '2px' }}>Customer Name</div>
                           <div style={{ fontSize: '11px', color: '#333', lineHeight: 1.6 }}>123 Street, City, State 123456<br/>customer@email.com</div>
                         </td>
                         <td style={{ verticalAlign: 'top', width: '40%' }}>
-                          <div style={{ fontSize: '8px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#888', marginBottom: '4px' }}>Payment Details</div>
-                          <div style={{ fontSize: '11px', color: '#666', marginBottom: '3px' }}><strong>Method:</strong> Online</div>
-                          <span style={{ fontSize: '10px', fontWeight: 700, border: '1px solid #000', padding: '2px 6px', letterSpacing: '0.5px' }}>PAID</span>
+                          <div style={{ fontSize: '8px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#888', marginBottom: '4px' }}>{settings.inv_payment_label || 'Payment Details'}</div>
+                          <div style={{ fontSize: '11px', color: '#666', marginBottom: '3px' }}><strong>{settings.inv_method_label || 'Method'}:</strong> Online</div>
+                          <span style={{ fontSize: '10px', fontWeight: 700, border: '1px solid #000', padding: '2px 6px', letterSpacing: '0.5px' }}>{settings.inv_status_label || 'PAID'}</span>
                         </td>
                       </tr>
                     </tbody>
@@ -503,11 +532,11 @@ export default function AdminSettingsPage() {
                   <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
                     <thead>
                       <tr style={{ background: '#000', color: '#fff' }}>
-                        <th style={{ padding: '8px 6px', textAlign: 'left', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Product</th>
-                        <th style={{ padding: '8px 6px', textAlign: 'center', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Variant</th>
-                        <th style={{ padding: '8px 6px', textAlign: 'center', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Qty</th>
-                        <th style={{ padding: '8px 6px', textAlign: 'right', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Rate</th>
-                        <th style={{ padding: '8px 6px', textAlign: 'right', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Amount</th>
+                        <th style={{ padding: '8px 6px', textAlign: 'left', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{settings.inv_product_label || 'Product'}</th>
+                        <th style={{ padding: '8px 6px', textAlign: 'center', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{settings.inv_variant_label || 'Variant'}</th>
+                        <th style={{ padding: '8px 6px', textAlign: 'center', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{settings.inv_qty_label || 'Qty'}</th>
+                        <th style={{ padding: '8px 6px', textAlign: 'right', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{settings.inv_rate_label || 'Rate'}</th>
+                        <th style={{ padding: '8px 6px', textAlign: 'right', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{settings.inv_amount_label || 'Amount'}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -529,14 +558,14 @@ export default function AdminSettingsPage() {
                         <td style={{ width: '45%' }}>
                           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <tbody>
-                              <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>Subtotal</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>₹1,998</td></tr>
-                              <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>Discount (MARVVN10)</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>-₹200</td></tr>
-                              <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>Shipping</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>FREE</td></tr>
+                              <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>{settings.inv_subtotal_label || 'Subtotal'}</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>₹1,998</td></tr>
+                              <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>{settings.inv_discount_label || 'Discount'} (MARVVN10)</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>-₹200</td></tr>
+                              <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>{settings.inv_shipping_label || 'Shipping'}</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>{settings.inv_free_label || 'FREE'}</td></tr>
                               {settings.invoice_show_gst !== 'false' && settings.invoice_gst_number && (
                                 <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>GST ({settings.invoice_gst_percentage || '12'}%)</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>₹240</td></tr>
                               )}
                               <tr style={{ borderTop: '2px solid #000' }}>
-                                <td style={{ padding: '8px 0', fontSize: '13px', fontWeight: 800 }}>TOTAL</td>
+                                <td style={{ padding: '8px 0', fontSize: '13px', fontWeight: 800 }}>{settings.inv_total_label || 'TOTAL'}</td>
                                 <td style={{ padding: '8px 0', textAlign: 'right', fontSize: '13px', fontWeight: 800 }}>₹2,238</td>
                               </tr>
                             </tbody>
@@ -548,8 +577,8 @@ export default function AdminSettingsPage() {
 
                   {/* Coupon */}
                   <div style={{ border: '1px solid #000', padding: '8px 12px', marginBottom: '16px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#000' }}>Coupon Applied: MARVVN10</div>
-                    <div style={{ fontSize: '10px', color: '#555', marginTop: '1px' }}>You saved ₹200</div>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#000' }}>{settings.inv_coupon_label || 'Coupon Applied'}: MARVVN10</div>
+                    <div style={{ fontSize: '10px', color: '#555', marginTop: '1px' }}>{settings.inv_you_saved_label || 'You saved'} ₹200</div>
                   </div>
 
                   {/* Return Policy + QR */}
@@ -557,14 +586,14 @@ export default function AdminSettingsPage() {
                     <tbody>
                       <tr>
                         <td style={{ verticalAlign: 'top', width: '65%', paddingRight: '16px' }}>
-                          <div style={{ fontSize: '8px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#888', marginBottom: '4px' }}>Return Policy</div>
+                          <div style={{ fontSize: '8px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#888', marginBottom: '4px' }}>{settings.inv_return_policy_label || 'Return Policy'}</div>
                           <div style={{ fontSize: '10px', color: '#333', lineHeight: 1.7, borderLeft: '2px solid #000', paddingLeft: '10px' }}>
                             {settings.invoice_return_policy || '3 days return • Unused & undamaged • Non-refundable shipping • Quality inspection required'}
                           </div>
                         </td>
                         <td style={{ verticalAlign: 'top', width: '35%', textAlign: 'right' }}>
                           <div style={{ width: '80px', height: '80px', border: '1px solid #ddd', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', color: '#999' }}>QR</div>
-                          <div style={{ fontSize: '8px', color: '#888', marginTop: '3px' }}>Scan to view order</div>
+                          <div style={{ fontSize: '8px', color: '#888', marginTop: '3px' }}>{settings.inv_scan_label || 'Scan to view order'}</div>
                         </td>
                       </tr>
                     </tbody>

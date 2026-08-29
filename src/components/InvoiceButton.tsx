@@ -22,6 +22,29 @@ interface InvoiceData {
     terms?: string
     returnPolicy?: string
   }
+  labels: {
+    invoiceLabel: string
+    orderLabel: string
+    dateLabel: string
+    billToLabel: string
+    paymentLabel: string
+    methodLabel: string
+    statusLabel: string
+    productLabel: string
+    variantLabel: string
+    qtyLabel: string
+    rateLabel: string
+    amountLabel: string
+    subtotalLabel: string
+    discountLabel: string
+    shippingLabel: string
+    freeLabel: string
+    totalLabel: string
+    couponLabel: string
+    youSavedLabel: string
+    returnPolicyLabel: string
+    scanLabel: string
+  }
   customer: {
     name: string
     email: string
@@ -45,6 +68,7 @@ interface InvoiceData {
 
 function generateInvoiceHTML(invoice: InvoiceData): string {
   const s = invoice.store
+  const l = invoice.labels
 
   const logoSection = s.showLogo && s.logoUrl
     ? `<img src="${s.logoUrl}" style="height:40px;object-fit:contain" alt="${s.name}" />`
@@ -69,21 +93,21 @@ function generateInvoiceHTML(invoice: InvoiceData): string {
   }).join('')
 
   const summaryRows: string[] = []
-  summaryRows.push(`<tr><td style="padding:5px 0;font-size:12px;color:#444">Subtotal</td><td style="padding:5px 0;text-align:right;font-size:12px;color:#444;width:100px">₹${invoice.subtotal.toLocaleString('en-IN')}</td></tr>`)
+  summaryRows.push(`<tr><td style="padding:5px 0;font-size:12px;color:#444">${l.subtotalLabel}</td><td style="padding:5px 0;text-align:right;font-size:12px;color:#444;width:100px">₹${invoice.subtotal.toLocaleString('en-IN')}</td></tr>`)
   if (invoice.promoCode) {
-    summaryRows.push(`<tr><td style="padding:5px 0;font-size:12px;color:#444">Discount (${invoice.promoCode})</td><td style="padding:5px 0;text-align:right;font-size:12px;color:#444">-₹${invoice.discount.toLocaleString('en-IN')}</td></tr>`)
+    summaryRows.push(`<tr><td style="padding:5px 0;font-size:12px;color:#444">${l.discountLabel} (${invoice.promoCode})</td><td style="padding:5px 0;text-align:right;font-size:12px;color:#444">-₹${invoice.discount.toLocaleString('en-IN')}</td></tr>`)
   } else if (invoice.discount > 0) {
-    summaryRows.push(`<tr><td style="padding:5px 0;font-size:12px;color:#444">Discount</td><td style="padding:5px 0;text-align:right;font-size:12px;color:#444">-₹${invoice.discount.toLocaleString('en-IN')}</td></tr>`)
+    summaryRows.push(`<tr><td style="padding:5px 0;font-size:12px;color:#444">${l.discountLabel}</td><td style="padding:5px 0;text-align:right;font-size:12px;color:#444">-₹${invoice.discount.toLocaleString('en-IN')}</td></tr>`)
   }
-  summaryRows.push(`<tr><td style="padding:5px 0;font-size:12px;color:#444">Shipping</td><td style="padding:5px 0;text-align:right;font-size:12px;color:#444">${invoice.shippingFee > 0 ? '₹' + invoice.shippingFee.toLocaleString('en-IN') : 'FREE'}</td></tr>`)
+  summaryRows.push(`<tr><td style="padding:5px 0;font-size:12px;color:#444">${l.shippingLabel}</td><td style="padding:5px 0;text-align:right;font-size:12px;color:#444">${invoice.shippingFee > 0 ? '₹' + invoice.shippingFee.toLocaleString('en-IN') : l.freeLabel}</td></tr>`)
   if (s.showGst && invoice.gst) {
     summaryRows.push(`<tr><td style="padding:5px 0;font-size:12px;color:#444">GST (${invoice.gst.percentage}%)</td><td style="padding:5px 0;text-align:right;font-size:12px;color:#444">₹${invoice.gst.amount.toLocaleString('en-IN')}</td></tr>`)
   }
 
   const couponSection = invoice.promoCode ? `
     <div style="margin-top:12px;border:1px solid #000;padding:10px 14px">
-      <div style="font-size:12px;font-weight:700;color:#000">Coupon Applied: ${invoice.promoCode}</div>
-      <div style="font-size:11px;color:#555;margin-top:2px">You saved ₹${invoice.discount.toLocaleString('en-IN')}</div>
+      <div style="font-size:12px;font-weight:700;color:#000">${l.couponLabel}: ${invoice.promoCode}</div>
+      <div style="font-size:11px;color:#555;margin-top:2px">${l.youSavedLabel} ₹${invoice.discount.toLocaleString('en-IN')}</div>
     </div>` : ''
 
   const returnPolicy = s.returnPolicy || 'Return accepted within 3 days of delivery • Product must be unused & undamaged • Delivery charges are non-refundable • Damaged/used products are not accepted • Refund after quality inspection'
@@ -116,12 +140,11 @@ function generateInvoiceHTML(invoice: InvoiceData): string {
           </div>
         </td>
         <td style="vertical-align:top;text-align:right;padding-bottom:20px;border-bottom:2px solid #000">
-          <div style="font-size:20px;font-weight:800;letter-spacing:2px;color:#000;margin-bottom:6px">TAX INVOICE</div>
+          <div style="font-size:20px;font-weight:800;letter-spacing:2px;color:#000;margin-bottom:6px">${l.invoiceLabel}</div>
           <table style="margin-left:auto;border-collapse:collapse">
-            <tr><td style="font-size:11px;color:#666;padding:2px 10px 2px 0;text-align:right">Invoice #</td><td style="font-size:12px;font-weight:600;padding:2px 0;text-align:right">${invoice.invoiceNumber}</td></tr>
-            <tr><td style="font-size:11px;color:#666;padding:2px 10px 2px 0;text-align:right">Order #</td><td style="font-size:12px;font-weight:600;padding:2px 0;text-align:right">${invoice.orderId.slice(0, 8).toUpperCase()}</td></tr>
-            <tr><td style="font-size:11px;color:#666;padding:2px 10px 2px 0;text-align:right">Order Date</td><td style="font-size:11px;padding:2px 0;text-align:right">${new Date(invoice.orderDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</td></tr>
-            <tr><td style="font-size:11px;color:#666;padding:2px 10px 2px 0;text-align:right">Invoice Date</td><td style="font-size:11px;padding:2px 0;text-align:right">${new Date(invoice.invoiceDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</td></tr>
+            <tr><td style="font-size:11px;color:#666;padding:2px 10px 2px 0;text-align:right">${l.orderLabel} #</td><td style="font-size:12px;font-weight:600;padding:2px 0;text-align:right">${invoice.invoiceNumber}</td></tr>
+            <tr><td style="font-size:11px;color:#666;padding:2px 10px 2px 0;text-align:right">${l.orderLabel} #</td><td style="font-size:12px;font-weight:600;padding:2px 0;text-align:right">${invoice.orderId.slice(0, 8).toUpperCase()}</td></tr>
+            <tr><td style="font-size:11px;color:#666;padding:2px 10px 2px 0;text-align:right">${l.dateLabel}</td><td style="font-size:11px;padding:2px 0;text-align:right">${new Date(invoice.orderDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</td></tr>
           </table>
         </td>
       </tr>
@@ -131,7 +154,7 @@ function generateInvoiceHTML(invoice: InvoiceData): string {
     <table style="width:100%;border-collapse:collapse;margin-bottom:24px">
       <tr>
         <td style="vertical-align:top;width:60%;padding-right:20px">
-          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-bottom:6px">Bill To</div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-bottom:6px">${l.billToLabel}</div>
           <div style="font-size:14px;font-weight:700;margin-bottom:3px">${invoice.customer.name}</div>
           <div style="font-size:12px;color:#333;line-height:1.6">
             ${invoice.customer.address}${invoice.customer.apartment ? ', ' + invoice.customer.apartment : ''}<br/>
@@ -141,8 +164,8 @@ function generateInvoiceHTML(invoice: InvoiceData): string {
           </div>
         </td>
         <td style="vertical-align:top;width:40%">
-          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-bottom:6px">Payment Details</div>
-          <div style="font-size:12px;color:#333;margin-bottom:4px"><span style="color:#666">Method:</span> ${paymentLabel}</div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-bottom:6px">${l.paymentLabel}</div>
+          <div style="font-size:12px;color:#333;margin-bottom:4px"><span style="color:#666">${l.methodLabel}:</span> ${paymentLabel}</div>
           <div><span style="font-size:11px;font-weight:700;border:1px solid #000;padding:2px 8px;letter-spacing:0.5px">${statusText}</span></div>
         </td>
       </tr>
@@ -152,11 +175,11 @@ function generateInvoiceHTML(invoice: InvoiceData): string {
     <table style="width:100%;border-collapse:collapse;margin-bottom:24px">
       <thead>
         <tr style="background:#000;color:#fff">
-          <th style="padding:10px 8px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Product</th>
-          <th style="padding:10px 8px;text-align:center;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Variant</th>
-          <th style="padding:10px 8px;text-align:center;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Qty</th>
-          <th style="padding:10px 8px;text-align:right;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Rate</th>
-          <th style="padding:10px 8px;text-align:right;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">Amount</th>
+          <th style="padding:10px 8px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">${l.productLabel}</th>
+          <th style="padding:10px 8px;text-align:center;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">${l.variantLabel}</th>
+          <th style="padding:10px 8px;text-align:center;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">${l.qtyLabel}</th>
+          <th style="padding:10px 8px;text-align:right;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">${l.rateLabel}</th>
+          <th style="padding:10px 8px;text-align:right;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px">${l.amountLabel}</th>
         </tr>
       </thead>
       <tbody>${productRows}</tbody>
@@ -170,7 +193,7 @@ function generateInvoiceHTML(invoice: InvoiceData): string {
           <table style="width:100%;border-collapse:collapse">
             ${summaryRows.join('')}
             <tr style="border-top:2px solid #000">
-              <td style="padding:10px 0;font-size:14px;font-weight:800">TOTAL</td>
+              <td style="padding:10px 0;font-size:14px;font-weight:800">${l.totalLabel}</td>
               <td style="padding:10px 0;text-align:right;font-size:14px;font-weight:800">₹${invoice.total.toLocaleString('en-IN')}</td>
             </tr>
           </table>
@@ -184,12 +207,12 @@ function generateInvoiceHTML(invoice: InvoiceData): string {
     <table style="width:100%;border-collapse:collapse;margin-top:${invoice.promoCode ? '16px' : '0'};margin-bottom:20px">
       <tr>
         <td style="vertical-align:top;width:65%;padding-right:20px">
-          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-bottom:6px">Return Policy</div>
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#888;margin-bottom:6px">${l.returnPolicyLabel}</div>
           <div style="font-size:11px;color:#333;line-height:1.7;border-left:2px solid #000;padding-left:12px">${returnPolicy}</div>
         </td>
         <td style="vertical-align:top;width:35%;text-align:right">
           <img src="${qrUrl}" alt="QR" style="width:100px;height:100px;border:1px solid #ddd" />
-          <div style="font-size:9px;color:#888;margin-top:4px;letter-spacing:0.3px">Scan to view order online</div>
+          <div style="font-size:9px;color:#888;margin-top:4px;letter-spacing:0.3px">${l.scanLabel}</div>
         </td>
       </tr>
     </table>
