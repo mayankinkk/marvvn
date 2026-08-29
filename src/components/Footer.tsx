@@ -45,11 +45,11 @@ export default function Footer() {
 
   const [subscribing, setSubscribing] = useState(false)
 
-  const shopLinks = useMemo(() => {
+  const shopLinks: { label: string; href: string }[] = useMemo(() => {
     try { return JSON.parse(settings.footer_shop_links || '[]') } catch { return defaultShopLinks }
   }, [settings.footer_shop_links])
 
-  const trendingLinks = useMemo(() => {
+  const trendingLinks: { label: string; href: string }[] = useMemo(() => {
     try { return JSON.parse(settings.footer_trending_links || '[]') } catch { return defaultTrendingLinks }
   }, [settings.footer_trending_links])
 
