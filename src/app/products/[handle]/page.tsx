@@ -323,6 +323,10 @@ export default function ProductPage() {
                 <Shield className="w-5 h-5 text-marvvn-gray-400" />
                 <span>100% genuine products</span>
               </div>
+              <div className="flex items-center gap-3 text-sm">
+                <RotateCcw className="w-5 h-5 text-marvvn-gray-400" />
+                <span>Shipping charges deducted from refund on free-shipping returns</span>
+              </div>
             </div>
           </div>
         </div>
