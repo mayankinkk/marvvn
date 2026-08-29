@@ -1,13 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Save, Store, Truck, Globe, Palette, Shield, Bell, Search, Loader2 } from 'lucide-react'
+import { Save, Store, Truck, Globe, Palette, Shield, Bell, Search, Loader2, FileText } from 'lucide-react'
 
-type Tab = 'general' | 'shipping' | 'seo' | 'social' | 'notifications' | 'appearance' | 'maintenance'
+type Tab = 'general' | 'shipping' | 'seo' | 'social' | 'notifications' | 'appearance' | 'maintenance' | 'invoice'
 
 const tabs: { id: Tab; label: string; icon: any }[] = [
   { id: 'general', label: 'General', icon: Store },
   { id: 'shipping', label: 'Shipping', icon: Truck },
+  { id: 'invoice', label: 'Invoice', icon: FileText },
   { id: 'seo', label: 'SEO', icon: Search },
   { id: 'social', label: 'Social', icon: Globe },
   { id: 'appearance', label: 'Appearance', icon: Palette },
@@ -345,6 +346,192 @@ export default function AdminSettingsPage() {
               </div>
               <div className="bg-marvvn-gray-50 rounded-lg p-4 text-sm text-marvvn-gray-600">
                 <p>Email notifications are sent via Supabase Auth. Make sure your SMTP settings are configured in the Supabase dashboard.</p>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'invoice' && (
+            <div className="space-y-6">
+              <h2 className="font-medium text-lg">Invoice Template</h2>
+              <p className="text-sm text-marvvn-gray-500">Customize how GST invoices look on your store.</p>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <Field
+                  label="Invoice Logo URL"
+                  value={settings.invoice_logo_url || ''}
+                  onChange={(v) => update('invoice_logo_url', v)}
+                  placeholder="https://..."
+                />
+                {settings.invoice_logo_url && (
+                  <div className="mt-2 w-40 h-16 border rounded overflow-hidden bg-white">
+                    <img src={settings.invoice_logo_url} alt="Invoice logo" className="w-full h-full object-contain" />
+                  </div>
+                )}
+                <Field
+                  label="GSTIN Number"
+                  value={settings.invoice_gst_number || ''}
+                  onChange={(v) => update('invoice_gst_number', v)}
+                  placeholder="22AAAAA0000A1Z5"
+                />
+                <Field
+                  label="GST Percentage (%)"
+                  value={settings.invoice_gst_percentage || '12'}
+                  onChange={(v) => update('invoice_gst_percentage', v)}
+                  type="number"
+                />
+                <Field
+                  label="Invoice Number Prefix"
+                  value={settings.invoice_prefix || 'INV'}
+                  onChange={(v) => update('invoice_prefix', v)}
+                  placeholder="INV"
+                />
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Primary Color</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={settings.invoice_primary_color || '#000000'}
+                      onChange={(e) => update('invoice_primary_color', e.target.value)}
+                      className="w-10 h-10 rounded border cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={settings.invoice_primary_color || '#000000'}
+                      onChange={(e) => update('invoice_primary_color', e.target.value)}
+                      className="input-field flex-1 font-mono"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Secondary Color</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={settings.invoice_secondary_color || '#666666'}
+                      onChange={(e) => update('invoice_secondary_color', e.target.value)}
+                      className="w-10 h-10 rounded border cursor-pointer"
+                    />
+                    <input
+                      type="text"
+                      value={settings.invoice_secondary_color || '#666666'}
+                      onChange={(e) => update('invoice_secondary_color', e.target.value)}
+                      className="input-field flex-1 font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-6">
+                <Toggle
+                  label="Show Logo"
+                  description="Display store logo on invoice"
+                  checked={settings.invoice_show_logo !== 'false'}
+                  onChange={(v) => update('invoice_show_logo', v ? 'true' : 'false')}
+                />
+                <Toggle
+                  label="Show GST Breakdown"
+                  description="Display GST amount separately"
+                  checked={settings.invoice_show_gst !== 'false'}
+                  onChange={(v) => update('invoice_show_gst', v ? 'true' : 'false')}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Footer Text</label>
+                <input
+                  type="text"
+                  value={settings.invoice_footer_text || ''}
+                  onChange={(e) => update('invoice_footer_text', e.target.value)}
+                  className="input-field w-full"
+                  placeholder="Thank you for shopping with MARVVN!"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">Terms & Conditions</label>
+                <textarea
+                  value={settings.invoice_terms || ''}
+                  onChange={(e) => update('invoice_terms', e.target.value)}
+                  className="input-field w-full min-h-[80px]"
+                  placeholder="Return policy, warranty info..."
+                />
+              </div>
+
+              {/* Live Preview */}
+              <div className="border-t pt-6">
+                <h3 className="text-sm font-medium mb-3">Live Preview</h3>
+                <div className="border rounded-lg overflow-hidden" style={{ fontFamily: 'Arial, sans-serif' }}>
+                  <div style={{ padding: '20px', borderBottom: `3px solid ${settings.invoice_primary_color || '#000'}` }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        {settings.invoice_show_logo !== 'false' && settings.invoice_logo_url ? (
+                          <img src={settings.invoice_logo_url} alt="" style={{ height: '40px', objectFit: 'contain' }} />
+                        ) : (
+                          <h1 style={{ fontSize: '22px', letterSpacing: '3px', margin: 0, color: settings.invoice_primary_color || '#000' }}>
+                            {settings.store_name || 'MARVVN'}
+                          </h1>
+                        )}
+                        <p style={{ color: '#666', fontSize: '11px', margin: '4px 0 0' }}>{settings.store_address || 'Faridabad'}</p>
+                        {settings.invoice_gst_number && <p style={{ color: '#666', fontSize: '11px', margin: '2px 0 0' }}>GSTIN: {settings.invoice_gst_number}</p>}
+                      </div>
+                      <div style={{ textAlign: 'right' }}>
+                        <h2 style={{ fontSize: '16px', margin: 0, color: '#333' }}>TAX INVOICE</h2>
+                        <p style={{ fontSize: '11px', color: '#666', margin: '4px 0' }}>#{settings.invoice_prefix || 'INV'}-DEMO123</p>
+                        <p style={{ fontSize: '11px', color: '#666', margin: '2px 0' }}>{new Date().toLocaleDateString('en-IN')}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div style={{ padding: '16px 20px' }}>
+                    <p style={{ fontSize: '11px', color: '#999', margin: '0 0 4px', textTransform: 'uppercase' }}>Bill To</p>
+                    <p style={{ fontSize: '13px', fontWeight: 'bold', margin: '0' }}>Customer Name</p>
+                    <p style={{ fontSize: '11px', color: '#666', margin: '2px 0' }}>123 Street, City, State 123456</p>
+                  </div>
+                  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ background: '#f5f5f5' }}>
+                        <th style={{ padding: '8px', textAlign: 'left', fontSize: '10px', textTransform: 'uppercase', color: '#666' }}>Item</th>
+                        <th style={{ padding: '8px', textAlign: 'center', fontSize: '10px', textTransform: 'uppercase', color: '#666' }}>Qty</th>
+                        <th style={{ padding: '8px', textAlign: 'right', fontSize: '10px', textTransform: 'uppercase', color: '#666' }}>Rate</th>
+                        <th style={{ padding: '8px', textAlign: 'right', fontSize: '10px', textTransform: 'uppercase', color: '#666' }}>Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style={{ borderBottom: '1px solid #eee' }}>
+                        <td style={{ padding: '8px', fontSize: '12px' }}>Demo Product (M, Black)</td>
+                        <td style={{ padding: '8px', textAlign: 'center', fontSize: '12px' }}>2</td>
+                        <td style={{ padding: '8px', textAlign: 'right', fontSize: '12px' }}>₹999</td>
+                        <td style={{ padding: '8px', textAlign: 'right', fontSize: '12px' }}>₹1,998</td>
+                      </tr>
+                    </tbody>
+                    <tfoot>
+                      {settings.invoice_show_gst !== 'false' && settings.invoice_gst_number && (
+                        <>
+                          <tr>
+                            <td colSpan={3} style={{ padding: '6px 8px', textAlign: 'right', fontSize: '12px' }}>Subtotal</td>
+                            <td style={{ padding: '6px 8px', textAlign: 'right', fontSize: '12px' }}>₹1,998</td>
+                          </tr>
+                          <tr>
+                            <td colSpan={3} style={{ padding: '6px 8px', textAlign: 'right', fontSize: '12px' }}>GST ({settings.invoice_gst_percentage || '12'}%)</td>
+                            <td style={{ padding: '6px 8px', textAlign: 'right', fontSize: '12px' }}>₹240</td>
+                          </tr>
+                        </>
+                      )}
+                      <tr style={{ borderTop: `2px solid ${settings.invoice_primary_color || '#000'}` }}>
+                        <td colSpan={3} style={{ padding: '10px 8px', textAlign: 'right', fontSize: '14px', fontWeight: 'bold' }}>Total</td>
+                        <td style={{ padding: '10px 8px', textAlign: 'right', fontSize: '14px', fontWeight: 'bold' }}>₹2,238</td>
+                      </tr>
+                    </tfoot>
+                  </table>
+                  <div style={{ padding: '16px 20px', borderTop: '1px solid #eee', textAlign: 'center' }}>
+                    {settings.invoice_terms && (
+                      <p style={{ fontSize: '10px', color: '#999', margin: '0 0 4px' }}>{settings.invoice_terms}</p>
+                    )}
+                    <p style={{ fontSize: '11px', color: settings.invoice_secondary_color || '#666', margin: 0 }}>{settings.invoice_footer_text || 'Thank you for shopping with MARVVN!'}</p>
+                  </div>
+                </div>
               </div>
             </div>
           )}

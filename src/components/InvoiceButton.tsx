@@ -1,16 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Download, FileText } from 'lucide-react'
-
-interface InvoiceItem {
-  title: string
-  quantity: number
-  size?: string
-  color?: string
-  price: number
-  total: number
-}
+import { FileText } from 'lucide-react'
 
 interface InvoiceData {
   orderId: string
@@ -21,7 +12,14 @@ interface InvoiceData {
     email: string
     phone: string
     address: string
+    logoUrl?: string
+    showLogo?: boolean
     gst?: { number: string; percentage: number } | null
+    showGst?: boolean
+    primaryColor?: string
+    secondaryColor?: string
+    footerText?: string
+    terms?: string
   }
   customer: {
     name: string
@@ -32,7 +30,7 @@ interface InvoiceData {
     state: string
     pincode: string
   }
-  items: InvoiceItem[]
+  items: { title: string; quantity: number; size?: string; color?: string; price: number; total: number }[]
   subtotal: number
   gst?: { percentage: number; amount: number } | null
   discount: number
@@ -43,61 +41,65 @@ interface InvoiceData {
 }
 
 function generateInvoiceHTML(invoice: InvoiceData): string {
-  const gstRows = invoice.gst ? `
+  const s = invoice.store
+  const pc = s.primaryColor || '#000000'
+  const sc = s.secondaryColor || '#666666'
+
+  const logoSection = s.showLogo && s.logoUrl
+    ? `<img src="${s.logoUrl}" style="height:40px;object-fit:contain" alt="${s.name}" />`
+    : `<h1 style="font-size:22px;letter-spacing:3px;margin:0;color:${pc}">${s.name}</h1>`
+
+  const gstRows = s.showGst && invoice.gst ? `
     <tr>
-      <td colspan="4" style="padding:8px;text-align:right">Subtotal</td>
-      <td style="padding:8px;text-align:right">₹${invoice.subtotal.toLocaleString()}</td>
+      <td colspan="4" style="padding:6px 8px;text-align:right;font-size:12px">Subtotal</td>
+      <td style="padding:6px 8px;text-align:right;font-size:12px">₹${invoice.subtotal.toLocaleString()}</td>
     </tr>
     <tr>
-      <td colspan="4" style="padding:8px;text-align:right">GST (${invoice.gst.percentage}%)</td>
-      <td style="padding:8px;text-align:right">₹${invoice.gst.amount.toLocaleString()}</td>
+      <td colspan="4" style="padding:6px 8px;text-align:right;font-size:12px">GST (${invoice.gst.percentage}%)</td>
+      <td style="padding:6px 8px;text-align:right;font-size:12px">₹${invoice.gst.amount.toLocaleString()}</td>
     </tr>
   ` : ''
 
   const discountRow = invoice.discount > 0 ? `
     <tr>
-      <td colspan="4" style="padding:8px;text-align:right;color:#16a34a">Discount</td>
-      <td style="padding:8px;text-align:right;color:#16a34a">-₹${invoice.discount.toLocaleString()}</td>
+      <td colspan="4" style="padding:6px 8px;text-align:right;font-size:12px;color:#16a34a">Discount</td>
+      <td style="padding:6px 8px;text-align:right;font-size:12px;color:#16a34a">-₹${invoice.discount.toLocaleString()}</td>
     </tr>
   ` : ''
 
   return `
     <!DOCTYPE html>
     <html>
-    <head>
-      <style>
-        @media print { body { margin: 0; } }
-      </style>
-    </head>
+    <head><style>@media print { body { margin: 0; } }</style></head>
     <body style="font-family:Arial,sans-serif;padding:40px;max-width:800px;margin:0 auto">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:30px;border-bottom:3px solid #000;padding-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:30px;border-bottom:3px solid ${pc};padding-bottom:20px">
         <div>
-          <h1 style="font-size:28px;letter-spacing:4px;margin:0">${invoice.store.name}</h1>
-          <p style="color:#666;font-size:12px;margin-top:4px">${invoice.store.address}</p>
-          <p style="color:#666;font-size:12px">${invoice.store.email} | ${invoice.store.phone}</p>
-          ${invoice.store.gst ? `<p style="color:#666;font-size:12px">GSTIN: ${invoice.store.gst.number}</p>` : ''}
+          ${logoSection}
+          <p style="color:#666;font-size:11px;margin:4px 0 0">${s.address}</p>
+          <p style="color:#666;font-size:11px;margin:2px 0 0">${s.email} | ${s.phone}</p>
+          ${s.gst ? `<p style="color:#666;font-size:11px;margin:2px 0 0">GSTIN: ${s.gst.number}</p>` : ''}
         </div>
         <div style="text-align:right">
-          <h2 style="font-size:20px;margin:0;color:#333">TAX INVOICE</h2>
-          <p style="font-size:12px;color:#666;margin:4px 0">Invoice #: ${invoice.invoiceNumber}</p>
-          <p style="font-size:12px;color:#666;margin:4px 0">Date: ${new Date(invoice.orderDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-          <p style="font-size:12px;color:#666;margin:4px 0">Order: #${invoice.orderId.slice(0, 8).toUpperCase()}</p>
+          <h2 style="font-size:18px;margin:0;color:${pc}">TAX INVOICE</h2>
+          <p style="font-size:11px;color:#666;margin:4px 0">Invoice #: ${invoice.invoiceNumber}</p>
+          <p style="font-size:11px;color:#666;margin:2px 0">Date: ${new Date(invoice.orderDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+          <p style="font-size:11px;color:#666;margin:2px 0">Order: #${invoice.orderId.slice(0, 8).toUpperCase()}</p>
         </div>
       </div>
 
       <div style="display:flex;justify-content:space-between;margin-bottom:30px">
         <div>
-          <p style="font-size:11px;text-transform:uppercase;color:#999;margin:0 0 4px">Bill To</p>
-          <p style="font-size:14px;font-weight:bold;margin:0">${invoice.customer.name}</p>
-          <p style="font-size:12px;color:#666;margin:2px 0">${invoice.customer.address}</p>
-          <p style="font-size:12px;color:#666;margin:2px 0">${invoice.customer.city}, ${invoice.customer.state} ${invoice.customer.pincode}</p>
-          <p style="font-size:12px;color:#666;margin:2px 0">${invoice.customer.email}</p>
-          <p style="font-size:12px;color:#666;margin:2px 0">${invoice.customer.phone}</p>
+          <p style="font-size:10px;text-transform:uppercase;color:${sc};margin:0 0 4px;letter-spacing:1px">Bill To</p>
+          <p style="font-size:13px;font-weight:bold;margin:0">${invoice.customer.name}</p>
+          <p style="font-size:11px;color:#666;margin:2px 0">${invoice.customer.address}</p>
+          <p style="font-size:11px;color:#666;margin:2px 0">${invoice.customer.city}, ${invoice.customer.state} ${invoice.customer.pincode}</p>
+          <p style="font-size:11px;color:#666;margin:2px 0">${invoice.customer.email}</p>
+          <p style="font-size:11px;color:#666;margin:2px 0">${invoice.customer.phone}</p>
         </div>
         <div style="text-align:right">
-          <p style="font-size:11px;text-transform:uppercase;color:#999;margin:0 0 4px">Payment</p>
-          <p style="font-size:12px;color:#666;margin:2px 0">Method: ${invoice.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment'}</p>
-          <p style="font-size:12px;color:${invoice.paymentStatus === 'paid' ? '#16a34a' : '#d97706'};margin:2px 0;font-weight:bold">
+          <p style="font-size:10px;text-transform:uppercase;color:${sc};margin:0 0 4px;letter-spacing:1px">Payment</p>
+          <p style="font-size:11px;color:#666;margin:2px 0">Method: ${invoice.paymentMethod === 'cod' ? 'Cash on Delivery' : 'Online Payment'}</p>
+          <p style="font-size:11px;color:${invoice.paymentStatus === 'paid' ? '#16a34a' : '#d97706'};margin:2px 0;font-weight:bold">
             ${invoice.paymentStatus === 'paid' ? 'PAID' : 'PENDING'}
           </p>
         </div>
@@ -106,24 +108,24 @@ function generateInvoiceHTML(invoice: InvoiceData): string {
       <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
         <thead>
           <tr style="background:#f5f5f5">
-            <th style="padding:10px 8px;text-align:left;font-size:11px;text-transform:uppercase;color:#666">Item</th>
-            <th style="padding:10px 8px;text-align:center;font-size:11px;text-transform:uppercase;color:#666">Qty</th>
-            <th style="padding:10px 8px;text-align:center;font-size:11px;text-transform:uppercase;color:#666">Size</th>
-            <th style="padding:10px 8px;text-align:right;font-size:11px;text-transform:uppercase;color:#666">Rate</th>
-            <th style="padding:10px 8px;text-align:right;font-size:11px;text-transform:uppercase;color:#666">Amount</th>
+            <th style="padding:10px 8px;text-align:left;font-size:10px;text-transform:uppercase;color:${sc};letter-spacing:0.5px">Item</th>
+            <th style="padding:10px 8px;text-align:center;font-size:10px;text-transform:uppercase;color:${sc}">Qty</th>
+            <th style="padding:10px 8px;text-align:center;font-size:10px;text-transform:uppercase;color:${sc}">Size</th>
+            <th style="padding:10px 8px;text-align:right;font-size:10px;text-transform:uppercase;color:${sc}">Rate</th>
+            <th style="padding:10px 8px;text-align:right;font-size:10px;text-transform:uppercase;color:${sc}">Amount</th>
           </tr>
         </thead>
         <tbody>
           ${invoice.items.map(item => `
             <tr style="border-bottom:1px solid #eee">
-              <td style="padding:10px 8px;font-size:13px">
+              <td style="padding:10px 8px;font-size:12px">
                 ${item.title}
-                ${item.color ? `<span style="color:#999;font-size:11px"> - ${item.color}</span>` : ''}
+                ${item.color ? `<span style="color:${sc};font-size:10px"> - ${item.color}</span>` : ''}
               </td>
-              <td style="padding:10px 8px;text-align:center;font-size:13px">${item.quantity}</td>
-              <td style="padding:10px 8px;text-align:center;font-size:13px;color:#666">${item.size || '-'}</td>
-              <td style="padding:10px 8px;text-align:right;font-size:13px">₹${item.price.toLocaleString()}</td>
-              <td style="padding:10px 8px;text-align:right;font-size:13px">₹${item.total.toLocaleString()}</td>
+              <td style="padding:10px 8px;text-align:center;font-size:12px">${item.quantity}</td>
+              <td style="padding:10px 8px;text-align:center;font-size:12px;color:${sc}">${item.size || '-'}</td>
+              <td style="padding:10px 8px;text-align:right;font-size:12px">₹${item.price.toLocaleString()}</td>
+              <td style="padding:10px 8px;text-align:right;font-size:12px">₹${item.total.toLocaleString()}</td>
             </tr>
           `).join('')}
         </tbody>
@@ -131,19 +133,19 @@ function generateInvoiceHTML(invoice: InvoiceData): string {
           ${gstRows}
           ${discountRow}
           <tr>
-            <td colspan="4" style="padding:10px 8px;text-align:right;font-size:13px;color:#666">Shipping</td>
-            <td style="padding:10px 8px;text-align:right;font-size:13px">FREE</td>
+            <td colspan="4" style="padding:8px 8px;text-align:right;font-size:12px;color:${sc}">Shipping</td>
+            <td style="padding:8px 8px;text-align:right;font-size:12px">FREE</td>
           </tr>
-          <tr style="border-top:2px solid #000">
-            <td colspan="4" style="padding:12px 8px;text-align:right;font-size:15px;font-weight:bold">Total</td>
-            <td style="padding:12px 8px;text-align:right;font-size:15px;font-weight:bold">₹${invoice.total.toLocaleString()}</td>
+          <tr style="border-top:2px solid ${pc}">
+            <td colspan="4" style="padding:12px 8px;text-align:right;font-size:14px;font-weight:bold">Total</td>
+            <td style="padding:12px 8px;text-align:right;font-size:14px;font-weight:bold">₹${invoice.total.toLocaleString()}</td>
           </tr>
         </tfoot>
       </table>
 
-      <div style="text-align:center;padding-top:30px;border-top:1px solid #eee;color:#999;font-size:11px">
-        <p style="margin:2px 0">Thank you for shopping with ${invoice.store.name}!</p>
-        <p style="margin:2px 0">This is a computer-generated invoice.</p>
+      <div style="text-align:center;padding-top:20px;border-top:1px solid #eee">
+        ${s.terms ? `<p style="font-size:10px;color:#999;margin:0 0 4px">${s.terms}</p>` : ''}
+        <p style="font-size:11px;color:${sc};margin:0">${s.footerText}</p>
       </div>
     </body>
     </html>
@@ -170,7 +172,7 @@ export default function InvoiceButton({ orderId, className = '' }: InvoiceButton
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url
-        a.download = `MARVVN-Invoice-${orderId.slice(0, 8).toUpperCase()}.html`
+        a.download = `${data.invoice.invoiceNumber || 'MARVVN-Invoice'}.html`
         document.body.appendChild(a)
         a.click()
         document.body.removeChild(a)

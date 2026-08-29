@@ -20,26 +20,35 @@ export async function GET(request: Request) {
   if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 })
 
   const shipping = order.shipping_address || {}
-  const storeSettings = await supabase.from('settings').select('store_name, store_email, store_phone, store_address, gst_number, gst_percentage').single()
 
-  const gst = storeSettings.data?.gst_number ? {
-    number: storeSettings.data.gst_number,
-    percentage: storeSettings.data.gst_percentage || 12,
-  } : null
+  // Fetch invoice settings from store_settings
+  const { data: settingsRows } = await supabase.from('store_settings').select('key, value')
+  const settings: Record<string, string> = {}
+  ;(settingsRows || []).forEach((row: any) => { settings[row.key] = row.value })
+
+  const gstNumber = settings.invoice_gst_number || ''
+  const gstPercentage = parseFloat(settings.invoice_gst_percentage || '12')
 
   const subtotal = order.order_items?.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0) || 0
-  const gstAmount = gst ? Math.round(subtotal * gst.percentage / 100) : 0
+  const gstAmount = gstNumber ? Math.round(subtotal * gstPercentage / 100) : 0
 
   const invoice = {
     orderId: order.id,
     orderDate: order.created_at,
-    invoiceNumber: `INV-${order.id.slice(0, 8).toUpperCase()}`,
+    invoiceNumber: `${settings.invoice_prefix || 'INV'}-${order.id.slice(0, 8).toUpperCase()}`,
     store: {
-      name: storeSettings.data?.store_name || 'MARVVN',
-      email: storeSettings.data?.store_email || 'marvvnclothing@gmail.com',
-      phone: storeSettings.data?.store_phone || '7578017237',
-      address: storeSettings.data?.store_address || 'Faridabad',
-      gst: gst,
+      name: settings.store_name || 'MARVVN',
+      email: settings.store_email || 'marvvnclothing@gmail.com',
+      phone: settings.store_phone || '7578017237',
+      address: settings.store_address || 'Faridabad',
+      logoUrl: settings.invoice_logo_url || '',
+      showLogo: settings.invoice_show_logo !== 'false',
+      gst: gstNumber ? { number: gstNumber, percentage: gstPercentage } : null,
+      showGst: settings.invoice_show_gst !== 'false',
+      primaryColor: settings.invoice_primary_color || '#000000',
+      secondaryColor: settings.invoice_secondary_color || '#666666',
+      footerText: settings.invoice_footer_text || 'Thank you for shopping with MARVVN!',
+      terms: settings.invoice_terms || '',
     },
     customer: {
       name: `${shipping.firstName || ''} ${shipping.lastName || ''}`.trim(),
@@ -59,7 +68,7 @@ export async function GET(request: Request) {
       total: item.price * item.quantity,
     })) || [],
     subtotal,
-    gst: gst ? { percentage: gst.percentage, amount: gstAmount } : null,
+    gst: gstNumber ? { percentage: gstPercentage, amount: gstAmount } : null,
     discount: order.discount || 0,
     shipping: 0,
     total: order.total,

@@ -19,6 +19,9 @@ const ALLOWED_KEYS = new Set([
   'hero_banner_2_title', 'hero_banner_2_subtitle', 'hero_banner_2_link',
   'hero_banner_3_title', 'hero_banner_3_subtitle', 'hero_banner_3_link',
   'popular_searches',
+  'invoice_logo_url', 'invoice_gst_number', 'invoice_gst_percentage',
+  'invoice_primary_color', 'invoice_secondary_color', 'invoice_footer_text',
+  'invoice_terms', 'invoice_show_logo', 'invoice_show_gst', 'invoice_prefix',
 ])
 
 const DEFAULTS: Record<string, string> = {
@@ -49,6 +52,16 @@ const DEFAULTS: Record<string, string> = {
   seo_keywords: 'streetwear, oversized tees, marvvn, fashion',
   announcement_bar: '⚡︎NOT MADE TO FIT IN | BUILT FOR THE REAL ONES ⚡︎',
   popular_searches: JSON.stringify(['Oversized T-Shirt', 'Joggers', 'Marvel', 'Cargos', 'Caps']),
+  invoice_logo_url: '',
+  invoice_gst_number: '',
+  invoice_gst_percentage: '12',
+  invoice_primary_color: '#000000',
+  invoice_secondary_color: '#666666',
+  invoice_footer_text: 'Thank you for shopping with MARVVN!',
+  invoice_terms: 'This is a computer-generated invoice. For returns, contact us within 7 days of delivery.',
+  invoice_show_logo: 'true',
+  invoice_show_gst: 'true',
+  invoice_prefix: 'INV',
   mega_menu: JSON.stringify([
     {
       title: 'Women',
