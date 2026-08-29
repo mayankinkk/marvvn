@@ -21,7 +21,7 @@ export default function CheckoutPage() {
   const router = useRouter()
 
   const freeShippingThreshold = Number(settings.free_shipping_threshold) || 999
-  const shippingFee = Number(settings.shipping_fee) || 99
+  const shippingFee = Number(settings.shipping_fee) || 65
 
   const [step, setStep] = useState<Step>('contact')
   const [promoInput, setPromoInput] = useState('')

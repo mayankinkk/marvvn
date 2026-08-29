@@ -18,7 +18,7 @@ const DEFAULTS: Record<string, string> = {
   currency_symbol: '₹',
   tax_rate: '0',
   free_shipping_threshold: '999',
-  shipping_fee: '99',
+  shipping_fee: '65',
   whatsapp_number: '917578017237',
   instagram_url: '',
   facebook_url: '',

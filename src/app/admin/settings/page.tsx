@@ -175,7 +175,7 @@ export default function AdminSettingsPage() {
                 />
                 <Field
                   label="Standard Shipping Fee (₹)"
-                  value={settings.shipping_fee || '99'}
+                  value={settings.shipping_fee || '65'}
                   onChange={(v) => update('shipping_fee', v)}
                   type="number"
                 />
@@ -193,7 +193,7 @@ export default function AdminSettingsPage() {
                 />
               </div>
               <div className="bg-marvvn-gray-50 rounded-lg p-4 text-sm text-marvvn-gray-600">
-                <p>Orders above <strong>₹{settings.free_shipping_threshold || '999'}</strong> get free shipping. Standard fee of <strong>₹{settings.shipping_fee || '99'}</strong> applies otherwise.</p>
+                <p>Orders above <strong>₹{settings.free_shipping_threshold || '999'}</strong> get free shipping. Standard fee of <strong>₹{settings.shipping_fee || '65'}</strong> applies otherwise.</p>
                 <p className="mt-2">Products with stock below <strong>{settings.low_stock_threshold || '5'}</strong> units will trigger a low stock alert.</p>
               </div>
             </div>
