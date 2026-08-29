@@ -54,8 +54,8 @@ export default function AboutUsPage() {
               for those who deserve more from what they spend.
             </p>
 
-            <div className="bg-marvvn-black text-white p-8 mt-8">
-              <p className="text-xl font-display font-bold text-center">NOT MADE TO FIT IN</p>
+            <div className="bg-marvvn-black text-white py-12 px-8 mt-8">
+              <p className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-center tracking-wide">NOT MADE TO FIT IN</p>
             </div>
           </div>
         </div>
