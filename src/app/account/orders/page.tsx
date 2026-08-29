@@ -8,7 +8,8 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useAuthStore } from '@/lib/auth-store'
 import { formatPrice } from '@/lib/utils'
-import { ChevronRight, Package, Loader2, CreditCard, Eye } from 'lucide-react'
+import { ChevronRight, Package, Loader2, CreditCard, Eye, FileText, RotateCcw } from 'lucide-react'
+import InvoiceButton from '@/components/InvoiceButton'
 
 interface OrderItem {
   id: string
@@ -116,6 +117,25 @@ export default function OrdersPage() {
     }
   }
 
+  const [returningId, setReturningId] = useState<string | null>(null)
+  const [returnReason, setReturnReason] = useState('')
+  const [showReturnForm, setShowReturnForm] = useState<string | null>(null)
+
+  async function handleReturnRequest(orderId: string) {
+    if (!returnReason.trim()) return
+    setReturningId(orderId)
+    try {
+      await fetch('/api/returns', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, reason: returnReason }),
+      })
+      setShowReturnForm(null)
+      setReturnReason('')
+    } catch {}
+    setReturningId(null)
+  }
+
   if (loading || !isAuthenticated) {
     return null
   }
@@ -216,19 +236,51 @@ export default function OrdersPage() {
                 </div>
 
                 {/* Order Footer */}
-                <div className="px-4 py-3 bg-marvvn-gray-50 border-t border-marvvn-gray-100 flex items-center justify-between text-xs">
-                  <span className="text-marvvn-gray-500">
-                    {order.order_items?.length || 0} item{(order.order_items?.length || 0) > 1 ? 's' : ''}
-                    {order.payment_method === 'cod' ? ' · Cash on Delivery' : ''}
-                  </span>
-                  <div className="flex items-center gap-3">
-                    {order.payment_status && (
-                      <span className={`text-[11px] font-medium ${order.payment_status === 'paid' ? 'text-green-600' : 'text-yellow-600'}`}>
-                        {order.payment_status === 'paid' ? 'Paid' : 'Payment pending'}
-                      </span>
-                    )}
-                    <span className="font-semibold">Total: {formatPrice(order.total)}</span>
+                <div className="px-4 py-3 bg-marvvn-gray-50 border-t border-marvvn-gray-100">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-marvvn-gray-500">
+                      {order.order_items?.length || 0} item{(order.order_items?.length || 0) > 1 ? 's' : ''}
+                      {order.payment_method === 'cod' ? ' · Cash on Delivery' : ''}
+                    </span>
+                    <div className="flex items-center gap-3">
+                      {order.payment_status && (
+                        <span className={`text-[11px] font-medium ${order.payment_status === 'paid' ? 'text-green-600' : 'text-yellow-600'}`}>
+                          {order.payment_status === 'paid' ? 'Paid' : 'Payment pending'}
+                        </span>
+                      )}
+                      <span className="font-semibold">Total: {formatPrice(order.total)}</span>
+                    </div>
                   </div>
+                  <div className="flex items-center gap-3 mt-2 pt-2 border-t border-marvvn-gray-100">
+                    <InvoiceButton orderId={order.id} />
+                    {order.status === 'delivered' && (
+                      <button
+                        onClick={() => setShowReturnForm(showReturnForm === order.id ? null : order.id)}
+                        className="flex items-center gap-1.5 text-xs font-medium text-marvvn-gray-500 hover:text-marvvn-black transition-colors cursor-pointer"
+                      >
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        Return
+                      </button>
+                    )}
+                  </div>
+                  {showReturnForm === order.id && (
+                    <div className="mt-2 pt-2 border-t border-marvvn-gray-100 space-y-2">
+                      <textarea
+                        value={returnReason}
+                        onChange={e => setReturnReason(e.target.value)}
+                        placeholder="Reason for return..."
+                        className="w-full px-3 py-2 text-xs border border-marvvn-gray-200 rounded focus:outline-none focus:border-marvvn-black"
+                        rows={2}
+                      />
+                      <button
+                        onClick={() => handleReturnRequest(order.id)}
+                        disabled={returningId === order.id || !returnReason.trim()}
+                        className="px-3 py-1.5 text-xs bg-marvvn-black text-white rounded hover:bg-marvvn-gray-900 cursor-pointer disabled:opacity-50"
+                      >
+                        {returningId === order.id ? 'Submitting...' : 'Submit Return Request'}
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

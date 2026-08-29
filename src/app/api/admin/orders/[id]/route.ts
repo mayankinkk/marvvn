@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { sendOrderStatusUpdate } from '@/lib/email'
 import { sendWhatsAppOrderStatusUpdate } from '@/lib/whatsapp'
 
@@ -45,6 +46,21 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   const updateData: any = { updated_at: new Date().toISOString() }
   if (status) updateData.status = status
   if (payment_status) updateData.payment_status = payment_status
+
+  // Get current order to append to status_history
+  const { data: currentOrder } = await supabase
+    .from('orders')
+    .select('status_history')
+    .eq('id', id)
+    .single()
+
+  if (status) {
+    const history = currentOrder?.status_history || []
+    updateData.status_history = [
+      ...history,
+      { status, timestamp: new Date().toISOString() }
+    ]
+  }
 
   const { data, error } = await supabase
     .from('orders')

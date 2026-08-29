@@ -77,3 +77,36 @@ export async function sendWhatsAppOrderStatusUpdate(phone: string, orderId: stri
     console.error('WhatsApp status update failed:', error)
   }
 }
+
+export async function sendWhatsAppCartAbandonment(phone: string, items: { title: string; quantity: number }[], total: number) {
+  if (!PHONE_NUMBER_ID || !ACCESS_TOKEN || !phone) return
+
+  const itemsList = items.map(i => `${i.quantity}x ${i.title}`).join('\n')
+
+  const message = `🛒 *Hey, you left something behind!*
+
+${itemsList}
+
+Total: ₹${total.toLocaleString()}
+
+Complete your order before it sells out:
+https://marvvn.online/cart`
+
+  try {
+    await fetch(`${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${ACCESS_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messaging_product: 'whatsapp',
+        to: phone,
+        type: 'text',
+        text: { body: message },
+      }),
+    })
+  } catch (error) {
+    console.error('WhatsApp cart abandonment failed:', error)
+  }
+}

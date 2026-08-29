@@ -53,6 +53,19 @@ export default function OrderTrackingPage() {
 
   const currentStepIndex = order ? statusSteps.findIndex(s => s.key === order.status) : -1
 
+  // Build timeline from status_history
+  const timeline = order?.status_history || []
+  const createdAt = order?.created_at
+
+  function getDateForStep(stepKey: string): string | null {
+    // Find the most recent entry in status_history matching this step
+    const entry = timeline.find((h: any) => h.status === stepKey)
+    if (entry) return new Date(entry.timestamp || entry.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+    // For pending, use created_at
+    if (stepKey === 'pending' && createdAt) return new Date(createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+    return null
+  }
+
   return (
     <div className="min-h-screen">
       <Header />
@@ -122,12 +135,13 @@ export default function OrderTrackingPage() {
                 </span>
               </div>
 
-              {/* Progress Steps */}
+              {/* Progress Steps with Dates */}
               <div className="space-y-0 mb-6">
                 {statusSteps.map((step, i) => {
                   const isCompleted = currentStepIndex >= i
                   const isCurrent = currentStepIndex === i
                   const isCancelled = order.status === 'cancelled'
+                  const date = getDateForStep(step.key)
 
                   return (
                     <div key={step.key} className="flex gap-3">
@@ -147,6 +161,9 @@ export default function OrderTrackingPage() {
                           {step.label}
                         </p>
                         <p className="text-xs text-marvvn-gray-400">{step.description}</p>
+                        {date && (
+                          <p className="text-[11px] text-marvvn-gray-400 mt-0.5 font-mono">{date}</p>
+                        )}
                       </div>
                     </div>
                   )

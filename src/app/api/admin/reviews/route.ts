@@ -26,7 +26,7 @@ export async function POST(request: Request) {
   if (!(await isAdmin(supabase))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const body = await request.json()
-  const { name, email, text, rating, product_handle, verified, featured } = body
+  const { name, email, text, rating, product_handle, verified, featured, photos } = body
 
   if (!name || !text || !rating) {
     return NextResponse.json({ error: 'Name, text, and rating are required' }, { status: 400 })
@@ -46,6 +46,7 @@ export async function POST(request: Request) {
       product_handle: product_handle || null,
       verified: verified || false,
       featured: featured || false,
+      photos: photos || [],
     })
     .select()
     .single()
@@ -59,7 +60,7 @@ export async function PUT(request: Request) {
   if (!(await isAdmin(supabase))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const body = await request.json()
-  const { id, name, email, text, rating, product_handle, verified, featured } = body
+  const { id, name, email, text, rating, product_handle, verified, featured, photos } = body
 
   if (!id) return NextResponse.json({ error: 'Review ID is required' }, { status: 400 })
 
@@ -71,6 +72,7 @@ export async function PUT(request: Request) {
   if (product_handle !== undefined) updates.product_handle = product_handle
   if (verified !== undefined) updates.verified = verified
   if (featured !== undefined) updates.featured = featured
+  if (photos !== undefined) updates.photos = photos
 
   const { data, error } = await supabase
     .from('reviews')

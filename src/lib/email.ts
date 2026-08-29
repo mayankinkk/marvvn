@@ -207,3 +207,106 @@ export async function sendWelcomeEmail(email: string, name: string) {
     `,
   })
 }
+
+export async function sendLowStockAlert(email: string, products: { id: string; title: string; stock: number }[]) {
+  const client = getResend()
+  if (!client) return
+
+  const rows = products.map(p =>
+    `<tr>
+      <td style="padding:8px;border-bottom:1px solid #eee">${p.title}</td>
+      <td style="padding:8px;border-bottom:1px solid #eee;text-align:center;font-weight:bold;color:${p.stock <= 2 ? '#dc2626' : '#d97706'}">${p.stock}</td>
+    </tr>`
+  ).join('')
+
+  await client.emails.send({
+    from: 'MARVVN <orders@marvvn.online>',
+    to: email,
+    subject: `Low Stock Alert - ${products.length} product${products.length > 1 ? 's' : ''} running low`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px">
+        <div style="text-align:center;padding:20px 0;border-bottom:2px solid #000">
+          <h1 style="font-size:24px;letter-spacing:4px;margin:0">MARVVN</h1>
+        </div>
+        <div style="padding:20px 0">
+          <h2 style="color:#333">Low Stock Warning</h2>
+          <p style="color:#666">The following products are running low on stock:</p>
+        </div>
+        <table style="width:100%;border-collapse:collapse;margin:20px 0">
+          <thead>
+            <tr style="background:#f5f5f5">
+              <th style="padding:8px;text-align:left">Product</th>
+              <th style="padding:8px;text-align:center">Stock Left</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div style="text-align:center;padding:20px 0">
+          <a href="https://marvvn.online/admin/inventory" style="display:inline-block;padding:12px 24px;background:#000;color:#fff;text-decoration:none;font-weight:bold">View Inventory</a>
+        </div>
+      </body>
+      </html>
+    `,
+  })
+}
+
+export async function sendBackInStockAlert(email: string, productTitle: string, handle: string) {
+  const client = getResend()
+  if (!client) return
+
+  await client.emails.send({
+    from: 'MARVVN <hello@marvvn.online>',
+    to: email,
+    subject: `${productTitle} is back in stock!`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px">
+        <div style="text-align:center;padding:20px 0;border-bottom:2px solid #000">
+          <h1 style="font-size:24px;letter-spacing:4px;margin:0">MARVVN</h1>
+        </div>
+        <div style="padding:20px 0;text-align:center">
+          <h2 style="color:#333">It's back!</h2>
+          <p style="color:#666"><strong>${productTitle}</strong> is back in stock. Grab it before it sells out again!</p>
+          <a href="https://marvvn.online/products/${handle}" style="display:inline-block;padding:14px 32px;background:#000;color:#fff;text-decoration:none;font-weight:bold;margin-top:16px">Shop Now</a>
+        </div>
+      </body>
+      </html>
+    `,
+  })
+}
+
+export async function sendReturnRequestEmail(email: string, orderId: string, status: string, adminNotes?: string) {
+  const client = getResend()
+  if (!client) return
+
+  const statusMessages: Record<string, string> = {
+    approved: 'Your return request has been approved. Please ship the item back to us.',
+    rejected: 'Your return request has been reviewed and cannot be approved at this time.',
+    completed: 'Your return has been processed. Refund will be credited within 5-7 business days.',
+  }
+
+  await client.emails.send({
+    from: 'MARVVN <orders@marvvn.online>',
+    to: email,
+    subject: `Return Request ${status.charAt(0).toUpperCase() + status.slice(1)} - #${orderId.slice(0, 8).toUpperCase()}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px">
+        <div style="text-align:center;padding:20px 0;border-bottom:2px solid #000">
+          <h1 style="font-size:24px;letter-spacing:4px;margin:0">MARVVN</h1>
+        </div>
+        <div style="padding:20px 0;text-align:center">
+          <h2 style="color:#333">Return Request ${status.charAt(0).toUpperCase() + status.slice(1)}</h2>
+          <p style="color:#666">${statusMessages[status] || 'Your return request status has been updated.'}</p>
+          <p style="color:#999;font-size:14px">Order #${orderId.slice(0, 8).toUpperCase()}</p>
+          ${adminNotes ? `<p style="color:#666;margin-top:12px"><strong>Note:</strong> ${adminNotes}</p>` : ''}
+        </div>
+      </body>
+      </html>
+    `,
+  })
+}

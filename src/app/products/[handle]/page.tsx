@@ -4,11 +4,10 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
-import { Heart, ShoppingBag, Minus, Plus, ChevronRight, Truck, RotateCcw, Shield } from 'lucide-react'
+import { Heart, ShoppingBag, Minus, Plus, ChevronRight, Truck, RotateCcw, Shield, Bell } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
-import { useCurrency } from '@/lib/hooks/useCurrency'
 import ProductReviews from '@/components/ProductReviews'
 import SizeGuide from '@/components/SizeGuide'
 import RecentlyViewed, { trackRecentlyViewed } from '@/components/RecentlyViewed'
@@ -17,6 +16,8 @@ import { useProducts, useProduct } from '@/lib/hooks/useProducts'
 import { formatPrice, calculateDiscount, cn } from '@/lib/utils'
 import { useCartStore } from '@/lib/store'
 import { useWishlistStore } from '@/lib/wishlist-store'
+import { useAuthStore } from '@/lib/auth-store'
+import { FlashSaleTimer, CrossSellProducts, SizeRecommendations } from '@/components/ProductExtras'
 
 export default function ProductPage() {
   const params = useParams()
@@ -30,6 +31,9 @@ export default function ProductPage() {
   const { addItem, toggleCart } = useCartStore()
   const { format, symbol } = useCurrency()
   const { toggleItem, isInWishlist } = useWishlistStore()
+  const { user } = useAuthStore()
+  const [stockAlertSigned, setStockAlertSigned] = useState(false)
+  const [stockAlertEmail, setStockAlertEmail] = useState('')
 
   useEffect(() => {
     setSelectedSize('')
@@ -44,6 +48,17 @@ export default function ProductPage() {
       trackViewItem(product.id, product.title, product.price)
     }
   }, [product])
+
+  const handleStockAlert = async () => {
+    const email = stockAlertEmail || user?.email
+    if (!email || !product) return
+    await fetch('/api/stock-alerts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productId: product.id, email }),
+    })
+    setStockAlertSigned(true)
+  }
 
   if (loading) {
     return (
@@ -87,6 +102,7 @@ export default function ProductPage() {
     .filter((p) => p.id !== product.id && p.category === product.category)
     .slice(0, 4)
   const inWishlist = isInWishlist(product.id)
+  const isOutOfStock = product.stock !== undefined && product.stock <= 0
 
   const handleAddToCart = () => {
     const size = selectedSize || product.sizes[0]
@@ -141,6 +157,15 @@ export default function ProductPage() {
           </div>
 
           <div className="space-y-6">
+            {/* Flash Sale Timer */}
+            {product.flash_sale && product.flash_sale_ends_at && product.flash_sale_price && (
+              <FlashSaleTimer
+                endsAt={product.flash_sale_ends_at}
+                salePrice={product.flash_sale_price}
+                originalPrice={product.price}
+              />
+            )}
+
             <div>
               <h1 className="text-2xl lg:text-3xl font-display font-medium">{product.title}</h1>
               <div className="flex items-center gap-3 mt-3">
@@ -151,9 +176,9 @@ export default function ProductPage() {
                 )}
                 <span className={cn(
                   'text-2xl font-medium',
-                  product.compareAtPrice ? 'text-marvvn-red' : ''
+                  product.compareAtPrice || product.flash_sale ? 'text-marvvn-red' : ''
                 )}>
-                  {formatPrice(product.price)}
+                  {formatPrice(product.flash_sale && product.flash_sale_price ? product.flash_sale_price : product.price)}
                 </span>
                 {discount > 0 && (
                   <span className="px-2 py-1 text-xs font-medium bg-marvvn-red text-white rounded">
@@ -165,11 +190,39 @@ export default function ProductPage() {
 
             <p className="text-marvvn-gray-600">{product.description}</p>
 
+            {/* Out of Stock Alert */}
+            {isOutOfStock && (
+              <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                {stockAlertSigned ? (
+                  <p className="text-sm text-amber-700 flex items-center gap-2">
+                    <Bell className="w-4 h-4" /> You'll be notified when this is back in stock!
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    <p className="text-sm text-amber-700 font-medium">This product is currently out of stock</p>
+                    <div className="flex gap-2">
+                      <input
+                        type="email"
+                        placeholder="Your email"
+                        value={stockAlertEmail}
+                        onChange={(e) => setStockAlertEmail(e.target.value)}
+                        className="flex-1 px-3 py-2 text-sm border border-amber-300 rounded focus:outline-none focus:border-amber-500"
+                      />
+                      <button onClick={handleStockAlert} className="px-3 py-2 text-sm bg-amber-600 text-white rounded hover:bg-amber-700 cursor-pointer">
+                        Notify Me
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-medium uppercase tracking-wider">Size</h3>
                 <SizeGuide category={product.category === 'women' ? 'women' : 'men'} />
               </div>
+              <SizeRecommendations category={product.category} currentSize={selectedSize} />
               <div className="flex flex-wrap gap-2">
                 {product.sizes.map((size) => (
                   <button
@@ -235,10 +288,11 @@ export default function ProductPage() {
               <button
                 type="button"
                 onClick={handleAddToCart}
-                className="flex-1 btn-primary py-4 flex items-center justify-center gap-2 text-base cursor-pointer"
+                disabled={isOutOfStock}
+                className="flex-1 btn-primary py-4 flex items-center justify-center gap-2 text-base cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <ShoppingBag className="w-5 h-5" />
-                Add To Cart
+                {isOutOfStock ? 'Out of Stock' : 'Add To Cart'}
               </button>
               <button
                 type="button"
@@ -271,6 +325,10 @@ export default function ProductPage() {
           </div>
         </div>
 
+        {/* Cross-sell / Complete The Look */}
+        <CrossSellProducts currentProductId={product.id} category={product.category} />
+
+        {/* Related Products */}
         {relatedProducts.length > 0 && (
           <section className="mt-16 lg:mt-24">
             <h2 className="text-xl lg:text-2xl font-display font-medium mb-6">You May Also Like</h2>
@@ -290,4 +348,8 @@ export default function ProductPage() {
       <Footer />
     </div>
   )
+}
+
+function useCurrency() {
+  return { format: (n: number) => `₹${n.toLocaleString()}`, symbol: '₹' }
 }

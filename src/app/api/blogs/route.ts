@@ -9,11 +9,7 @@ export async function GET() {
     .select('*')
     .eq('published', true)
     .order('created_at', { ascending: false })
-    .limit(6)
 
-  if (error) {
-    return NextResponse.json({ blogs: [] })
-  }
-
-  return NextResponse.json({ blogs: data })
+  if (error) return NextResponse.json({ blogs: [] })
+  return NextResponse.json({ blogs: data || [] })
 }

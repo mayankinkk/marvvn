@@ -5,32 +5,38 @@ export async function POST(req: NextRequest) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
-  const { email, items, total } = await req.json()
+  const { email, items, total, phone } = await req.json()
 
   if (!email || !items?.length) {
     return NextResponse.json({ error: 'Email and items are required' }, { status: 400 })
   }
 
-  // Store cart abandonment record
-  await supabase.from('cart_abandonment').insert({
-    user_id: user.id,
-    email,
-    items,
-    total,
-    status: 'pending',
-  })
+  if (user) {
+    await supabase.from('cart_abandonment').insert({
+      user_id: user.id,
+      email,
+      items,
+      total,
+      status: 'pending',
+    })
+  }
 
-  // Schedule reminder email via cron (1 hour delay handled by external cron or Vercel cron)
-  // For now, send immediately if cron is not set up
+  // Send email
   try {
     const { sendCartAbandonmentEmail } = await import('@/lib/email')
     await sendCartAbandonmentEmail(email, items, total)
   } catch (e) {
     console.error('Failed to send cart abandonment email:', e)
+  }
+
+  // Send WhatsApp if phone available
+  if (phone) {
+    try {
+      const { sendWhatsAppCartAbandonment } = await import('@/lib/whatsapp')
+      await sendWhatsAppCartAbandonment(phone, items, total)
+    } catch (e) {
+      console.error('Failed to send cart abandonment WhatsApp:', e)
+    }
   }
 
   return NextResponse.json({ success: true })

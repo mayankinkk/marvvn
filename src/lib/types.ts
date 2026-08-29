@@ -14,6 +14,11 @@ export interface Product {
   isNew?: boolean
   isBestseller?: boolean
   badge?: 'new' | 'sale' | 'bestseller' | null
+  stock?: number
+  low_stock_threshold?: number
+  flash_sale?: boolean
+  flash_sale_price?: number
+  flash_sale_ends_at?: string
 }
 
 export interface Collection {
