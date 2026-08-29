@@ -12,7 +12,7 @@ export async function GET(request: Request) {
 
   const { data: order } = await supabase
     .from('orders')
-    .select('*, order_items(*, products(title, price))')
+    .select('*, order_items(*, products(title, handle, images))')
     .eq('id', orderId)
     .eq('user_id', user.id)
     .single()
@@ -21,20 +21,23 @@ export async function GET(request: Request) {
 
   const shipping = order.shipping_address || {}
 
-  // Fetch invoice settings from store_settings
   const { data: settingsRows } = await supabase.from('store_settings').select('key, value')
   const settings: Record<string, string> = {}
   ;(settingsRows || []).forEach((row: any) => { settings[row.key] = row.value })
 
   const gstNumber = settings.invoice_gst_number || ''
   const gstPercentage = parseFloat(settings.invoice_gst_percentage || '12')
+  const shippingFee = parseFloat(settings.shipping_fee || '0')
 
   const subtotal = order.order_items?.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0) || 0
   const gstAmount = gstNumber ? Math.round(subtotal * gstPercentage / 100) : 0
+  const discount = order.discount || 0
+  const total = order.total
 
   const invoice = {
     orderId: order.id,
     orderDate: order.created_at,
+    invoiceDate: new Date().toISOString(),
     invoiceNumber: `${settings.invoice_prefix || 'INV'}-${order.id.slice(0, 8).toUpperCase()}`,
     store: {
       name: settings.store_name || 'MARVVN',
@@ -47,33 +50,38 @@ export async function GET(request: Request) {
       showGst: settings.invoice_show_gst !== 'false',
       primaryColor: settings.invoice_primary_color || '#000000',
       secondaryColor: settings.invoice_secondary_color || '#666666',
-      footerText: settings.invoice_footer_text || 'Thank you for shopping with MARVVN!',
+      footerText: settings.invoice_footer_text || 'NOT MADE TO FIT IN. | BUILT FOR THE REAL ONES. 🔥',
       terms: settings.invoice_terms || '',
     },
     customer: {
       name: `${shipping.firstName || ''} ${shipping.lastName || ''}`.trim(),
-      email: shipping.email,
-      phone: shipping.phone,
-      address: `${shipping.address || ''}${shipping.apartment ? ', ' + shipping.apartment : ''}`,
-      city: shipping.city,
-      state: shipping.state,
-      pincode: shipping.pincode,
+      email: shipping.email || '',
+      phone: shipping.phone || '',
+      address: shipping.address || '',
+      apartment: shipping.apartment || '',
+      city: shipping.city || '',
+      state: shipping.state || '',
+      pincode: shipping.pincode || '',
     },
     items: order.order_items?.map((item: any) => ({
       title: item.products?.title || 'Product',
+      handle: item.products?.handle || '',
+      image: item.products?.images?.[0] || '',
       quantity: item.quantity,
-      size: item.size,
-      color: item.color,
+      size: item.size || '',
+      color: item.color || '',
       price: item.price,
       total: item.price * item.quantity,
     })) || [],
     subtotal,
     gst: gstNumber ? { percentage: gstPercentage, amount: gstAmount } : null,
-    discount: order.discount || 0,
-    shipping: 0,
-    total: order.total,
+    discount,
+    shippingFee,
+    promoCode: order.promo_code || null,
+    total,
     paymentMethod: order.payment_method,
     paymentStatus: order.payment_status,
+    siteUrl: settings.site_url || 'https://marvvn.online',
   }
 
   return NextResponse.json({ invoice })
