@@ -439,38 +439,6 @@ export default function AdminSettingsPage() {
                 />
               </div>
 
-              {/* Editable Labels */}
-              <div className="border-t pt-4">
-                <h3 className="text-sm font-medium mb-3">Editable Labels</h3>
-                <p className="text-xs text-marvvn-gray-500 mb-4">Customize every text on the invoice. Leave blank for defaults.</p>
-                <div className="grid md:grid-cols-3 gap-3">
-                  <Field label="Invoice Title" value={settings.invoice_invoice_label || ''} onChange={(v) => update('invoice_invoice_label', v)} placeholder="TAX INVOICE" />
-                  <Field label="Order Label" value={settings.invoice_order_label || ''} onChange={(v) => update('invoice_order_label', v)} placeholder="Order" />
-                  <Field label="Invoice Label" value={settings.invoice_order_date_label || ''} onChange={(v) => update('invoice_order_date_label', v)} placeholder="Order Date" />
-                  <Field label="Invoice Date Label" value={settings.invoice_invoice_date_label || ''} onChange={(v) => update('invoice_invoice_date_label', v)} placeholder="Invoice Date" />
-                  <Field label="Bill To Label" value={settings.invoice_bill_to_label || ''} onChange={(v) => update('invoice_bill_to_label', v)} placeholder="Bill To" />
-                  <Field label="Payment Label" value={settings.invoice_payment_label || ''} onChange={(v) => update('invoice_payment_label', v)} placeholder="Payment Details" />
-                  <Field label="Method Label" value={settings.invoice_payment_method_label || ''} onChange={(v) => update('invoice_payment_method_label', v)} placeholder="Method" />
-                  <Field label="Paid Label" value={settings.invoice_paid_label || ''} onChange={(v) => update('invoice_paid_label', v)} placeholder="PAID" />
-                  <Field label="Pending Label" value={settings.invoice_pending_label || ''} onChange={(v) => update('invoice_pending_label', v)} placeholder="PENDING" />
-                  <Field label="Failed Label" value={settings.invoice_failed_label || ''} onChange={(v) => update('invoice_failed_label', v)} placeholder="FAILED" />
-                  <Field label="COD Label" value={settings.invoice_cod_label || ''} onChange={(v) => update('invoice_cod_label', v)} placeholder="Cash on Delivery" />
-                  <Field label="Online Label" value={settings.invoice_online_label || ''} onChange={(v) => update('invoice_online_label', v)} placeholder="Online Payment" />
-                  <Field label="Product Header" value={settings.invoice_product_label || ''} onChange={(v) => update('invoice_product_label', v)} placeholder="Product" />
-                  <Field label="Variant Header" value={settings.invoice_variant_label || ''} onChange={(v) => update('invoice_variant_label', v)} placeholder="Variant" />
-                  <Field label="Qty Header" value={settings.invoice_qty_label || ''} onChange={(v) => update('invoice_qty_label', v)} placeholder="Qty" />
-                  <Field label="Rate Header" value={settings.invoice_rate_label || ''} onChange={(v) => update('invoice_rate_label', v)} placeholder="Rate" />
-                  <Field label="Amount Header" value={settings.invoice_amount_label || ''} onChange={(v) => update('invoice_amount_label', v)} placeholder="Amount" />
-                  <Field label="Subtotal Label" value={settings.invoice_subtotal_label || ''} onChange={(v) => update('invoice_subtotal_label', v)} placeholder="Subtotal" />
-                  <Field label="Discount Label" value={settings.invoice_discount_label || ''} onChange={(v) => update('invoice_discount_label', v)} placeholder="Discount" />
-                  <Field label="Coupon Label" value={settings.invoice_coupon_label || ''} onChange={(v) => update('invoice_coupon_label', v)} placeholder="Coupon Applied" />
-                  <Field label="Shipping Label" value={settings.invoice_shipping_label || ''} onChange={(v) => update('invoice_shipping_label', v)} placeholder="Shipping" />
-                  <Field label="Free Label" value={settings.invoice_free_label || ''} onChange={(v) => update('invoice_free_label', v)} placeholder="FREE" />
-                  <Field label="GST Label" value={settings.invoice_gst_label || ''} onChange={(v) => update('invoice_gst_label', v)} placeholder="GST" />
-                  <Field label="Total Label" value={settings.invoice_total_label || ''} onChange={(v) => update('invoice_total_label', v)} placeholder="TOTAL" />
-                </div>
-              </div>
-
               {/* Live Preview */}
               <div className="border-t pt-6">
                 <h3 className="text-sm font-medium mb-3">Live Preview</h3>
@@ -491,7 +459,7 @@ export default function AdminSettingsPage() {
                           </div>
                         </td>
                         <td style={{ verticalAlign: 'top', textAlign: 'right', paddingBottom: '16px', borderBottom: '2px solid #000' }}>
-                          <div style={{ fontSize: '18px', fontWeight: 800, letterSpacing: '2px', color: '#000', marginBottom: '5px' }}>{settings.invoice_invoice_label || 'TAX INVOICE'}</div>
+                          <div style={{ fontSize: '18px', fontWeight: 800, letterSpacing: '2px', color: '#000', marginBottom: '5px' }}>TAX INVOICE</div>
                           <table style={{ marginLeft: 'auto', borderCollapse: 'collapse' }}>
                             <tbody>
                               <tr>
@@ -518,14 +486,14 @@ export default function AdminSettingsPage() {
                     <tbody>
                       <tr>
                         <td style={{ verticalAlign: 'top', width: '60%', paddingRight: '16px' }}>
-                          <div style={{ fontSize: '8px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#888', marginBottom: '4px' }}>{settings.invoice_bill_to_label || 'Bill To'}</div>
+                          <div style={{ fontSize: '8px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#888', marginBottom: '4px' }}>Bill To</div>
                           <div style={{ fontSize: '13px', fontWeight: 700, marginBottom: '2px' }}>Customer Name</div>
                           <div style={{ fontSize: '11px', color: '#333', lineHeight: 1.6 }}>123 Street, City, State 123456<br/>customer@email.com</div>
                         </td>
                         <td style={{ verticalAlign: 'top', width: '40%' }}>
-                          <div style={{ fontSize: '8px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#888', marginBottom: '4px' }}>{settings.invoice_payment_label || 'Payment Details'}</div>
-                          <div style={{ fontSize: '11px', color: '#666', marginBottom: '3px' }}><strong>{settings.invoice_payment_method_label || 'Method'}:</strong> Online</div>
-                          <span style={{ fontSize: '10px', fontWeight: 700, border: '1px solid #000', padding: '2px 6px', letterSpacing: '0.5px' }}>{settings.invoice_paid_label || 'PAID'}</span>
+                          <div style={{ fontSize: '8px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1.5px', color: '#888', marginBottom: '4px' }}>Payment Details</div>
+                          <div style={{ fontSize: '11px', color: '#666', marginBottom: '3px' }}><strong>Method:</strong> Online</div>
+                          <span style={{ fontSize: '10px', fontWeight: 700, border: '1px solid #000', padding: '2px 6px', letterSpacing: '0.5px' }}>PAID</span>
                         </td>
                       </tr>
                     </tbody>
@@ -535,11 +503,11 @@ export default function AdminSettingsPage() {
                   <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '20px' }}>
                     <thead>
                       <tr style={{ background: '#000', color: '#fff' }}>
-                        <th style={{ padding: '8px 6px', textAlign: 'left', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{settings.invoice_product_label || 'Product'}</th>
-                        <th style={{ padding: '8px 6px', textAlign: 'center', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{settings.invoice_variant_label || 'Variant'}</th>
-                        <th style={{ padding: '8px 6px', textAlign: 'center', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{settings.invoice_qty_label || 'Qty'}</th>
-                        <th style={{ padding: '8px 6px', textAlign: 'right', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{settings.invoice_rate_label || 'Rate'}</th>
-                        <th style={{ padding: '8px 6px', textAlign: 'right', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>{settings.invoice_amount_label || 'Amount'}</th>
+                        <th style={{ padding: '8px 6px', textAlign: 'left', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Product</th>
+                        <th style={{ padding: '8px 6px', textAlign: 'center', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Variant</th>
+                        <th style={{ padding: '8px 6px', textAlign: 'center', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Qty</th>
+                        <th style={{ padding: '8px 6px', textAlign: 'right', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Rate</th>
+                        <th style={{ padding: '8px 6px', textAlign: 'right', fontSize: '9px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Amount</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -561,14 +529,14 @@ export default function AdminSettingsPage() {
                         <td style={{ width: '45%' }}>
                           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                             <tbody>
-                              <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>{settings.invoice_subtotal_label || 'Subtotal'}</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>₹1,998</td></tr>
-                              <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>{settings.invoice_discount_label || 'Coupon'} (MARVVN10)</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>-₹200</td></tr>
-                              <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>{settings.invoice_shipping_label || 'Shipping'}</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>{settings.invoice_free_label || 'FREE'}</td></tr>
+                              <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>Subtotal</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>₹1,998</td></tr>
+                              <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>Discount (MARVVN10)</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>-₹200</td></tr>
+                              <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>Shipping</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>FREE</td></tr>
                               {settings.invoice_show_gst !== 'false' && settings.invoice_gst_number && (
-                                <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>{settings.invoice_gst_label || 'GST'} ({settings.invoice_gst_percentage || '12'}%)</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>₹240</td></tr>
+                                <tr><td style={{ padding: '4px 0', fontSize: '11px', color: '#444' }}>GST ({settings.invoice_gst_percentage || '12'}%)</td><td style={{ padding: '4px 0', textAlign: 'right', fontSize: '11px', color: '#444' }}>₹240</td></tr>
                               )}
                               <tr style={{ borderTop: '2px solid #000' }}>
-                                <td style={{ padding: '8px 0', fontSize: '13px', fontWeight: 800 }}>{settings.invoice_total_label || 'TOTAL'}</td>
+                                <td style={{ padding: '8px 0', fontSize: '13px', fontWeight: 800 }}>TOTAL</td>
                                 <td style={{ padding: '8px 0', textAlign: 'right', fontSize: '13px', fontWeight: 800 }}>₹2,238</td>
                               </tr>
                             </tbody>
@@ -580,8 +548,8 @@ export default function AdminSettingsPage() {
 
                   {/* Coupon */}
                   <div style={{ border: '1px solid #000', padding: '8px 12px', marginBottom: '16px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#000' }}>{settings.invoice_coupon_label || 'Coupon Applied'}: MARVVN10</div>
-                    <div style={{ fontSize: '10px', color: '#555', marginTop: '1px' }}>{settings.invoice_discount_label || 'You saved'} ₹200</div>
+                    <div style={{ fontSize: '11px', fontWeight: 700, color: '#000' }}>Coupon Applied: MARVVN10</div>
+                    <div style={{ fontSize: '10px', color: '#555', marginTop: '1px' }}>You saved ₹200</div>
                   </div>
 
                   {/* Return Policy + QR */}
@@ -604,9 +572,6 @@ export default function AdminSettingsPage() {
 
                   {/* Footer */}
                   <div style={{ borderTop: '2px solid #000', paddingTop: '12px', textAlign: 'center' }}>
-                    {settings.invoice_terms && (
-                      <div style={{ fontSize: '9px', color: '#888', marginBottom: '4px' }}>{settings.invoice_terms}</div>
-                    )}
                     <div style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '1.5px', color: '#000', textTransform: 'uppercase', marginBottom: '3px' }}>
                       {settings.invoice_footer_text || 'NOT MADE TO FIT IN. | BUILT FOR THE REAL ONES.'}
                     </div>
