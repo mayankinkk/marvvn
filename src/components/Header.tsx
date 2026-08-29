@@ -129,30 +129,6 @@ export default function Header() {
           isScrolled ? 'shadow-md' : ''
         )}
       >
-        {/* Top Nav */}
-        <div className="hidden lg:block border-b border-marvvn-gray-100">
-          <div className="container flex items-center justify-between py-2 text-xs text-marvvn-gray-500">
-            <div className="flex items-center gap-4">
-              <Link href="/pages/store-locator" className="flex items-center gap-1 hover:text-marvvn-black transition-colors">
-                <MapPin className="w-3 h-3" />
-                Store Locator
-              </Link>
-            </div>
-            <div className="flex items-center gap-4">
-              <LanguageSwitcher />
-              {topLinks.map((link) => (
-                <Link
-                  key={link.label}
-                  href={link.href}
-                  className="hover:text-marvvn-black transition-colors"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-
         {/* Logo and Main Nav */}
         <div className="container">
           <div className="flex items-center justify-between h-16 lg:h-20">
