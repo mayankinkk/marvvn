@@ -7,6 +7,7 @@ import AuthCodeHandler from '@/components/AuthCodeHandler'
 import { I18nProvider } from '@/lib/i18n'
 import { AnalyticsScripts, Analytics, Pixel } from '@/components/Analytics'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import ChatBot from '@/components/ChatBot'
 import './globals.css'
 
 const inter = Inter({
@@ -92,6 +93,7 @@ export default function RootLayout({
               <I18nProvider>
                 {children}
               </I18nProvider>
+              <ChatBot />
           </SupabaseProvider>
         </SettingsProvider>
       </body>
