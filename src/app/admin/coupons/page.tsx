@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Trash2, ToggleLeft, ToggleRight, X } from 'lucide-react'
+import { Plus, Trash2, ToggleLeft, ToggleRight, X, TrendingUp, Ticket, BarChart3 } from 'lucide-react'
 import { formatPrice } from '@/lib/utils'
 
 interface Coupon {
@@ -16,8 +16,16 @@ interface Coupon {
   expires_at: string | null
 }
 
+interface CouponStats {
+  code: string
+  usage_count: number
+  total_discount: number
+  total_revenue: number
+}
+
 export default function AdminCouponsPage() {
   const [coupons, setCoupons] = useState<Coupon[]>([])
+  const [couponStats, setCouponStats] = useState<Record<string, CouponStats>>({})
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -36,6 +44,17 @@ export default function AdminCouponsPage() {
       .then((res) => res.json())
       .then((data) => { setCoupons(data.coupons || []); setLoading(false) })
       .catch(() => setLoading(false))
+
+    fetch('/api/admin/stats')
+      .then((res) => res.json())
+      .then((data) => {
+        const stats: Record<string, CouponStats> = {}
+        ;(data.promoUsage || []).forEach((p: any) => {
+          stats[p.code] = { code: p.code, usage_count: p.count, total_discount: p.totalDiscount, total_revenue: 0 }
+        })
+        setCouponStats(stats)
+      })
+      .catch(() => {})
   }, [])
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -79,6 +98,9 @@ export default function AdminCouponsPage() {
     setCoupons(coupons.filter((c) => c.id !== id))
   }
 
+  const totalUsage = Object.values(couponStats).reduce((sum, s) => sum + s.usage_count, 0)
+  const totalDiscount = Object.values(couponStats).reduce((sum, s) => sum + s.total_discount, 0)
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -102,6 +124,37 @@ export default function AdminCouponsPage() {
           <Plus className="w-4 h-4" />
           Create Coupon
         </button>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="bg-white border rounded-xl p-4 flex items-center gap-3">
+          <div className="w-10 h-10 bg-marvvn-gray-100 rounded-lg flex items-center justify-center">
+            <Ticket className="w-5 h-5 text-marvvn-gray-600" />
+          </div>
+          <div>
+            <p className="text-xs text-marvvn-gray-500">Active Coupons</p>
+            <p className="text-xl font-bold">{coupons.filter(c => c.active).length}</p>
+          </div>
+        </div>
+        <div className="bg-white border rounded-xl p-4 flex items-center gap-3">
+          <div className="w-10 h-10 bg-marvvn-gray-100 rounded-lg flex items-center justify-center">
+            <BarChart3 className="w-5 h-5 text-marvvn-gray-600" />
+          </div>
+          <div>
+            <p className="text-xs text-marvvn-gray-500">Total Usage</p>
+            <p className="text-xl font-bold">{totalUsage}</p>
+          </div>
+        </div>
+        <div className="bg-white border rounded-xl p-4 flex items-center gap-3">
+          <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+            <TrendingUp className="w-5 h-5 text-green-600" />
+          </div>
+          <div>
+            <p className="text-xs text-marvvn-gray-500">Total Discount Given</p>
+            <p className="text-xl font-bold text-green-600">₹{totalDiscount.toLocaleString('en-IN')}</p>
+          </div>
+        </div>
       </div>
 
       {showForm && (
@@ -195,6 +248,7 @@ export default function AdminCouponsPage() {
                 <th className="px-6 py-3 font-medium">Discount</th>
                 <th className="px-6 py-3 font-medium">Min Cart</th>
                 <th className="px-6 py-3 font-medium">Uses</th>
+                <th className="px-6 py-3 font-medium">Discount Given</th>
                 <th className="px-6 py-3 font-medium">Expires</th>
                 <th className="px-6 py-3 font-medium">Status</th>
                 <th className="px-6 py-3 font-medium text-right">Actions</th>
@@ -202,38 +256,44 @@ export default function AdminCouponsPage() {
             </thead>
             <tbody>
               {coupons.length === 0 ? (
-                <tr><td colSpan={7} className="px-6 py-12 text-center text-marvvn-gray-400">No coupons yet. Create one above.</td></tr>
+                <tr><td colSpan={8} className="px-6 py-12 text-center text-marvvn-gray-400">No coupons yet. Create one above.</td></tr>
               ) : (
-                coupons.map((coupon) => (
-                  <tr key={coupon.id} className="border-b last:border-0 hover:bg-marvvn-gray-50">
-                    <td className="px-6 py-3 font-mono font-bold">{coupon.code}</td>
-                    <td className="px-6 py-3">
-                      {coupon.discount_type === 'percentage' ? `${coupon.discount_value}%` : formatPrice(coupon.discount_value)}
-                    </td>
-                    <td className="px-6 py-3">{coupon.min_cart > 0 ? formatPrice(coupon.min_cart) : 'None'}</td>
-                    <td className="px-6 py-3">
-                      {coupon.used_count}{coupon.max_uses ? ` / ${coupon.max_uses}` : ''}
-                    </td>
-                    <td className="px-6 py-3 text-marvvn-gray-500">
-                      {coupon.expires_at ? new Date(coupon.expires_at).toLocaleDateString() : 'Never'}
-                    </td>
-                    <td className="px-6 py-3">
-                      <span className={`px-2 py-0.5 text-xs rounded-full ${coupon.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-500'}`}>
-                        {coupon.active ? 'Active' : 'Inactive'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-3 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button type="button" onClick={() => toggleActive(coupon)} className="cursor-pointer">
-                          {coupon.active ? <ToggleRight className="w-6 h-6 text-green-600" /> : <ToggleLeft className="w-6 h-6 text-marvvn-gray-400" />}
-                        </button>
-                        <button type="button" onClick={() => handleDelete(coupon.id)} className="p-1 hover:bg-red-50 rounded cursor-pointer">
-                          <Trash2 className="w-4 h-4 text-marvvn-gray-400 hover:text-marvvn-red" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                coupons.map((coupon) => {
+                  const stats = couponStats[coupon.code]
+                  return (
+                    <tr key={coupon.id} className="border-b last:border-0 hover:bg-marvvn-gray-50">
+                      <td className="px-6 py-3 font-mono font-bold">{coupon.code}</td>
+                      <td className="px-6 py-3">
+                        {coupon.discount_type === 'percentage' ? `${coupon.discount_value}%` : formatPrice(coupon.discount_value)}
+                      </td>
+                      <td className="px-6 py-3">{coupon.min_cart > 0 ? formatPrice(coupon.min_cart) : 'None'}</td>
+                      <td className="px-6 py-3">
+                        {coupon.used_count}{coupon.max_uses ? ` / ${coupon.max_uses}` : ''}
+                      </td>
+                      <td className="px-6 py-3 text-green-600 font-medium">
+                        {stats ? `₹${stats.total_discount.toLocaleString('en-IN')}` : '—'}
+                      </td>
+                      <td className="px-6 py-3 text-marvvn-gray-500">
+                        {coupon.expires_at ? new Date(coupon.expires_at).toLocaleDateString() : 'Never'}
+                      </td>
+                      <td className="px-6 py-3">
+                        <span className={`px-2 py-0.5 text-xs rounded-full ${coupon.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-500'}`}>
+                          {coupon.active ? 'Active' : 'Inactive'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-3 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button type="button" onClick={() => toggleActive(coupon)} className="cursor-pointer">
+                            {coupon.active ? <ToggleRight className="w-6 h-6 text-green-600" /> : <ToggleLeft className="w-6 h-6 text-marvvn-gray-400" />}
+                          </button>
+                          <button type="button" onClick={() => handleDelete(coupon.id)} className="p-1 hover:bg-red-50 rounded cursor-pointer">
+                            <Trash2 className="w-4 h-4 text-marvvn-gray-400 hover:text-marvvn-red" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })
               )}
             </tbody>
           </table>
