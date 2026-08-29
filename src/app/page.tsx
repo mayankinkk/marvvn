@@ -27,33 +27,6 @@ export default function Home() {
   const womenProducts = useMemo(() => products.filter(p => p.category === 'women').slice(0, 12), [products])
   const menProducts = useMemo(() => products.filter(p => p.category === 'men').slice(0, 12), [products])
 
-  const promo1 = {
-    desktopImage: settings.promo_1_image || '/images/banners/promo-1-desktop.svg',
-    mobileImage: settings.promo_1_mobile_image || settings.promo_1_image || '/images/banners/promo-1-mobile.svg',
-    tagline: settings.promo_1_subtitle || 'MADE TO MOVE WITH YOU',
-    title: settings.promo_1_title || 'FREESTYLE COLLECTION',
-    ctaText: 'Shop Now',
-    ctaLink: settings.promo_1_link || '/collections/new-arrivals',
-  }
-
-  const promo2 = {
-    desktopImage: settings.promo_2_image || '/images/banners/promo-2-desktop.svg',
-    mobileImage: settings.promo_2_mobile_image || settings.promo_2_image || '/images/banners/promo-2-mobile.svg',
-    tagline: settings.promo_2_subtitle || 'INSPIRED BY YOUR FRIENDLY NEIGHBORHOOD SPIDER-MAN',
-    title: settings.promo_2_title || 'SPIDER-MAN COLLECTION',
-    ctaText: 'Shop Women',
-    ctaLink: settings.promo_2_link || '/collections/spiderman-women',
-  }
-
-  const promo3 = {
-    desktopImage: settings.promo_3_image || '/images/banners/promo-3-desktop.svg',
-    mobileImage: settings.promo_3_mobile_image || settings.promo_3_image || '/images/banners/promo-3-mobile.svg',
-    tagline: settings.promo_3_subtitle || 'MATCHDAY UNIFORM',
-    title: settings.promo_3_title || 'RED BULL X MARVVN',
-    ctaText: 'Shop Now',
-    ctaLink: settings.promo_3_link || '/collections/red-bull-collection',
-  }
-
   const promo4 = {
     desktopImage: settings.promo_4_image || '/images/banners/promo-4-desktop.svg',
     mobileImage: settings.promo_4_mobile_image || settings.promo_4_image || '/images/banners/promo-4-mobile.svg',
@@ -80,24 +53,6 @@ export default function Home() {
         <HeroBanner />
 
         <ShopByGender />
-
-        <section className="py-4 lg:py-6">
-          <div className="container">
-            <PromoBanner {...promo1} />
-          </div>
-        </section>
-
-        <section className="py-4 lg:py-6">
-          <div className="container">
-            <PromoBanner {...promo2} />
-          </div>
-        </section>
-
-        <section className="py-4 lg:py-6">
-          <div className="container">
-            <PromoBanner {...promo3} />
-          </div>
-        </section>
 
         <section className="py-8 lg:py-16">
           <div className="container">
