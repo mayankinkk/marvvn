@@ -131,3 +131,96 @@ export function trackViewItem(productId: string, productName: string, price: num
     })
   }
 }
+
+export function trackViewItemList(items: { id: string; name: string; price: number; position: number }[], listName: string) {
+  if (typeof window === 'undefined') return
+  if (window.gtag) {
+    window.gtag('event', 'view_item_list', {
+      items: items.map(i => ({
+        item_id: i.id,
+        item_name: i.name,
+        price: i.price,
+        index: i.position,
+      })),
+    })
+  }
+  if (window.fbq) {
+    window.fbq('track', 'ViewContent', {
+      content_ids: items.map(i => i.id),
+      content_type: 'product',
+      content_name: listName,
+    })
+  }
+}
+
+export function trackSelectItem(productId: string, productName: string, price: number, listName: string, position: number) {
+  if (typeof window === 'undefined') return
+  if (window.gtag) {
+    window.gtag('event', 'select_item', {
+      items: [{ item_id: productId, item_name: productName, price, index: position }],
+    })
+  }
+  if (window.fbq) {
+    window.fbq('track', 'ViewContent', {
+      content_ids: [productId],
+      content_name: productName,
+      content_type: 'product',
+    })
+  }
+}
+
+export function trackBeginCheckout(total: number, items: { id: string; name: string; price: number; quantity: number }[]) {
+  if (typeof window === 'undefined') return
+  if (window.gtag) {
+    window.gtag('event', 'begin_checkout', {
+      currency: 'INR',
+      value: total,
+      items: items.map(i => ({ item_id: i.id, item_name: i.name, price: i.price, quantity: i.quantity })),
+    })
+  }
+  if (window.fbq) {
+    window.fbq('track', 'InitiateCheckout', {
+      content_ids: items.map(i => i.id),
+      value: total,
+      currency: 'INR',
+      num_items: items.reduce((sum, i) => sum + i.quantity, 0),
+    })
+  }
+}
+
+export function trackRemoveFromCart(productId: string, productName: string, price: number, quantity: number) {
+  if (typeof window === 'undefined') return
+  if (window.gtag) {
+    window.gtag('event', 'remove_from_cart', {
+      currency: 'INR',
+      value: price * quantity,
+      items: [{ item_id: productId, item_name: productName, price, quantity }],
+    })
+  }
+  if (window.fbq) {
+    window.fbq('track', 'RemoveFromCart', {
+      content_ids: [productId],
+      content_name: productName,
+      value: price * quantity,
+      currency: 'INR',
+    })
+  }
+}
+
+export function trackRefund(orderId: string, total: number) {
+  if (typeof window === 'undefined') return
+  if (window.gtag) {
+    window.gtag('event', 'refund', {
+      transaction_id: orderId,
+      value: total,
+      currency: 'INR',
+    })
+  }
+}
+
+export function trackShare(contentType: string, id: string, method: string) {
+  if (typeof window === 'undefined') return
+  if (window.gtag) {
+    window.gtag('event', 'share', { content_type: contentType, content_id: id, method })
+  }
+}

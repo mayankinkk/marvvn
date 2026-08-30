@@ -94,10 +94,22 @@ export async function DELETE(request: Request) {
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+    body = {}
   }
 
-  const { productId, size, color } = body
+  const { productId, size, color, clearAll } = body || {}
+
+  if (clearAll) {
+    const { error } = await supabase
+      .from('cart_items')
+      .delete()
+      .eq('user_id', user.id)
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+    return NextResponse.json({ success: true })
+  }
 
   if (!productId) {
     return NextResponse.json({ error: 'productId is required' }, { status: 400 })

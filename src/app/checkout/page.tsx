@@ -10,6 +10,7 @@ import { useCartStore } from '@/lib/store'
 import { useAuthStore } from '@/lib/auth-store'
 import { useSettings } from '@/components/SettingsProvider'
 import { formatPrice } from '@/lib/utils'
+import { trackBeginCheckout } from '@/components/Analytics'
 import { ChevronDown, ChevronUp, Check, Truck, ShieldCheck, RotateCcw, Tag, X, Loader2, CreditCard, Wallet, Banknote } from 'lucide-react'
 
 type Step = 'contact' | 'shipping' | 'payment'
@@ -60,23 +61,37 @@ export default function CheckoutPage() {
     }
   }, [payment.method])
 
-  // Track cart abandonment
+  // Track cart abandonment — fires on tab close OR after 15 minutes
   useEffect(() => {
     if (items.length === 0) return
     const email = contact.email || user?.email
     if (!email) return
-    const timer = setTimeout(() => {
+
+    const abandonmentData = {
+      email,
+      items: items.map(i => ({ title: i.product.title, quantity: i.quantity, price: i.product.price, handle: i.product.handle })),
+      total: totalPrice(),
+    }
+
+    const sendAbandonment = () => {
       fetch('/api/cart-abandonment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          items: items.map(i => ({ title: i.product.title, quantity: i.quantity, price: i.product.price, handle: i.product.handle })),
-          total: totalPrice(),
-        }),
+        body: JSON.stringify(abandonmentData),
       }).catch(() => {})
-    }, 60 * 60 * 1000)
-    return () => clearTimeout(timer)
+    }
+
+    // Fire on tab/window close
+    const handleBeforeUnload = () => sendAbandonment()
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    // Also fire after 15 minutes as a fallback
+    const timer = setTimeout(sendAbandonment, 15 * 60 * 1000)
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+      clearTimeout(timer)
+    }
   }, [items, totalPrice, contact.email, user?.email])
 
   const shippingCost = totalPrice() >= freeShippingThreshold ? 0 : shippingFee
@@ -118,6 +133,16 @@ export default function CheckoutPage() {
   const handlePlaceOrder = async () => {
     setIsPlacing(true)
     setOrderError('')
+
+    trackBeginCheckout(
+      finalPrice(),
+      items.map(item => ({
+        id: item.product.id,
+        name: item.product.title,
+        price: item.product.price,
+        quantity: item.quantity,
+      }))
+    )
 
     try {
       const orderRes = await fetch('/api/orders', {

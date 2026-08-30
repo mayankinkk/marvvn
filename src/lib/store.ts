@@ -26,13 +26,20 @@ interface CartStore {
 
 async function syncToServer(items: CartItem[]) {
   try {
-    if (items.length === 0) return
     const serializable = items.map((item) => ({
       productId: item.product.id,
       quantity: item.quantity,
       size: item.size,
       color: item.color,
     }))
+    if (serializable.length === 0) {
+      await fetch('/api/cart', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clearAll: true }),
+      })
+      return
+    }
     await Promise.all(
       serializable.map((item) =>
         fetch('/api/cart', {
@@ -102,6 +109,7 @@ export const useCartStore = create<CartStore>()(
 
       clearCart: () => {
         set({ items: [], promoCode: '', discount: 0 })
+        syncToServer([])
       },
 
       toggleCart: () => set((state) => ({ isOpen: !state.isOpen })),

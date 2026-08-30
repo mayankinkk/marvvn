@@ -8,6 +8,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useCartStore } from '@/lib/store'
 import { formatPrice } from '@/lib/utils'
+import { trackRemoveFromCart } from '@/components/Analytics'
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, totalItems, totalPrice, finalPrice, clearCart, promoCode, discount, applyPromoCode, removePromoCode } = useCartStore()
@@ -83,7 +84,10 @@ export default function CartPage() {
                         </p>
                         <button
                           type="button"
-                          onClick={() => removeItem(item.product.id, item.size, item.color)}
+                          onClick={() => {
+                            trackRemoveFromCart(item.product.id, item.product.title, item.product.price, item.quantity)
+                            removeItem(item.product.id, item.size, item.color)
+                          }}
                           className="text-xs text-marvvn-gray-400 hover:text-marvvn-red mt-2 flex items-center gap-1"
                         >
                           <X className="w-3 h-3" /> Remove

@@ -77,12 +77,28 @@ export default function RootLayout({
               name: 'MARVVN',
               url: 'https://marvvn.online',
               logo: 'https://marvvn.online/logo.png',
-              sameAs: [],
+              sameAs: ['https://instagram.com/marvvn'],
               contactPoint: {
                 '@type': 'ContactPoint',
-                telephone: '',
+                email: 'marvvnclothing@gmail.com',
                 contactType: 'customer service',
                 availableLanguage: ['English', 'Hindi'],
+              },
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebSite',
+              name: 'MARVVN',
+              url: 'https://marvvn.online',
+              potentialAction: {
+                '@type': 'SearchAction',
+                target: 'https://marvvn.online/search?q={search_term_string}',
+                'query-input': 'required name=search_term_string',
               },
             }),
           }}

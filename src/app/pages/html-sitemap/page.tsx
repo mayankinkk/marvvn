@@ -1,9 +1,12 @@
-'use client'
-
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { ChevronRight } from 'lucide-react'
+
+export const metadata = {
+  title: 'Sitemap | MARVVN',
+  description: 'Complete sitemap of MARVVN - find all our pages, products, and policies.',
+}
 
 const siteLinks = [
   { title: 'Shop', links: [
@@ -22,7 +25,7 @@ const siteLinks = [
     { label: 'Contact Us', href: '/pages/get-in-touch' },
     { label: 'Store Locator', href: '/pages/store-locator' },
     { label: 'FAQ', href: '/pages/faq' },
-    { label: 'Blogs', href: '/blogs/bonkers-corner' },
+    { label: 'Blogs', href: '/blogs' },
   ]},
   { title: 'Policies', links: [
     { label: 'Privacy Policy', href: '/policies/privacy-policy' },

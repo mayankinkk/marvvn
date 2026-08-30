@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Head from 'next/head'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
@@ -115,20 +114,6 @@ export default function BlogPostPage() {
 
   return (
     <div className="min-h-screen">
-      <Head>
-        <title>{post.title} | MARVVN Blog</title>
-        <meta name="description" content={post.excerpt} />
-        <meta property="og:title" content={post.title} />
-        <meta property="og:description" content={post.excerpt} />
-        <meta property="og:image" content={post.image} />
-        <meta property="og:url" content={`https://marvvn.online/blogs/${post.handle}`} />
-        <meta property="og:type" content="article" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={post.title} />
-        <meta name="twitter:description" content={post.excerpt} />
-        <meta name="twitter:image" content={post.image} />
-        <link rel="alternate" type="application/rss+xml" title="MARVVN Blog" href="/feed.xml" />
-      </Head>
       <Header />
       <main className="container py-8 lg:py-12">
         <nav className="flex items-center gap-2 text-xs text-marvvn-gray-500 mb-6">

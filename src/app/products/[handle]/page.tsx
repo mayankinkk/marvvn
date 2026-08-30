@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import ImageZoom from '@/components/ImageZoom'
+import { useCurrency } from '@/lib/hooks/useCurrency'
 import { useParams } from 'next/navigation'
 import { Heart, ShoppingBag, Minus, Plus, ChevronRight, Truck, RotateCcw, Shield, Bell, MapPin, Package, CreditCard, Zap, Star } from 'lucide-react'
 import Header from '@/components/Header'
@@ -19,6 +21,7 @@ import { useWishlistStore } from '@/lib/wishlist-store'
 import { useAuthStore } from '@/lib/auth-store'
 import { useSettings } from '@/components/SettingsProvider'
 import { FlashSaleTimer, CrossSellProducts, SizeRecommendations } from '@/components/ProductExtras'
+import { ProductJsonLd, BreadcrumbJsonLd } from '@/components/JsonLd'
 
 type Tab = 'size-fit' | 'fabric-care' | 'reviews' | 'shipping' | 'returns'
 
@@ -188,6 +191,26 @@ export default function ProductPage() {
 
   return (
     <div className="min-h-screen">
+      <ProductJsonLd
+        product={{
+          title: product.title,
+          handle: product.handle,
+          description: product.description,
+          price: product.price,
+          compareAtPrice: product.compareAtPrice,
+          images: product.images,
+          category: product.category,
+          sizes: product.sizes,
+          stock: product.stock,
+        }}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', url: '/' },
+          { name: product.category, url: `/collections/${product.category}` },
+          { name: product.title, url: `/products/${product.handle}` },
+        ]}
+      />
       <Header />
 
       <main className="container py-4 lg:py-8">
@@ -205,12 +228,10 @@ export default function ProductPage() {
           {/* Left — Images */}
           <div className="space-y-4">
             <div className="aspect-[3/4] bg-marvvn-gray-50 overflow-hidden relative">
-              <Image
+              <ImageZoom
                 src={product.images?.[activeImage] || '/placeholder.png'}
                 alt={product.title}
-                fill
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-cover"
+                className="w-full h-full"
               />
             </div>
             {product.images?.length > 1 && (
@@ -642,8 +663,4 @@ export default function ProductPage() {
       <Footer />
     </div>
   )
-}
-
-function useCurrency() {
-  return { format: (n: number) => `₹${n.toLocaleString()}`, symbol: '₹' }
 }

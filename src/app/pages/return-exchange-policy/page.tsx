@@ -1,14 +1,15 @@
-'use client'
-
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { ChevronRight } from 'lucide-react'
-import { useSettings } from '@/components/SettingsProvider'
+
+export const metadata = {
+  title: 'Return & Exchange Policy | MARVVN',
+  description: 'Read MARVVN return and refund policy - 3-day returns, no exchanges.',
+}
 
 export default function ReturnExchangePolicyPage() {
-  const settings = useSettings()
-  const storeEmail = settings.store_email || 'marvvnclothing@gmail.com'
+  const storeEmail = 'marvvnclothing@gmail.com'
 
   return (
     <div className="min-h-screen">

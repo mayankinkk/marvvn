@@ -3,6 +3,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { createClient } from '@/lib/supabase/client'
+import { useCartStore } from './store'
 
 interface User {
   id: string
@@ -52,6 +53,7 @@ export const useAuthStore = create<AuthStore>()(
             phone: data.user.user_metadata?.phone || '',
           }
           set({ user, isAuthenticated: true, loading: false })
+          useCartStore.getState().loadFromServer()
           return true
         } catch {
           set({ loading: false })
@@ -118,6 +120,7 @@ export const useAuthStore = create<AuthStore>()(
             const data = await res.json()
             if (data.user) {
               set({ user: data.user, isAuthenticated: true, loading: false })
+              useCartStore.getState().loadFromServer()
               return
             }
           }
@@ -129,17 +132,18 @@ export const useAuthStore = create<AuthStore>()(
           const { data: sessionData } = await supabase.auth.getSession()
           const su = sessionData?.session?.user
           if (su) {
-            set({
-              user: {
-                id: su.id,
-                email: su.email || '',
-                name: su.user_metadata?.full_name || su.user_metadata?.name || su.user_metadata?.fullname || su.email?.split('@')[0] || '',
-                phone: su.user_metadata?.phone || '',
-              },
-              isAuthenticated: true,
-              loading: false,
-            })
-            return
+              set({
+                user: {
+                  id: su.id,
+                  email: su.email || '',
+                  name: su.user_metadata?.full_name || su.user_metadata?.name || su.user_metadata?.fullname || su.email?.split('@')[0] || '',
+                  phone: su.user_metadata?.phone || '',
+                },
+                isAuthenticated: true,
+                loading: false,
+              })
+              useCartStore.getState().loadFromServer()
+              return
           }
         } catch {}
         set({ user: null, isAuthenticated: false, loading: false })

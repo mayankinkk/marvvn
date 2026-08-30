@@ -1,15 +1,17 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import { ChevronRight, SlidersHorizontal } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ProductGrid from '@/components/ProductGrid'
+import { CollectionJsonLd, BreadcrumbJsonLd } from '@/components/JsonLd'
 import { collections } from '@/lib/data'
 import { useProducts } from '@/lib/hooks/useProducts'
 import { cn } from '@/lib/utils'
+import { trackViewItemList } from '@/components/Analytics'
 
 const COLLECTION_FILTERS: Record<string, (p: any) => boolean> = {
   'new-arrivals': (p) => p.collection?.includes('new-arrivals'),
@@ -77,6 +79,13 @@ export default function CollectionPage() {
       case 'oldest':
         result = [...result].reverse()
         break
+      case 'bestselling':
+        result = [...result].sort((a, b) => {
+          const aScore = (a.isBestseller ? 1 : 0) + (a.badge === 'bestseller' ? 1 : 0)
+          const bScore = (b.isBestseller ? 1 : 0) + (b.badge === 'bestseller' ? 1 : 0)
+          return bScore - aScore
+        })
+        break
       default:
         break
     }
@@ -89,6 +98,20 @@ export default function CollectionPage() {
     (currentPage - 1) * productsPerPage,
     currentPage * productsPerPage
   )
+
+  useEffect(() => {
+    if (filteredProducts.length > 0) {
+      trackViewItemList(
+        filteredProducts.slice(0, 10).map((p: any, i: number) => ({
+          id: p.id,
+          name: p.title,
+          price: p.price,
+          position: i + 1,
+        })),
+        collection?.title || handle
+      )
+    }
+  }, [handle])
 
   const allSizes = [...new Set(products.flatMap((p) => p.sizes || []))]
   const allColors = [...new Set(products.flatMap((p) => p.colors || []))]
@@ -109,6 +132,25 @@ export default function CollectionPage() {
 
   return (
     <div className="min-h-screen">
+      <CollectionJsonLd
+        collection={{
+          title: collection?.title || handle.replace(/-/g, ' '),
+          handle,
+          description: collection?.description,
+        }}
+        products={filteredProducts.slice(0, 50).map((p: any) => ({
+          title: p.title,
+          handle: p.handle,
+          price: p.price,
+          images: p.images || [],
+        }))}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', url: '/' },
+          { name: collection?.title || handle.replace(/-/g, ' '), url: `/collections/${handle}` },
+        ]}
+      />
       <Header />
 
       <main className="container py-4 lg:py-8">
@@ -145,6 +187,7 @@ export default function CollectionPage() {
               className="px-4 py-2 border border-marvvn-gray-300 text-sm focus:outline-none focus:border-marvvn-black"
             >
               <option value="newest">Sort by: Newest</option>
+              <option value="bestselling">Sort by: Bestselling</option>
               <option value="price-low">Sort by: Price Low to High</option>
               <option value="price-high">Sort by: Price High to Low</option>
               <option value="oldest">Sort by: Oldest</option>
@@ -201,23 +244,49 @@ export default function CollectionPage() {
 
             <div>
               <h3 className="text-sm font-medium uppercase tracking-wider mb-3">Price</h3>
-              <div className="space-y-2">
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex-1">
+                    <label className="text-[10px] text-marvvn-gray-400 uppercase">Min</label>
+                    <input
+                      type="number"
+                      min="0"
+                      max={priceRange[1]}
+                      value={priceRange[0]}
+                      onChange={(e) => { setPriceRange([Number(e.target.value), priceRange[1]]); setCurrentPage(1) }}
+                      className="w-full px-2 py-1.5 text-xs border border-marvvn-gray-300 focus:outline-none focus:border-marvvn-black"
+                      placeholder="0"
+                    />
+                  </div>
+                  <span className="text-marvvn-gray-400 mt-4">—</span>
+                  <div className="flex-1">
+                    <label className="text-[10px] text-marvvn-gray-400 uppercase">Max</label>
+                    <input
+                      type="number"
+                      min={priceRange[0]}
+                      value={priceRange[1]}
+                      onChange={(e) => { setPriceRange([priceRange[0], Number(e.target.value)]); setCurrentPage(1) }}
+                      className="w-full px-2 py-1.5 text-xs border border-marvvn-gray-300 focus:outline-none focus:border-marvvn-black"
+                      placeholder="5000"
+                    />
+                  </div>
+                </div>
                 <input
                   type="range"
                   min="0"
-                  max="5000"
+                  max="10000"
                   value={priceRange[1]}
-                  onChange={(e) => { setPriceRange([0, Number(e.target.value)]); setCurrentPage(1) }}
+                  onChange={(e) => { setPriceRange([priceRange[0], Number(e.target.value)]); setCurrentPage(1) }}
                   className="w-full"
                 />
                 <div className="flex items-center justify-between text-xs text-marvvn-gray-500">
-                  <span>₹0</span>
+                  <span>₹{priceRange[0].toLocaleString()}</span>
                   <span>₹{priceRange[1].toLocaleString()}</span>
                 </div>
               </div>
             </div>
 
-            {(selectedSizes.length > 0 || selectedColors.length > 0 || priceRange[1] < 5000) && (
+            {(selectedSizes.length > 0 || selectedColors.length > 0 || priceRange[0] > 0 || priceRange[1] < 10000) && (
               <button
                 type="button"
                 onClick={() => {
@@ -282,7 +351,7 @@ export default function CollectionPage() {
                   onClick={() => {
                     setSelectedSizes([])
                     setSelectedColors([])
-                    setPriceRange([0, 5000])
+                  setPriceRange([0, 10000])
                     setCurrentPage(1)
                   }}
                   className="btn-primary cursor-pointer"

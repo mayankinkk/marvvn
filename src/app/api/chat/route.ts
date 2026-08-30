@@ -1,11 +1,18 @@
 import { NextResponse } from 'next/server'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import { createClient } from '@/lib/supabase/server'
+import { rateLimit } from '@/lib/rate-limit'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request) {
   try {
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
+    const rl = rateLimit(`chat:${ip}`, 20, 60000)
+    if (!rl.success) {
+      return NextResponse.json({ error: 'Too many messages. Please slow down.' }, { status: 429 })
+    }
+
     const { message, history = [] } = await request.json()
 
     if (!message) {

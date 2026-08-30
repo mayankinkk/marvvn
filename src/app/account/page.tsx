@@ -82,6 +82,15 @@ export default function AccountPage() {
         .then(r => r.json())
         .then(setStats)
         .catch(() => {})
+      // Load notification preferences from profile
+      fetch('/api/account/profile', { method: 'GET' })
+        .then(r => r.json())
+        .then(data => {
+          if (data.profile?.notification_preferences) {
+            setNotifications(data.profile.notification_preferences)
+          }
+        })
+        .catch(() => {})
     }
   }, [isAuthenticated])
 
@@ -138,6 +147,21 @@ export default function AccountPage() {
       setSaveMsg('Something went wrong')
     }
     setSaving(false)
+  }
+
+  const handleDeleteAccount = async () => {
+    if (!confirm('Are you sure you want to delete your account? This action cannot be undone.')) return
+    try {
+      const res = await fetch('/api/account/delete', { method: 'POST' })
+      if (res.ok) {
+        logout()
+        router.push('/')
+      } else {
+        alert('Failed to delete account. Please try again.')
+      }
+    } catch {
+      alert('Something went wrong. Please try again.')
+    }
   }
 
   if (!isAuthenticated) return null
@@ -510,8 +534,16 @@ export default function AccountPage() {
                         </div>
                       </div>
                       <div
-                        className={`w-11 h-6 rounded-full transition-colors relative ${notifications.email ? 'bg-marvvn-black' : 'bg-marvvn-gray-300'}`}
-                        onClick={() => setNotifications(n => ({ ...n, email: !n.email }))}
+                        className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${notifications.email ? 'bg-marvvn-black' : 'bg-marvvn-gray-300'}`}
+                        onClick={() => {
+                          const newVal = !notifications.email
+                          setNotifications(n => ({ ...n, email: newVal }))
+                          fetch('/api/account/profile', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ notification_preferences: { ...notifications, email: newVal } }),
+                          }).catch(() => {})
+                        }}
                       >
                         <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${notifications.email ? 'translate-x-5.5' : 'translate-x-0.5'}`} />
                       </div>
@@ -525,8 +557,16 @@ export default function AccountPage() {
                         </div>
                       </div>
                       <div
-                        className={`w-11 h-6 rounded-full transition-colors relative ${notifications.whatsapp ? 'bg-marvvn-black' : 'bg-marvvn-gray-300'}`}
-                        onClick={() => setNotifications(n => ({ ...n, whatsapp: !n.whatsapp }))}
+                        className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${notifications.whatsapp ? 'bg-marvvn-black' : 'bg-marvvn-gray-300'}`}
+                        onClick={() => {
+                          const newVal = !notifications.whatsapp
+                          setNotifications(n => ({ ...n, whatsapp: newVal }))
+                          fetch('/api/account/profile', {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ notification_preferences: { ...notifications, whatsapp: newVal } }),
+                          }).catch(() => {})
+                        }}
                       >
                         <div className={`w-5 h-5 bg-white rounded-full absolute top-0.5 transition-transform ${notifications.whatsapp ? 'translate-x-5.5' : 'translate-x-0.5'}`} />
                       </div>
@@ -538,7 +578,7 @@ export default function AccountPage() {
                 <div className="border border-red-200 p-6">
                   <h3 className="font-medium text-red-600 mb-2">Danger Zone</h3>
                   <p className="text-sm text-marvvn-gray-500 mb-4">Permanently delete your account and all associated data.</p>
-                  <button type="button" className="px-4 py-2 border border-red-300 text-red-600 text-sm hover:bg-red-50 transition-colors">
+                  <button type="button" onClick={handleDeleteAccount} className="px-4 py-2 border border-red-300 text-red-600 text-sm hover:bg-red-50 transition-colors cursor-pointer">
                     Delete Account
                   </button>
                 </div>

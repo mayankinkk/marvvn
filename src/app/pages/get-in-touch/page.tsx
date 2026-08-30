@@ -5,10 +5,8 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { ChevronRight, Mail, Phone, MapPin, Send } from 'lucide-react'
-import { useSettings } from '@/components/SettingsProvider'
 
 export default function ContactPage() {
-  const settings = useSettings()
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
   const [submitted, setSubmitted] = useState(false)
   const [sending, setSending] = useState(false)
@@ -36,9 +34,9 @@ export default function ContactPage() {
     setSending(false)
   }
 
-  const storeEmail = settings.store_email || 'marvvnclothing@gmail.com'
-  const storePhone = settings.store_phone || ''
-  const storeAddress = settings.store_address || 'India'
+  const storeEmail = 'marvvnclothing@gmail.com'
+  const storePhone = '7578017237'
+  const storeAddress = 'India'
 
   return (
     <div className="min-h-screen">
@@ -107,21 +105,9 @@ export default function ContactPage() {
             <div className="border-t pt-6">
               <h3 className="font-medium text-sm mb-3">Follow Us</h3>
               <div className="flex gap-3">
-                {settings.instagram_url && (
-                  <a href={settings.instagram_url} target="_blank" rel="noopener noreferrer" className="px-4 py-2 border border-marvvn-gray-300 text-sm hover:border-marvvn-black transition-colors">
-                    Instagram
-                  </a>
-                )}
-                {settings.facebook_url && (
-                  <a href={settings.facebook_url} target="_blank" rel="noopener noreferrer" className="px-4 py-2 border border-marvvn-gray-300 text-sm hover:border-marvvn-black transition-colors">
-                    Facebook
-                  </a>
-                )}
-                {settings.twitter_url && (
-                  <a href={settings.twitter_url} target="_blank" rel="noopener noreferrer" className="px-4 py-2 border border-marvvn-gray-300 text-sm hover:border-marvvn-black transition-colors">
-                    X
-                  </a>
-                )}
+                <a href="https://instagram.com/marvvn" target="_blank" rel="noopener noreferrer" className="px-4 py-2 border border-marvvn-gray-300 text-sm hover:border-marvvn-black transition-colors">
+                  Instagram
+                </a>
               </div>
             </div>
           </div>

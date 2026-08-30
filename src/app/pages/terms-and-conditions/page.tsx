@@ -1,16 +1,17 @@
-'use client'
-
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { ChevronRight } from 'lucide-react'
-import { useSettings } from '@/components/SettingsProvider'
+
+export const metadata = {
+  title: 'Terms & Conditions | MARVVN',
+  description: 'Read MARVVN terms and conditions for using our website and services.',
+}
 
 export default function TermsPage() {
-  const settings = useSettings()
-  const storeEmail = settings.store_email || 'marvvnclothing@gmail.com'
-  const storePhone = settings.store_phone || '7578017237'
-  const storeAddress = settings.store_address || 'Faridabad'
+  const storeEmail = 'marvvnclothing@gmail.com'
+  const storePhone = '7578017237'
+  const storeAddress = 'Faridabad'
 
   return (
     <div className="min-h-screen">

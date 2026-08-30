@@ -1,6 +1,23 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
+export async function GET() {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('notification_preferences')
+    .eq('id', user.id)
+    .single()
+
+  return NextResponse.json({ profile })
+}
+
 export async function PUT(request: Request) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -10,12 +27,13 @@ export async function PUT(request: Request) {
   }
 
   const body = await request.json()
-  const { name, phone, currentPassword, newPassword } = body
+  const { name, phone, currentPassword, newPassword, notification_preferences } = body
 
-  if (name || phone) {
+  if (name || phone || notification_preferences) {
     const updates: any = {}
     if (name) updates.name = name
     if (phone) updates.phone = phone
+    if (notification_preferences) updates.notification_preferences = notification_preferences
 
     const { error } = await supabase.from('profiles').upsert({
       id: user.id,

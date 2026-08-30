@@ -1,14 +1,17 @@
-'use client'
-
 import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { ChevronRight } from 'lucide-react'
-import { useSettings } from '@/components/SettingsProvider'
+
+export const metadata = {
+  title: 'Privacy Policy | MARVVN',
+  description: 'Read MARVVN privacy policy - how we collect, use, and protect your data.',
+}
 
 export default function PrivacyPolicyPage() {
-  const settings = useSettings()
-  const storeEmail = settings.store_email || 'marvvnclothing@gmail.com'
+  const storeEmail = 'marvvnclothing@gmail.com'
+  const storeName = 'MARVVN'
+  const storeAddress = 'India'
   return (
     <div className="min-h-screen">
       <Header />
@@ -104,7 +107,7 @@ export default function PrivacyPolicyPage() {
               <h2 className="text-lg font-medium text-marvvn-black mb-3">9. Contact Us</h2>
               <p>
                 For privacy-related inquiries, contact us at {storeEmail} or 
-                write to us at {settings.store_name || 'MARVVN'}, {settings.store_address || 'India'}.
+                write to us at {storeName}, {storeAddress}.
               </p>
             </section>
           </div>
