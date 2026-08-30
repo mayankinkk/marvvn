@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Facebook, Twitter, Instagram, Youtube, Send, MapPin, Phone, Mail } from 'lucide-react'
+import { Facebook, Twitter, Instagram, Youtube, Send, MapPin, Phone, Mail, MessageCircle } from 'lucide-react'
 import { useState, useMemo } from 'react'
 import { useSettings } from '@/components/SettingsProvider'
 
@@ -77,6 +77,8 @@ export default function Footer() {
     settings.twitter_url && { icon: Twitter, href: settings.twitter_url, label: 'X' },
     settings.instagram_url && { icon: Instagram, href: settings.instagram_url, label: 'Instagram' },
     settings.youtube_url && { icon: Youtube, href: settings.youtube_url, label: 'YouTube' },
+    settings.instagram_dm_url && { icon: MessageCircle, href: settings.instagram_dm_url, label: 'Instagram DM' },
+    settings.facebook_dm_url && { icon: MessageCircle, href: settings.facebook_dm_url, label: 'Facebook Messenger' },
   ].filter(Boolean) as { icon: any; href: string; label: string }[]
 
   return (

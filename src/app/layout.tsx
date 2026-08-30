@@ -8,6 +8,7 @@ import { I18nProvider } from '@/lib/i18n'
 import { AnalyticsScripts, Analytics, Pixel } from '@/components/Analytics'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import ChatBot from '@/components/ChatBot'
+import LiveChat from '@/components/LiveChat'
 import './globals.css'
 
 const inter = Inter({
@@ -94,6 +95,7 @@ export default function RootLayout({
                 {children}
               </I18nProvider>
               <ChatBot />
+              <LiveChat />
           </SupabaseProvider>
         </SettingsProvider>
       </body>
