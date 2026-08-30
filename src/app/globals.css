@@ -157,14 +157,14 @@
     overflow: hidden;
   }
 
-  /* Offset content below fixed header on all non-homepage pages */
+  /* Offset content below fixed header (header + announcement bar) on all non-homepage pages */
   .page-content {
-    padding-top: 5rem; /* 80px = header h-20 */
+    padding-top: 7rem; /* ~112px: announcement bar (~36px) + mobile header h-16 (64px) + buffer */
   }
 
   @media (min-width: 1024px) {
     .page-content {
-      padding-top: 5.5rem; /* 88px = header h-20 + announcement bar allowance */
+      padding-top: 8rem; /* ~128px: announcement bar (~36px) + desktop header h-20 (80px) + buffer */
     }
   }
 }
