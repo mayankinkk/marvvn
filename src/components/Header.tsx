@@ -109,26 +109,26 @@ export default function Header() {
 
   return (
     <>
-      {/* Announcement Bar */}
-      {settings.announcement_bar && (
-        <div className="bg-marvvn-black/90 backdrop-blur-sm text-white py-2 overflow-hidden">
-          <div className="marquee-container whitespace-nowrap text-sm font-medium">
-            {[...Array(6)].map((_, i) => (
-              <span key={i} className="inline-block px-8 shrink-0">
-                {settings.announcement_bar}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Main Header */}
+      {/* Main Header - absolute overlay */}
       <header
         className={cn(
           'absolute top-0 left-0 right-0 z-50 transition-all duration-300',
-          isScrolled ? 'bg-white shadow-md sticky' : 'bg-white/80 backdrop-blur-md'
+          isScrolled ? 'bg-white/95 backdrop-blur-md shadow-md' : 'bg-white/70 backdrop-blur-md'
         )}
       >
+        {/* Announcement Bar */}
+        {settings.announcement_bar && (
+          <div className="bg-marvvn-black/90 backdrop-blur-sm text-white py-2 overflow-hidden">
+            <div className="marquee-container whitespace-nowrap text-sm font-medium">
+              {[...Array(6)].map((_, i) => (
+                <span key={i} className="inline-block px-8 shrink-0">
+                  {settings.announcement_bar}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Logo and Main Nav */}
         <div className="container">
           <div className="flex items-center justify-between h-16 lg:h-20">
