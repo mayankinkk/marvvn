@@ -279,7 +279,7 @@ export default function ProductPage() {
 
             {/* Shipping text */}
             <p className="text-sm text-marvvn-gray-500">
-              Shipping calculated at checkout.
+              {settings.product_shipping_calc_text || 'Shipping calculated at checkout.'}
             </p>
 
             <p className="text-marvvn-gray-600 text-sm">{product.description}</p>
@@ -424,28 +424,32 @@ export default function ProductPage() {
             </div>
 
             {/* Buy It Now */}
-            <button
-              type="button"
-              onClick={handleBuyNow}
-              disabled={isOutOfStock}
-              className="w-full h-12 bg-marvvn-black text-white font-medium text-sm hover:bg-marvvn-gray-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Buy It Now
-            </button>
+            {settings.product_buy_now_enabled !== 'false' && (
+              <button
+                type="button"
+                onClick={handleBuyNow}
+                disabled={isOutOfStock}
+                className="w-full h-12 bg-marvvn-black text-white font-medium text-sm hover:bg-marvvn-gray-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Buy It Now
+              </button>
+            )}
 
             {/* Special Offers */}
-            <div className="border rounded-xl p-4">
-              <h3 className="text-sm font-medium mb-3">Special Offers</h3>
-              <div className="bg-marvvn-black text-white rounded-lg p-3 flex items-center gap-3">
-                <div className="w-8 h-8 bg-white/20 rounded flex items-center justify-center flex-shrink-0">
-                  <CreditCard className="w-4 h-4" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Get ₹65 Off on UPI</p>
-                  <p className="text-xs text-marvvn-gray-300">5+ Discounts Available</p>
+            {settings.product_special_offers_enabled !== 'false' && (
+              <div className="border rounded-xl p-4">
+                <h3 className="text-sm font-medium mb-3">{settings.product_special_offers_title || 'Special Offers'}</h3>
+                <div className="bg-marvvn-black text-white rounded-lg p-3 flex items-center gap-3">
+                  <div className="w-8 h-8 bg-white/20 rounded flex items-center justify-center flex-shrink-0">
+                    <CreditCard className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">{settings.product_special_offers_text || 'Get ₹65 Off on UPI'}</p>
+                    <p className="text-xs text-marvvn-gray-300">{settings.product_special_offers_subtitle || '5+ Discounts Available'}</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* What You Get */}
             <div className="border-t pt-6">

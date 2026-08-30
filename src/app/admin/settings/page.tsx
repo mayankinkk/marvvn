@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Save, Store, Truck, Globe, Palette, Shield, Bell, Search, Loader2, FileText, Download, Newspaper, Plus, X, Package, Check } from 'lucide-react'
+import { Save, Store, Truck, Globe, Palette, Shield, Bell, Search, Loader2, FileText, Download, Newspaper, Plus, X, Package, Check, CreditCard } from 'lucide-react'
 
 type Tab = 'general' | 'shipping' | 'seo' | 'social' | 'notifications' | 'appearance' | 'maintenance' | 'invoice' | 'blog' | 'footer' | 'product-page'
 
@@ -998,6 +998,73 @@ function ProductPageTab({ settings, update }: { settings: Record<string, string>
             placeholder="5"
           />
         </div>
+      </div>
+
+      {/* Shipping Calc Text */}
+      <div className="border rounded-lg p-4 space-y-4">
+        <h3 className="font-medium">Price Area</h3>
+        <Field
+          label="Shipping Text (below price)"
+          value={settings.product_shipping_calc_text || ''}
+          onChange={(v) => update('product_shipping_calc_text', v)}
+          placeholder="Shipping calculated at checkout."
+        />
+        <Toggle
+          label="Show Buy It Now Button"
+          description="Display a full-width Buy It Now button below Add to Cart"
+          checked={settings.product_buy_now_enabled !== 'false'}
+          onChange={(v) => update('product_buy_now_enabled', v ? 'true' : 'false')}
+        />
+      </div>
+
+      {/* Special Offers */}
+      <div className="border rounded-lg p-4 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-medium">Special Offers</h3>
+            <p className="text-xs text-marvvn-gray-500 mt-0.5">Discount banner shown below the Buy It Now button</p>
+          </div>
+          <Toggle
+            label="Enabled"
+            description=""
+            checked={settings.product_special_offers_enabled !== 'false'}
+            onChange={(v) => update('product_special_offers_enabled', v ? 'true' : 'false')}
+          />
+        </div>
+        {settings.product_special_offers_enabled !== 'false' && (
+          <>
+            <Field
+              label="Section Title"
+              value={settings.product_special_offers_title || ''}
+              onChange={(v) => update('product_special_offers_title', v)}
+              placeholder="Special Offers"
+            />
+            <Field
+              label="Offer Text"
+              value={settings.product_special_offers_text || ''}
+              onChange={(v) => update('product_special_offers_text', v)}
+              placeholder="Get ₹65 Off on UPI"
+            />
+            <Field
+              label="Subtitle"
+              value={settings.product_special_offers_subtitle || ''}
+              onChange={(v) => update('product_special_offers_subtitle', v)}
+              placeholder="5+ Discounts Available"
+            />
+            <div className="border-t pt-3">
+              <h4 className="text-xs font-medium mb-2">Preview</h4>
+              <div className="bg-marvvn-black text-white rounded-lg p-3 flex items-center gap-3 max-w-sm">
+                <div className="w-8 h-8 bg-white/20 rounded flex items-center justify-center flex-shrink-0">
+                  <CreditCard className="w-4 h-4" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">{settings.product_special_offers_text || 'Get ₹65 Off on UPI'}</p>
+                  <p className="text-xs text-marvvn-gray-300">{settings.product_special_offers_subtitle || '5+ Discounts Available'}</p>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Size & Fit */}

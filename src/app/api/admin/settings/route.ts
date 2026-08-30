@@ -36,6 +36,9 @@ const ALLOWED_KEYS = new Set([
   'product_fabric_care', 'product_fabric_notes',
   'product_shipping_text', 'product_returns_text', 'product_returns_refund',
   'product_other_info', 'product_delivery_min_days', 'product_delivery_max_days',
+  'product_shipping_calc_text', 'product_buy_now_enabled',
+  'product_special_offers_enabled', 'product_special_offers_title',
+  'product_special_offers_text', 'product_special_offers_subtitle',
 ])
 
 const DEFAULTS: Record<string, string> = {
@@ -134,6 +137,12 @@ const DEFAULTS: Record<string, string> = {
   product_other_info: '',
   product_delivery_min_days: '3',
   product_delivery_max_days: '5',
+  product_shipping_calc_text: 'Shipping calculated at checkout.',
+  product_buy_now_enabled: 'true',
+  product_special_offers_enabled: 'true',
+  product_special_offers_title: 'Special Offers',
+  product_special_offers_text: 'Get ₹65 Off on UPI',
+  product_special_offers_subtitle: '5+ Discounts Available',
   mega_menu: JSON.stringify([
     {
       title: 'Women',
