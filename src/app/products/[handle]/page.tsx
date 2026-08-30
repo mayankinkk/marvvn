@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
-import { Heart, ShoppingBag, Minus, Plus, ChevronRight, Truck, RotateCcw, Shield, Bell, MapPin, ChevronDown, Package, CreditCard, Zap, ArrowRight } from 'lucide-react'
+import { Heart, ShoppingBag, Minus, Plus, ChevronRight, Truck, RotateCcw, Shield, Bell, MapPin, Package, CreditCard, Zap, Star } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
@@ -20,7 +20,7 @@ import { useAuthStore } from '@/lib/auth-store'
 import { useSettings } from '@/components/SettingsProvider'
 import { FlashSaleTimer, CrossSellProducts, SizeRecommendations } from '@/components/ProductExtras'
 
-type Tab = 'size-fit' | 'fabric-care' | 'reviews' | 'shipping' | 'returns' | 'other-info'
+type Tab = 'size-fit' | 'fabric-care' | 'reviews' | 'shipping' | 'returns'
 
 const featureIconMap: Record<string, any> = {
   'package': Package,
@@ -30,7 +30,7 @@ const featureIconMap: Record<string, any> = {
   'truck': Truck,
   'shield': Shield,
   'heart': Heart,
-  'star': ChevronRight,
+  'star': Star,
 }
 
 export default function ProductPage() {
@@ -74,14 +74,12 @@ export default function ProductPage() {
     .split('\n').filter(Boolean).map((l: string) => l.trim())
   const otherInfoLines = (settings.product_other_info || '').split('\n').filter(Boolean).map((l: string) => l.trim())
 
-  // Add Other Information tab if content exists
-  const allTabs: { id: Tab; label: string; icon: any }[] = [
+  const tabs: { id: Tab; label: string; icon: any }[] = [
     { id: 'size-fit', label: 'Size & Fit', icon: Package },
     { id: 'fabric-care', label: 'Fabric & Care', icon: Shield },
     { id: 'reviews', label: 'Reviews', icon: Heart },
     { id: 'shipping', label: 'Shipping', icon: Truck },
     { id: 'returns', label: 'Returns & Exchange', icon: RotateCcw },
-    ...(otherInfoLines.length > 0 ? [{ id: 'other-info' as Tab, label: 'Other Information', icon: Shield }] : []),
   ]
 
   useEffect(() => {
@@ -125,6 +123,14 @@ export default function ProductPage() {
       setDeliveryError('Could not check delivery')
     }
     setDeliveryLoading(false)
+  }
+
+  const handleBuyNow = () => {
+    if (!product) return
+    const size = selectedSize || product.sizes[0]
+    const color = selectedColor || product.colors[0]
+    addItem(product, size, color, quantity)
+    window.location.href = '/checkout'
   }
 
   if (loading) {
@@ -177,8 +183,6 @@ export default function ProductPage() {
     toggleCart()
   }
 
-  const tabs = allTabs
-
   return (
     <div className="min-h-screen">
       <Header />
@@ -226,7 +230,7 @@ export default function ProductPage() {
           </div>
 
           {/* Right — Product Info */}
-          <div className="space-y-6">
+          <div className="space-y-5">
             {/* Flash Sale Timer */}
             {product.flash_sale && product.flash_sale_ends_at && product.flash_sale_price && (
               <FlashSaleTimer
@@ -236,29 +240,49 @@ export default function ProductPage() {
               />
             )}
 
-            <div>
-              <h1 className="text-2xl lg:text-3xl font-display font-medium">{product.title}</h1>
-              <div className="flex items-center gap-3 mt-3">
-                {product.compareAtPrice && (
-                  <span className="text-lg text-marvvn-gray-400 line-through">
-                    {formatPrice(product.compareAtPrice)}
-                  </span>
+            {/* Title + Wishlist */}
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="text-2xl lg:text-3xl font-display font-medium leading-tight">{product.title}</h1>
+              <button
+                type="button"
+                onClick={() => toggleItem(product)}
+                className={cn(
+                  'flex-shrink-0 w-10 h-10 flex items-center justify-center border transition-all cursor-pointer mt-1',
+                  inWishlist
+                    ? 'border-marvvn-red bg-red-50 text-marvvn-red'
+                    : 'border-marvvn-gray-300 hover:border-marvvn-black hover:bg-marvvn-gray-50'
                 )}
-                <span className={cn(
-                  'text-2xl font-medium',
-                  product.compareAtPrice || product.flash_sale ? 'text-marvvn-red' : ''
-                )}>
-                  {formatPrice(displayPrice)}
-                </span>
-                {discount > 0 && (
-                  <span className="px-2 py-1 text-xs font-medium bg-marvvn-red text-white rounded">
-                    Save {discount}%
-                  </span>
-                )}
-              </div>
+              >
+                <Heart className={cn('w-5 h-5', inWishlist && 'fill-current')} />
+              </button>
             </div>
 
-            <p className="text-marvvn-gray-600">{product.description}</p>
+            {/* Price */}
+            <div className="flex items-center gap-3">
+              {product.compareAtPrice && (
+                <span className="text-lg text-marvvn-gray-400 line-through">
+                  {formatPrice(product.compareAtPrice)}
+                </span>
+              )}
+              <span className={cn(
+                'text-2xl font-medium',
+                product.compareAtPrice || product.flash_sale ? 'text-marvvn-red' : ''
+              )}>
+                {formatPrice(displayPrice)}
+              </span>
+              {discount > 0 && (
+                <span className="px-2 py-1 text-xs font-medium bg-marvvn-red text-white rounded">
+                  Save {discount}%
+                </span>
+              )}
+            </div>
+
+            {/* Shipping text */}
+            <p className="text-sm text-marvvn-gray-500">
+              Shipping calculated at checkout.
+            </p>
+
+            <p className="text-marvvn-gray-600 text-sm">{product.description}</p>
 
             {/* Check Delivery & Pickup */}
             <div className="border rounded-xl p-4">
@@ -280,7 +304,7 @@ export default function ProductPage() {
                   disabled={pincode.length !== 6 || deliveryLoading}
                   className="px-6 py-2.5 text-sm font-medium border border-marvvn-black hover:bg-marvvn-black hover:text-white transition-colors cursor-pointer disabled:opacity-50"
                 >
-                  {deliveryLoading ? 'Checking...' : 'Check'}
+                  {deliveryLoading ? 'Checking...' : deliveryInfo ? 'Change' : 'Check'}
                 </button>
               </div>
               {deliveryInfo && (
@@ -369,14 +393,13 @@ export default function ProductPage() {
               </div>
             </div>
 
-            {/* Quantity */}
-            <div>
-              <h3 className="text-sm font-medium uppercase tracking-wider mb-3">Quantity</h3>
-              <div className="flex items-center gap-3">
+            {/* Quantity + Add to Cart row */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center border border-marvvn-gray-300">
                 <button
                   type="button"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="w-10 h-10 flex items-center justify-center border border-marvvn-gray-300 hover:border-marvvn-black transition-colors cursor-pointer"
+                  className="w-10 h-12 flex items-center justify-center hover:bg-marvvn-gray-50 transition-colors cursor-pointer"
                 >
                   <Minus className="w-4 h-4" />
                 </button>
@@ -384,36 +407,44 @@ export default function ProductPage() {
                 <button
                   type="button"
                   onClick={() => setQuantity(quantity + 1)}
-                  className="w-10 h-10 flex items-center justify-center border border-marvvn-gray-300 hover:border-marvvn-black transition-colors cursor-pointer"
+                  className="w-10 h-12 flex items-center justify-center hover:bg-marvvn-gray-50 transition-colors cursor-pointer"
                 >
                   <Plus className="w-4 h-4" />
                 </button>
               </div>
-            </div>
-
-            {/* Add to Cart */}
-            <div className="flex gap-3">
               <button
                 type="button"
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
-                className="flex-1 btn-primary py-4 flex items-center justify-center gap-2 text-base cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 h-12 btn-primary flex items-center justify-center gap-2 text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <ShoppingBag className="w-5 h-5" />
+                <ShoppingBag className="w-4 h-4" />
                 {isOutOfStock ? 'Out of Stock' : 'Add To Cart'}
               </button>
-              <button
-                type="button"
-                onClick={() => toggleItem(product)}
-                className={cn(
-                  'w-14 h-14 flex items-center justify-center border transition-all cursor-pointer',
-                  inWishlist
-                    ? 'border-marvvn-red bg-red-50 text-marvvn-red'
-                    : 'border-marvvn-gray-300 hover:border-marvvn-black hover:bg-marvvn-gray-50'
-                )}
-              >
-                <Heart className={cn('w-5 h-5', inWishlist && 'fill-current')} />
-              </button>
+            </div>
+
+            {/* Buy It Now */}
+            <button
+              type="button"
+              onClick={handleBuyNow}
+              disabled={isOutOfStock}
+              className="w-full h-12 bg-marvvn-black text-white font-medium text-sm hover:bg-marvvn-gray-800 transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Buy It Now
+            </button>
+
+            {/* Special Offers */}
+            <div className="border rounded-xl p-4">
+              <h3 className="text-sm font-medium mb-3">Special Offers</h3>
+              <div className="bg-marvvn-black text-white rounded-lg p-3 flex items-center gap-3">
+                <div className="w-8 h-8 bg-white/20 rounded flex items-center justify-center flex-shrink-0">
+                  <CreditCard className="w-4 h-4" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Get ₹65 Off on UPI</p>
+                  <p className="text-xs text-marvvn-gray-300">5+ Discounts Available</p>
+                </div>
+              </div>
             </div>
 
             {/* What You Get */}
@@ -465,23 +496,33 @@ export default function ProductPage() {
           {/* Tab Content */}
           <div className="max-w-3xl">
             {activeTab === 'size-fit' && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Size & Fit</h3>
-                <p className="text-sm text-marvvn-gray-600">
-                  {product.category === 'women'
-                    ? (settings.product_size_fit_women || "The model (Height 5'7\") is wearing size S")
-                    : (settings.product_size_fit_men || "The model (Height 5'10\") is wearing size M")}
-                </p>
-                <p className="text-sm text-marvvn-gray-600">
-                  {settings.product_size_fit_advice || 'Fits true to size. Do you need size advice? Please refer to our size chart.'}
-                </p>
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <p className="text-sm text-marvvn-gray-600">
+                    {product.category === 'women'
+                      ? (settings.product_size_fit_women || "The model (Height 5'7\") is wearing size S")
+                      : (settings.product_size_fit_men || "The model (Height 5'10\") is wearing size M")}
+                  </p>
+                  <p className="text-sm text-marvvn-gray-600">
+                    {settings.product_size_fit_advice || 'Fits true to size. Do you need size advice? Please refer to our size chart.'}
+                  </p>
+                </div>
                 <SizeGuide category={product.category === 'women' ? 'women' : 'men'} />
+
+                {/* Other Information — shown inline in Size & Fit tab like Bonkers */}
+                {otherInfoLines.length > 0 && (
+                  <div className="border-t pt-6 mt-6">
+                    <h4 className="text-sm font-medium mb-3">Other Information</h4>
+                    <ul className="text-sm text-marvvn-gray-600 space-y-2 list-disc list-inside">
+                      {otherInfoLines.map((line: string, i: number) => <li key={i}>{line}</li>)}
+                    </ul>
+                  </div>
+                )}
               </div>
             )}
 
             {activeTab === 'fabric-care' && (
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Fabric & Care</h3>
                 <div className="text-sm text-marvvn-gray-600 space-y-2">
                   {fabricCareLines.map((line: string, i: number) => <p key={i}>{line}</p>)}
                 </div>
@@ -501,7 +542,6 @@ export default function ProductPage() {
 
             {activeTab === 'shipping' && (
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Shipping</h3>
                 <div className="text-sm text-marvvn-gray-600 space-y-3">
                   {shippingLines.map((line: string, i: number) => <p key={i}>{line}</p>)}
                 </div>
@@ -516,7 +556,6 @@ export default function ProductPage() {
 
             {activeTab === 'returns' && (
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Returns & Exchange</h3>
                 <div className="text-sm text-marvvn-gray-600 space-y-3">
                   {returnsLines.map((line: string, i: number) => <p key={i}>{line}</p>)}
                 </div>
@@ -525,15 +564,6 @@ export default function ProductPage() {
                   <p className="text-sm text-marvvn-gray-600">
                     {settings.product_returns_refund || 'After we receive and inspect the returned item, your refund will be credited to your original payment method within 5-7 business days.'}
                   </p>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'other-info' && otherInfoLines.length > 0 && (
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Other Information</h3>
-                <div className="text-sm text-marvvn-gray-600 space-y-3">
-                  {otherInfoLines.map((line: string, i: number) => <p key={i}>{line}</p>)}
                 </div>
               </div>
             )}
