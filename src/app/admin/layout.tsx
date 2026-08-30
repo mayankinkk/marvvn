@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Tag, Settings,
   Menu, X, FileText, Star, AlertTriangle, Image, Store, LogOut,
-  ChevronDown, LayoutGrid, MessageSquare, RotateCcw, Clock
+  ChevronDown, LayoutGrid, MessageSquare, RotateCcw, Clock, Headphones
 } from 'lucide-react'
 import { useAuthStore } from '@/lib/auth-store'
 
@@ -49,6 +49,7 @@ const navGroups: NavGroup[] = [
   {
     label: 'Operations',
     items: [
+      { href: '/admin/support', label: 'Support Tickets', icon: Headphones },
       { href: '/admin/inventory', label: 'Inventory', icon: AlertTriangle },
       { href: '/admin/returns', label: 'Returns', icon: RotateCcw },
       { href: '/admin/mega-menu', label: 'Mega Menu', icon: LayoutGrid },

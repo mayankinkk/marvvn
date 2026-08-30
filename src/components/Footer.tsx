@@ -26,6 +26,7 @@ const infoLinks = [
   { label: 'Stores Near Me', href: '/pages/store-locator' },
   { label: 'Blogs', href: '/blogs' },
   { label: 'Track Order', href: '/track-order' },
+  { label: 'Support', href: '/support' },
   { label: 'FAQs', href: '/pages/faq' },
   { label: 'Contact', href: '/pages/get-in-touch' },
   { label: 'Privacy Policy', href: '/policies/privacy-policy' },

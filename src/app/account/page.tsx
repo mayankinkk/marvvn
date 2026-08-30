@@ -10,7 +10,7 @@ import { useCurrency } from '@/lib/hooks/useCurrency'
 import {
   ChevronRight, User, Package, Heart, LogOut, Settings,
   Copy, Check, Edit3, Save, X, Lock, Eye, EyeOff, Bell, Mail, MessageCircle,
-  Truck, Clock, CheckCircle, ArrowRight, Home, MapPin
+  Truck, Clock, CheckCircle, ArrowRight, Home, MapPin, Headphones
 } from 'lucide-react'
 
 type Tab = 'dashboard' | 'orders' | 'addresses' | 'settings'
@@ -148,6 +148,8 @@ export default function AccountPage() {
     { id: 'settings' as Tab, label: 'Settings', icon: Settings },
   ]
 
+  const supportLink = { href: '/support', label: 'Support Tickets', icon: Headphones }
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -195,6 +197,13 @@ export default function AccountPage() {
                 )
               })}
               <div className="border-t border-marvvn-gray-200 mt-2 pt-2">
+                <Link
+                  href={supportLink.href}
+                  className="flex items-center gap-3 w-full px-4 py-3 text-sm text-marvvn-gray-700 hover:bg-marvvn-gray-50 transition-colors"
+                >
+                  <supportLink.icon className="w-4 h-4" />
+                  {supportLink.label}
+                </Link>
                 <button
                   type="button"
                   onClick={async () => { await logout(); router.push('/') }}
