@@ -24,6 +24,8 @@ export interface Product {
   waist?: string
   length?: string
   model_info?: string
+  what_you_get?: { icon: string; title: string; subtitle: string }[]
+  size_fit_text?: string
 }
 
 export interface Collection {

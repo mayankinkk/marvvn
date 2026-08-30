@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { ChevronRight } from 'lucide-react'
 
 interface PromoBannerProps {
   desktopImage: string
@@ -18,39 +17,38 @@ export default function PromoBanner({ desktopImage, mobileImage, tagline, title,
   return (
     <section className="relative w-full overflow-hidden group">
       <Link href={ctaLink}>
-        <div className="relative aspect-[16/7] md:aspect-[16/6] lg:aspect-[16/5]">
+        {/* Bonkers Corner: tall portrait-ish ratio, edge-to-edge */}
+        <div className="relative aspect-[16/9] md:aspect-[21/9]">
           <Image
             src={desktopImage}
             alt={title}
             fill
             sizes="100vw"
-            className="hidden md:block object-cover group-hover:scale-105 transition-transform duration-700"
+            className="hidden md:block object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out"
           />
           <Image
             src={mobileImage}
             alt={title}
             fill
             sizes="100vw"
-            className="md:hidden object-cover group-hover:scale-105 transition-transform duration-700"
+            className="md:hidden object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out"
           />
-          <div className="absolute inset-0 bg-black/20" />
-          <div className={`absolute inset-0 flex items-center ${reverse ? 'justify-end' : 'justify-start'}`}>
-            <div className="container">
-              <div className={`max-w-xl ${reverse ? 'text-right ml-auto' : ''}`}>
-                {tagline && (
-                  <p className="text-white/80 text-xs md:text-sm uppercase tracking-[0.2em] mb-2">
-                    {tagline}
-                  </p>
-                )}
-                <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-4 md:mb-6">
-                  {title}
-                </h2>
-                <span className="inline-flex items-center gap-2 text-white border-b-2 border-white pb-1 hover:text-marvvn-gray-200 hover:border-marvvn-gray-200 transition-colors text-sm md:text-base uppercase tracking-wider font-medium">
-                  {ctaText}
-                  <ChevronRight className="w-4 h-4" />
-                </span>
-              </div>
-            </div>
+          {/* Gradient: bottom-heavy so text pops */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+
+          {/* Text: bottom-left or bottom-right */}
+          <div className={`absolute bottom-0 left-0 right-0 p-8 md:p-12 ${reverse ? 'text-right' : 'text-left'}`}>
+            {tagline && (
+              <p className="text-white/70 text-xs uppercase tracking-[0.25em] mb-2 font-medium">
+                {tagline}
+              </p>
+            )}
+            <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white mb-5 leading-none tracking-tight">
+              {title}
+            </h2>
+            <span className="inline-block border border-white text-white text-xs font-bold uppercase tracking-widest px-6 py-3 group-hover:bg-white group-hover:text-black transition-colors duration-300">
+              {ctaText}
+            </span>
           </div>
         </div>
       </Link>

@@ -59,8 +59,11 @@ export default function ProductPage() {
   // Tabs
   const [activeTab, setActiveTab] = useState<Tab>('size-fit')
 
-  // Parse settings-driven content
+  // Parse settings-driven content — per-product overrides global
   const whatYouGetFeatures: { icon: string; title: string; subtitle: string }[] = (() => {
+    if (product?.what_you_get && Array.isArray(product.what_you_get) && product.what_you_get.length > 0) {
+      return product.what_you_get
+    }
     try { return JSON.parse(settings.product_what_you_get || '[]') } catch { return [] }
   })()
 
@@ -509,29 +512,32 @@ export default function ProductPage() {
           <div className="max-w-3xl">
             {activeTab === 'size-fit' && (
               <div className="space-y-6">
-                <div className="space-y-3">
-                  {/* Per-product model info overrides global setting */}
-                  <p className="text-sm text-marvvn-gray-600">
-                    {product.model_info
-                      || (product.category === 'women'
-                        ? (settings.product_size_fit_women || "The model (Height 5'7\") is wearing size S")
-                        : (settings.product_size_fit_men || "The model (Height 5'10\") is wearing size M"))}
-                  </p>
-
-                  {/* Per-product waist */}
-                  {product.waist && (
-                    <p className="text-sm text-marvvn-gray-600">Waist - {product.waist}</p>
-                  )}
-
-                  {/* Per-product length */}
-                  {product.length && (
-                    <p className="text-sm text-marvvn-gray-600">Length - {product.length}</p>
-                  )}
-
-                  <p className="text-sm text-marvvn-gray-600">
-                    {settings.product_size_fit_advice || 'Fits true to size. Do you need size advice? Please refer to our size chart.'}
-                  </p>
-                </div>
+                {/* Per-product Size & Fit text */}
+                {product.size_fit_text ? (
+                  <div className="space-y-2">
+                    {product.size_fit_text.split('\n').filter(Boolean).map((line: string, i: number) => (
+                      <p key={i} className="text-sm text-marvvn-gray-600">{line.trim()}</p>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-sm text-marvvn-gray-600">
+                      {product.model_info
+                        || (product.category === 'women'
+                          ? (settings.product_size_fit_women || "The model (Height 5'7\") is wearing size S")
+                          : (settings.product_size_fit_men || "The model (Height 5'10\") is wearing size M"))}
+                    </p>
+                    {product.waist && (
+                      <p className="text-sm text-marvvn-gray-600">Waist - {product.waist}</p>
+                    )}
+                    {product.length && (
+                      <p className="text-sm text-marvvn-gray-600">Length - {product.length}</p>
+                    )}
+                    <p className="text-sm text-marvvn-gray-600">
+                      {settings.product_size_fit_advice || 'Fits true to size. Do you need size advice? Please refer to our size chart.'}
+                    </p>
+                  </div>
+                )}
 
                 {/* Fabric Composition + GSM */}
                 {(product.fabric_composition || product.gsm) && (
@@ -547,7 +553,6 @@ export default function ProductPage() {
 
                 <SizeGuide category={product.category === 'women' ? 'women' : 'men'} />
 
-                {/* Other Information — shown inline in Size & Fit tab like Bonkers */}
                 {otherInfoLines.length > 0 && (
                   <div className="border-t pt-6 mt-6">
                     <h4 className="text-sm font-medium mb-3">Other Information</h4>

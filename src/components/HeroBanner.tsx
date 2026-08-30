@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useSettings } from '@/components/SettingsProvider'
 
@@ -47,7 +46,6 @@ export default function HeroBanner() {
     return () => clearInterval(timer)
   }, [isAutoPlaying, slides.length])
 
-
   return (
     <section
       className="relative w-full h-full overflow-hidden"
@@ -59,7 +57,7 @@ export default function HeroBanner() {
           <div
             key={index}
             className={cn(
-              'absolute inset-0 transition-opacity duration-700',
+              'absolute inset-0 transition-opacity duration-1000',
               index === current ? 'opacity-100 z-10' : 'opacity-0 z-0'
             )}
           >
@@ -79,64 +77,66 @@ export default function HeroBanner() {
               className="md:hidden object-cover"
               priority={index === 0}
             />
-            {/* Top gradient blur overlay */}
-            <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/40 via-black/10 to-transparent z-10" />
-            <div className="absolute inset-0 flex items-end pb-16 md:items-center md:pb-0">
-              <div className="container">
-                <div className="max-w-xl">
-                  <p className="text-white/80 text-xs md:text-sm uppercase tracking-[0.2em] mb-2 md:mb-3">
-                    {slide.tagline}
-                  </p>
-                  <h2 className="text-3xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-4 md:mb-6">
-                    {slide.title}
-                  </h2>
-                  <Link
-                    href={slide.ctaLink}
-                    className="inline-flex items-center gap-2 text-white border-b-2 border-white pb-1 hover:text-marvvn-gray-200 hover:border-marvvn-gray-200 transition-colors text-sm md:text-base uppercase tracking-wider font-medium"
-                  >
-                    {slide.ctaText}
-                    <ChevronRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </div>
+
+            {/* Bonkers Corner: very subtle gradient only at bottom for text legibility */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-transparent z-10" />
+
+            {/* Text block: bottom-left, stark and bold */}
+            <div className="absolute bottom-0 left-0 right-0 z-20 p-8 md:p-12 lg:p-16">
+              <p className="text-white/70 text-xs uppercase tracking-[0.25em] mb-2 font-medium">
+                {slide.tagline}
+              </p>
+              <h2 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-5 leading-none tracking-tight">
+                {slide.title}
+              </h2>
+              <Link
+                href={slide.ctaLink}
+                className="inline-block border border-white text-white text-xs font-bold uppercase tracking-widest px-6 py-3 hover:bg-white hover:text-black transition-colors duration-300"
+              >
+                {slide.ctaText}
+              </Link>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+      {/* Dot indicators */}
+      <div className="absolute bottom-8 md:bottom-12 lg:bottom-16 right-8 md:right-12 lg:right-16 z-30 flex items-center gap-2">
         {slides.map((_, index) => (
           <button
             key={index}
             type="button"
             onClick={() => setCurrent(index)}
             className={cn(
-              'w-2 h-2 rounded-full transition-all duration-300 cursor-pointer',
-              index === current ? 'w-6 bg-white' : 'bg-white/50'
+              'transition-all duration-300 cursor-pointer',
+              index === current
+                ? 'w-8 h-[2px] bg-white'
+                : 'w-4 h-[2px] bg-white/40'
             )}
             aria-label={`Go to slide ${index + 1}`}
           />
         ))}
       </div>
 
+      {/* Prev / Next — sharp square, Bonkers style */}
       <button
         type="button"
         onClick={() => setCurrent((prev) => (prev - 1 + slides.length) % slides.length)}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 hover:bg-white rounded-full items-center justify-center transition-colors hidden md:flex cursor-pointer"
+        className="absolute left-4 bottom-1/2 translate-y-1/2 z-30 w-10 h-10 border border-white/60 bg-black/20 backdrop-blur-sm text-white items-center justify-center transition-all hover:bg-white hover:text-black hidden md:flex cursor-pointer"
         aria-label="Previous slide"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
       </button>
       <button
         type="button"
         onClick={() => setCurrent((prev) => (prev + 1) % slides.length)}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 hover:bg-white rounded-full items-center justify-center transition-colors hidden md:flex cursor-pointer"
+        className="absolute right-4 bottom-1/2 translate-y-1/2 z-30 w-10 h-10 border border-white/60 bg-black/20 backdrop-blur-sm text-white items-center justify-center transition-all hover:bg-white hover:text-black hidden md:flex cursor-pointer"
         aria-label="Next slide"
       >
-        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
         </svg>
       </button>
     </section>

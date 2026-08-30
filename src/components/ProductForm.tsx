@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Save, ArrowLeft } from 'lucide-react'
+import { Save, ArrowLeft, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 
 interface ProductFormProps {
@@ -35,6 +35,8 @@ export default function ProductForm({ productId }: ProductFormProps) {
     waist: '',
     length: '',
     model_info: '',
+    what_you_get: '',
+    size_fit_text: '',
   })
 
   useEffect(() => {
@@ -64,6 +66,8 @@ export default function ProductForm({ productId }: ProductFormProps) {
               waist: p.waist || '',
               length: p.length || '',
               model_info: p.model_info || '',
+              what_you_get: JSON.stringify(p.what_you_get || []),
+              size_fit_text: p.size_fit_text || '',
             })
           }
         })
@@ -95,6 +99,8 @@ export default function ProductForm({ productId }: ProductFormProps) {
       waist: form.waist,
       length: form.length,
       model_info: form.model_info,
+      what_you_get: (() => { try { return JSON.parse(form.what_you_get || '[]') } catch { return [] } })(),
+      size_fit_text: form.size_fit_text,
     }
 
     try {
@@ -367,6 +373,30 @@ export default function ProductForm({ productId }: ProductFormProps) {
           </div>
         </div>
 
+        {/* Per-product What You Get */}
+        <div className="border-t pt-6 space-y-4">
+          <div>
+            <h3 className="font-medium text-sm mb-1">What You Get (per product)</h3>
+            <p className="text-xs text-marvvn-gray-500">Leave empty to use global settings. Add features specific to this product.</p>
+          </div>
+          <WhatYouGetEditor value={form.what_you_get} onChange={(v) => setForm({ ...form, what_you_get: v })} />
+        </div>
+
+        {/* Per-product Size & Fit text */}
+        <div className="border-t pt-6 space-y-4">
+          <div>
+            <h3 className="font-medium text-sm mb-1">Size & Fit Text (per product)</h3>
+            <p className="text-xs text-marvvn-gray-500">Custom text shown in the Size & Fit tab. Leave empty to use global settings.</p>
+          </div>
+          <textarea
+            value={form.size_fit_text}
+            onChange={(e) => setForm({ ...form, size_fit_text: e.target.value })}
+            className="input-field w-full min-h-[80px]"
+            placeholder="The model (Height 5'7&quot;) is wearing size S&#10;Waist - 28 inches&#10;Length - 42 inches"
+          />
+          <p className="text-xs text-marvvn-gray-500">One line per item. Supports multi-line display on the product page.</p>
+        </div>
+
         <div className="flex gap-3 pt-4 border-t">
           <Link href="/admin/products" className="btn-secondary px-6 py-3">
             Cancel
@@ -381,6 +411,65 @@ export default function ProductForm({ productId }: ProductFormProps) {
           </button>
         </div>
       </form>
+    </div>
+  )
+}
+
+const iconOptions = [
+  { value: 'package', label: 'Package' },
+  { value: 'credit-card', label: 'Credit Card' },
+  { value: 'zap', label: 'Lightning' },
+  { value: 'rotate-ccw', label: 'Rotate/Return' },
+  { value: 'truck', label: 'Truck' },
+  { value: 'shield', label: 'Shield' },
+  { value: 'heart', label: 'Heart' },
+  { value: 'star', label: 'Star' },
+]
+
+function WhatYouGetEditor({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const features: { icon: string; title: string; subtitle: string }[] = (() => {
+    try { return JSON.parse(value || '[]') } catch { return [] }
+  })()
+
+  const add = () => onChange(JSON.stringify([...features, { icon: 'package', title: '', subtitle: '' }]))
+  const remove = (i: number) => onChange(JSON.stringify(features.filter((_, idx) => idx !== i)))
+  const update = (i: number, field: string, val: string) => {
+    onChange(JSON.stringify(features.map((f, idx) => idx === i ? { ...f, [field]: val } : f)))
+  }
+
+  return (
+    <div className="space-y-3">
+      {features.map((feat, i) => (
+        <div key={i} className="grid grid-cols-[110px_1fr_1fr_auto] gap-2 items-end">
+          <select
+            value={feat.icon}
+            onChange={(e) => update(i, 'icon', e.target.value)}
+            className="input-field text-sm"
+          >
+            {iconOptions.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+          </select>
+          <input
+            type="text"
+            value={feat.title}
+            onChange={(e) => update(i, 'title', e.target.value)}
+            className="input-field text-sm"
+            placeholder="Title"
+          />
+          <input
+            type="text"
+            value={feat.subtitle}
+            onChange={(e) => update(i, 'subtitle', e.target.value)}
+            className="input-field text-sm"
+            placeholder="Subtitle"
+          />
+          <button type="button" onClick={() => remove(i)} className="p-2 text-marvvn-gray-400 hover:text-red-500 cursor-pointer">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      ))}
+      <button type="button" onClick={add} className="flex items-center gap-1.5 text-xs font-medium text-marvvn-black hover:underline cursor-pointer">
+        <Plus className="w-3.5 h-3.5" /> Add Feature
+      </button>
     </div>
   )
 }

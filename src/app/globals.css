@@ -41,24 +41,25 @@
 }
 
 @layer components {
+  /* Bonkers Corner style: sharp bordered buttons, no border-radius */
   .btn-primary {
-    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-white bg-marvvn-black border border-marvvn-black hover:bg-marvvn-gray-800 hover:border-marvvn-gray-800 transition-colors duration-200;
+    @apply inline-flex items-center justify-center px-6 py-3 text-xs font-bold uppercase tracking-widest text-white bg-black border border-black hover:bg-black/80 transition-colors duration-200;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-marvvn-black bg-transparent border border-marvvn-gray-300 hover:bg-marvvn-gray-50 transition-colors duration-200;
+    @apply inline-flex items-center justify-center px-6 py-3 text-xs font-bold uppercase tracking-widest text-black bg-transparent border border-black hover:bg-black hover:text-white transition-colors duration-200;
   }
 
   .btn-outline {
-    @apply inline-flex items-center justify-center px-6 py-3 text-sm font-medium text-marvvn-black bg-transparent border border-marvvn-black hover:bg-marvvn-black hover:text-white transition-colors duration-200;
+    @apply inline-flex items-center justify-center px-6 py-3 text-xs font-bold uppercase tracking-widest text-black bg-transparent border border-black hover:bg-black hover:text-white transition-colors duration-200;
   }
 
   .section-title {
-    @apply text-3xl md:text-4xl lg:text-5xl font-display font-medium tracking-tight;
+    @apply text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-none;
   }
 
   .section-subtitle {
-    @apply text-base md:text-lg text-marvvn-gray-600 max-w-2xl;
+    @apply text-sm text-marvvn-gray-500 max-w-2xl mt-2;
   }
 
   .product-card {
@@ -70,11 +71,11 @@
   }
 
   .product-badge {
-    @apply absolute top-3 left-3 z-10 px-2 py-1 text-xs font-medium text-white bg-marvvn-red rounded;
+    @apply absolute top-3 left-3 z-10 px-2 py-1 text-xs font-bold uppercase tracking-wider text-white bg-black;
   }
 
   .input-field {
-    @apply w-full px-4 py-3 text-marvvn-black bg-white border border-marvvn-gray-300 placeholder-marvvn-gray-400 focus:outline-none focus:border-marvvn-black focus:ring-1 focus:ring-marvvn-black transition-colors;
+    @apply w-full px-4 py-3 text-black bg-white border border-black/20 placeholder-black/30 focus:outline-none focus:border-black focus:ring-1 focus:ring-black transition-colors;
   }
 
   .link-underline {

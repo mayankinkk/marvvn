@@ -38,7 +38,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero section: header overlays this */}
+      {/* Hero section: header overlays this — full viewport height */}
       <div className="relative h-screen">
         <Header />
         <HeroBanner />
@@ -46,56 +46,54 @@ export default function Home() {
 
       <main>
 
+        {/* Shop Mens / Shop Womens — full bleed, no container, Bonkers Corner style */}
         <ShopByGender />
 
-        <section className="py-8 lg:py-16">
+        {/* New Arrivals — contained section */}
+        <section className="py-10 lg:py-16">
           <div className="container">
             <SectionHeader
-              title="New In"
-              description="Upgrade your closet with everything trendy and new"
-              ctaText="Shop New Arrivals"
+              title="NEW IN"
+              ctaText="SHOP NEW ARRIVALS"
               ctaLink="/collections/new-arrivals"
             />
             {!loading && <CollectionSlider products={newArrivals} title="New In" />}
           </div>
         </section>
 
-        <section className="py-4 lg:py-6">
-          <div className="container">
-            <PromoBanner {...promo4} reverse />
-          </div>
-        </section>
+        {/* Promo Banner — full bleed */}
+        <PromoBanner {...promo4} reverse />
 
-        <section className="py-8 lg:py-16">
+        {/* Best Sellers — contained */}
+        <section className="py-10 lg:py-16">
           <div className="container">
             <SectionHeader
-              title="Best Seller"
-              description="Handpicked and crafted for you"
-              ctaText="Shop Bestseller"
+              title="BEST SELLERS"
+              ctaText="SHOP BESTSELLERS"
               ctaLink="/collections/best-sellers"
             />
             {!loading && <ProductGrid products={bestSellers} columns={4} />}
           </div>
         </section>
 
-        <section className="py-8 lg:py-16">
+        {/* Shop Women — contained */}
+        <section className="py-10 lg:py-16 bg-[#f9f9f9]">
           <div className="container">
             <SectionHeader
-              title="Shop Women"
-              description="From everyday essentials to statement pieces"
-              ctaText="Shop Women"
+              title="SHOP WOMEN"
+              ctaText="SHOP WOMEN"
               ctaLink="/collections/women"
             />
             {!loading && <ProductGrid products={womenProducts} columns={4} />}
           </div>
         </section>
 
-        <section className="py-8 lg:py-16">
+        {/* Shop Men — contained */}
+        <section className="py-10 lg:py-16">
           <div className="container">
             <SectionHeader
-              title="Shop Men"
-              description="Uncover the latest in men's fashion"
-              ctaText="Shop Mens"
+              title="SHOP MEN"
+              ctaText="SHOP MEN"
               ctaLink="/collections/mens"
             />
             {!loading && <ProductGrid products={menProducts} columns={4} />}
@@ -117,7 +115,7 @@ export default function Home() {
           href={`https://wa.me/${settings.whatsapp_number.replace(/[^0-9]/g, '')}?text=Hi`}
           target="_blank"
           rel="noopener noreferrer"
-          className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#25D366] rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform cursor-pointer"
+          className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#25D366] flex items-center justify-center shadow-lg hover:scale-110 transition-transform cursor-pointer"
           aria-label="Chat on WhatsApp"
         >
           <svg className="w-7 h-7 text-white" viewBox="0 0 24 24" fill="currentColor">

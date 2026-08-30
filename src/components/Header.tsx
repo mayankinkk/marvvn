@@ -112,10 +112,10 @@ export default function Header() {
       {/* Main Header - absolute overlay with frosted glass */}
       <header
         className={cn(
-          'absolute top-0 left-0 right-0 z-50 transition-all duration-300',
+          'absolute top-0 left-0 right-0 z-50 transition-all duration-500',
           isScrolled
-            ? 'bg-white/95 backdrop-blur-md shadow-md'
-            : 'bg-white/20 backdrop-blur-md'
+            ? 'bg-white/98 backdrop-blur-xl shadow-sm border-b border-black/5'
+            : 'bg-transparent backdrop-blur-sm'
         )}
       >
         {/* Announcement Bar */}
@@ -131,32 +131,22 @@ export default function Header() {
           </div>
         )}
 
-        {/* Logo and Main Nav */}
+        {/* Logo center, Nav left, Icons right — Bonkers Corner layout */}
         <div className="container">
-          <div className="flex items-center justify-between h-16 lg:h-20">
-            {/* Mobile Menu Button */}
+          <div className="flex items-center h-16 lg:h-20 relative">
+
+            {/* Mobile Menu Button — leftmost */}
             <button
               type="button"
               className="lg:hidden p-2 -ml-2"
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Open menu"
             >
-              <Menu className="w-6 h-6" />
+              <Menu className={cn('w-6 h-6 transition-colors', isScrolled ? 'text-black' : 'text-white')} />
             </button>
 
-            {/* Logo */}
-            <Link href="/" className="relative z-10">
-              {settings.logo_url ? (
-                <img src={settings.logo_url} alt={settings.store_name || 'MARVVN'} className="h-8 lg:h-10" />
-              ) : (
-                <span className="text-2xl lg:text-3xl font-display font-bold tracking-tight">
-                  {settings.store_name || 'MARVVN'}
-                </span>
-              )}
-            </Link>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-8 h-full">
+            {/* Desktop Navigation — Left side */}
+            <nav className="hidden lg:flex items-center gap-6 xl:gap-8 h-full flex-1">
               {navLinks.map((link) => (
                 <div
                   key={link.label}
@@ -167,7 +157,8 @@ export default function Header() {
                   <Link
                     href={link.href}
                     className={cn(
-                      'text-sm font-medium uppercase tracking-wider hover:text-marvvn-gray-600 transition-colors flex items-center gap-1'
+                      'text-xs font-bold uppercase tracking-widest transition-colors flex items-center gap-1',
+                      isScrolled ? 'text-black hover:text-black/60' : 'text-white hover:text-white/70'
                     )}
                   >
                     {link.label}
@@ -177,9 +168,25 @@ export default function Header() {
               ))}
             </nav>
 
+            {/* Logo — Absolute center */}
+            <Link href="/" className="absolute left-1/2 -translate-x-1/2 z-10">
+              {settings.logo_url ? (
+                <img src={settings.logo_url} alt={settings.store_name || 'MARVVN'} className={cn('h-7 lg:h-9 transition-all', isScrolled ? '' : 'brightness-0 invert')} />
+              ) : (
+                <span className={cn('text-xl lg:text-2xl font-black uppercase tracking-[0.15em] transition-colors', isScrolled ? 'text-black' : 'text-white')}>
+                  {settings.store_name || 'MARVVN'}
+                </span>
+              )}
+            </Link>
+
             {/* Right Actions */}
-            <div className="flex items-center gap-1 lg:gap-3">
-              <button type="button" className="p-2 hover:bg-marvvn-gray-50 rounded-full transition-colors" onClick={() => setSearchOpen(true)} aria-label="Search">
+            <div className="flex items-center gap-1 lg:gap-2 ml-auto">
+              <button
+                type="button"
+                className={cn('p-2 transition-colors', isScrolled ? 'text-black hover:text-black/60' : 'text-white hover:text-white/70')}
+                onClick={() => setSearchOpen(true)}
+                aria-label="Search"
+              >
                 <Search className="w-5 h-5" />
               </button>
 
@@ -187,23 +194,23 @@ export default function Header() {
               <div className="relative hidden lg:block" ref={userMenuRef}>
                 <button
                   type="button"
-                  className="p-2 hover:bg-marvvn-gray-50 rounded-full transition-colors"
+                  className={cn('p-2 transition-colors', isScrolled ? 'text-black hover:text-black/60' : 'text-white hover:text-white/70')}
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   aria-label="Account"
                 >
                   <User className="w-5 h-5" />
                 </button>
                 {userMenuOpen && (
-                  <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-marvvn-gray-200 shadow-lg z-50">
+                  <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-black/10 shadow-xl z-50">
                     {isAuthenticated ? (
                       <div className="p-4">
-                        <p className="text-sm font-medium">{user?.name}</p>
+                        <p className="text-sm font-bold">{user?.name}</p>
                         <p className="text-xs text-marvvn-gray-500 mt-0.5">{user?.email}</p>
                         <div className="border-t mt-3 pt-3 space-y-2">
-                          <Link href="/account" className="block text-sm hover:text-marvvn-gray-600" onClick={() => setUserMenuOpen(false)}>
+                          <Link href="/account" className="block text-sm font-medium hover:text-marvvn-gray-600" onClick={() => setUserMenuOpen(false)}>
                             My Account
                           </Link>
-                          <Link href="/account/orders" className="block text-sm hover:text-marvvn-gray-600" onClick={() => setUserMenuOpen(false)}>
+                          <Link href="/account/orders" className="block text-sm font-medium hover:text-marvvn-gray-600" onClick={() => setUserMenuOpen(false)}>
                             Orders
                           </Link>
                           <button
@@ -217,10 +224,10 @@ export default function Header() {
                       </div>
                     ) : (
                       <div className="p-4 space-y-2">
-                        <Link href="/account/login" className="block w-full btn-primary text-center text-sm py-2" onClick={() => setUserMenuOpen(false)}>
+                        <Link href="/account/login" className="block w-full text-center text-xs font-bold uppercase tracking-widest py-2.5 bg-black text-white hover:bg-black/80 transition-colors" onClick={() => setUserMenuOpen(false)}>
                           Login
                         </Link>
-                        <Link href="/account/register" className="block w-full btn-secondary text-center text-sm py-2" onClick={() => setUserMenuOpen(false)}>
+                        <Link href="/account/register" className="block w-full text-center text-xs font-bold uppercase tracking-widest py-2.5 border border-black text-black hover:bg-black hover:text-white transition-colors" onClick={() => setUserMenuOpen(false)}>
                           Register
                         </Link>
                       </div>
@@ -230,10 +237,14 @@ export default function Header() {
               </div>
 
               {/* Wishlist */}
-              <Link href="/wishlist" className="p-2 hover:bg-marvvn-gray-50 rounded-full transition-colors relative hidden lg:flex" aria-label="Wishlist">
+              <Link
+                href="/wishlist"
+                className={cn('p-2 transition-colors relative hidden lg:flex', isScrolled ? 'text-black hover:text-black/60' : 'text-white hover:text-white/70')}
+                aria-label="Wishlist"
+              >
                 <Heart className="w-5 h-5" />
                 {wishlistCount() > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-marvvn-red text-white text-xs font-medium rounded-full flex items-center justify-center">
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-black text-white text-[10px] font-bold flex items-center justify-center">
                     {wishlistCount()}
                   </span>
                 )}
@@ -241,13 +252,13 @@ export default function Header() {
 
               <button
                 type="button"
-                className="p-2 hover:bg-marvvn-gray-50 rounded-full transition-colors relative"
+                className={cn('p-2 transition-colors relative', isScrolled ? 'text-black hover:text-black/60' : 'text-white hover:text-white/70')}
                 onClick={toggleCart}
                 aria-label="Cart"
               >
                 <ShoppingBag className="w-5 h-5" />
                 {totalItems() > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-marvvn-black text-white text-xs font-medium rounded-full flex items-center justify-center">
+                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-black text-white text-[10px] font-bold flex items-center justify-center">
                     {totalItems()}
                   </span>
                 )}

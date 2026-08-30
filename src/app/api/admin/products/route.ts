@@ -35,7 +35,7 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json()
-  const { handle, title, description, price, compare_at_price, images, category, collection, tags, sizes, colors, is_new, is_bestseller, badge, fabric_composition, gsm, waist, length, model_info } = body
+  const { handle, title, description, price, compare_at_price, images, category, collection, tags, sizes, colors, is_new, is_bestseller, badge, fabric_composition, gsm, waist, length, model_info, what_you_get, size_fit_text } = body
 
   if (!handle || !title || price === undefined) {
     return NextResponse.json({ error: 'Handle, title, and price are required' }, { status: 400 })
@@ -67,6 +67,8 @@ export async function POST(request: Request) {
       waist: waist || '',
       length: length || '',
       model_info: model_info || '',
+      what_you_get: what_you_get || [],
+      size_fit_text: size_fit_text || '',
     })
     .select()
     .single()

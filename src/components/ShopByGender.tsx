@@ -1,9 +1,7 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight } from 'lucide-react'
 import { useSettings } from '@/components/SettingsProvider'
 
 export default function ShopByGender() {
@@ -23,38 +21,41 @@ export default function ShopByGender() {
   ]
 
   return (
-    <section className="py-8 lg:py-12">
-      <div className="container">
-        <div className="grid md:grid-cols-2 gap-4 lg:gap-6">
-          {categories.map((category) => (
-            <Link
-              key={category.title}
-              href={category.link}
-              className="group relative overflow-hidden bg-marvvn-gray-100 aspect-[4/3]"
-            >
-              {category.image ? (
-                <Image
-                  src={category.image}
-                  alt={category.title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-cover group-hover:scale-105 transition-transform duration-700"
-                />
-              ) : (
-                <div className="w-full h-full bg-marvvn-gray-200 flex items-center justify-center">
-                  <span className="text-marvvn-gray-400 text-lg font-display">{category.title}</span>
-                </div>
-              )}
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-              <div className="absolute bottom-6 left-6 right-6">
-                <h3 className="text-lg md:text-xl font-display font-bold text-white mb-2">{category.title}</h3>
-                <span className="inline-flex items-center gap-1 text-white text-sm uppercase tracking-wider border-b border-white pb-0.5 group-hover:text-marvvn-gray-200 transition-colors">
-                  Explore <ArrowRight className="w-4 h-4" />
-                </span>
+    <section className="w-full">
+      <div className="grid md:grid-cols-2">
+        {categories.map((category) => (
+          <Link
+            key={category.title}
+            href={category.link}
+            className="group relative overflow-hidden bg-[#1a1a1a] aspect-[3/4] md:aspect-[4/5] block"
+          >
+            {category.image ? (
+              <Image
+                src={category.image}
+                alt={category.title}
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+              />
+            ) : (
+              <div className="w-full h-full bg-[#2a2a2a] flex items-center justify-center">
+                <span className="text-white/30 text-2xl font-bold tracking-widest">{category.title}</span>
               </div>
-            </Link>
-          ))}
-        </div>
+            )}
+            {/* Very subtle bottom gradient only */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+
+            {/* Bottom-left text — Bonkers Corner style */}
+            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
+              <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 tracking-tight leading-none">
+                {category.title}
+              </h3>
+              <span className="inline-block border border-white text-white text-xs font-semibold uppercase tracking-widest px-4 py-2 group-hover:bg-white group-hover:text-black transition-colors duration-300">
+                EXPLORE
+              </span>
+            </div>
+          </Link>
+        ))}
       </div>
     </section>
   )

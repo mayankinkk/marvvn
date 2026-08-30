@@ -20,14 +20,14 @@ const features = [
 
 export default function FeaturesBar() {
   return (
-    <section className="border-y border-marvvn-gray-100 bg-marvvn-gray-50">
-      <div className="container py-8 lg:py-12">
-        <div className="grid grid-cols-3 gap-6 lg:gap-8">
+    <section className="border-y border-black/8 bg-white">
+      <div className="container py-10 lg:py-14">
+        <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-black/8">
           {features.map((feature) => (
-            <div key={feature.title} className="text-center">
-              <feature.icon className="w-8 h-8 mx-auto mb-3 text-marvvn-black" strokeWidth={1.5} />
-              <h3 className="text-xs font-semibold uppercase tracking-wider mb-1">{feature.title}</h3>
-              <p className="text-xs text-marvvn-gray-500">{feature.description}</p>
+            <div key={feature.title} className="flex flex-col items-center text-center px-6 py-6 md:py-0">
+              <feature.icon className="w-7 h-7 mb-3 text-black" strokeWidth={1.5} />
+              <h3 className="text-xs font-bold uppercase tracking-widest mb-1.5">{feature.title}</h3>
+              <p className="text-xs text-marvvn-gray-500 max-w-[200px] leading-relaxed">{feature.description}</p>
             </div>
           ))}
         </div>
