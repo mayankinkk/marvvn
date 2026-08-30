@@ -7,6 +7,7 @@ import AuthCodeHandler from '@/components/AuthCodeHandler'
 import { I18nProvider } from '@/lib/i18n'
 import { AnalyticsScripts, Analytics, Pixel } from '@/components/Analytics'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { PageErrorBoundary } from '@/components/PageErrorBoundary'
 import ChatBot from '@/components/ChatBot'
 import LiveChat from '@/components/LiveChat'
 import './globals.css'
@@ -92,7 +93,9 @@ export default function RootLayout({
                 <AuthCodeHandler />
               </Suspense>
               <I18nProvider>
-                {children}
+                <PageErrorBoundary>
+                  {children}
+                </PageErrorBoundary>
               </I18nProvider>
               <ChatBot />
               <LiveChat />

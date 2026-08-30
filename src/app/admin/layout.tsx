@@ -6,13 +6,14 @@ import { usePathname, useRouter } from 'next/navigation'
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Tag, Settings,
   Menu, X, FileText, Star, AlertTriangle, Image, Store, LogOut,
-  ChevronDown, LayoutGrid, MessageSquare, RotateCcw, Clock, Headphones
+  ChevronDown, LayoutGrid, MessageSquare, RotateCcw, Clock, Headphones,
+  BarChart3, MessageCircle
 } from 'lucide-react'
 import { useAuthStore } from '@/lib/auth-store'
 
 interface NavGroup {
   label: string
-  items: { href: string; label: string; icon: any }[]
+  items: { href: string; label: string; icon: any; external?: boolean }[]
 }
 
 const navGroups: NavGroup[] = [
@@ -20,6 +21,7 @@ const navGroups: NavGroup[] = [
     label: 'Overview',
     items: [
       { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+      { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
     ],
   },
   {
@@ -36,6 +38,8 @@ const navGroups: NavGroup[] = [
       { href: '/admin/customers', label: 'Customers', icon: Users },
       { href: '/admin/coupons', label: 'Coupons', icon: Tag },
       { href: '/admin/abandoned-carts', label: 'Abandoned Carts', icon: Clock },
+      { href: '/admin/whatsapp-campaigns', label: 'WhatsApp Campaigns', icon: MessageCircle },
+      { href: '/api/shop/feed', label: 'Instagram Shop Feed', icon: Image, external: true },
     ],
   },
   {
@@ -135,6 +139,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <Link
                       key={item.href}
                       href={item.href}
+                      {...((item as any).external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                       onClick={() => setSidebarOpen(false)}
                       className={`flex items-center gap-3 px-3 py-2.5 text-[13px] font-medium rounded-lg transition-all duration-150 ${
                         isActive

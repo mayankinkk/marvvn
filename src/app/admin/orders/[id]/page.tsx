@@ -33,6 +33,7 @@ export default function AdminOrderDetailPage() {
   const [status, setStatus] = useState('')
   const [paymentStatus, setPaymentStatus] = useState('')
   const [notes, setNotes] = useState('')
+  const [trackingNumber, setTrackingNumber] = useState('')
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
@@ -44,6 +45,7 @@ export default function AdminOrderDetailPage() {
           setStatus(data.order.status)
           setPaymentStatus(data.order.payment_status)
           setNotes(data.order.notes || '')
+          setTrackingNumber(data.order.tracking_number || '')
         }
         setLoading(false)
       })
@@ -57,7 +59,7 @@ export default function AdminOrderDetailPage() {
       const res = await fetch(`/api/admin/orders/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status, payment_status: paymentStatus, notes }),
+        body: JSON.stringify({ status, payment_status: paymentStatus, notes, tracking_number: trackingNumber }),
       })
       if (res.ok) {
         const data = await res.json()
@@ -218,6 +220,16 @@ export default function AdminOrderDetailPage() {
                     <option key={s} value={s} className="capitalize">{s}</option>
                   ))}
                 </select>
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-gray-500 uppercase tracking-wider mb-1.5">Tracking Number (optional)</label>
+                <input
+                  type="text"
+                  value={trackingNumber}
+                  onChange={(e) => setTrackingNumber(e.target.value)}
+                  placeholder="e.g. DTDC123456789"
+                  className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:border-gray-900 focus:outline-none"
+                />
               </div>
               <button
                 type="button"

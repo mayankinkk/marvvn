@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Plus, Edit, Trash2, Search, CheckSquare, Square, X, DollarSign, Tag, Star, Package } from 'lucide-react'
+import { Plus, Edit, Trash2, Search, CheckSquare, Square, X, DollarSign, Tag, Star, Package, Upload } from 'lucide-react'
 import { formatPrice } from '@/lib/utils'
 import { Product } from '@/lib/types'
 import Image from 'next/image'
@@ -124,10 +124,16 @@ export default function AdminProductsPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-display font-medium">Products ({products.length})</h1>
-        <Link href="/admin/products/new" className="btn-primary flex items-center gap-2 text-sm">
-          <Plus className="w-4 h-4" />
-          Add Product
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href="/admin/products/import" className="btn-secondary flex items-center gap-2 text-sm">
+            <Upload className="w-4 h-4" />
+            Import CSV
+          </Link>
+          <Link href="/admin/products/new" className="btn-primary flex items-center gap-2 text-sm">
+            <Plus className="w-4 h-4" />
+            Add Product
+          </Link>
+        </div>
       </div>
 
       <div className="mb-6">

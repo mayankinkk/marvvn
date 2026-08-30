@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useCurrency } from '@/lib/hooks/useCurrency'
-import { Search, Package, ChevronRight, Truck, CheckCircle, Clock, XCircle, MapPin } from 'lucide-react'
+import { Search, Package, ChevronRight, Truck, CheckCircle, Clock, XCircle, MapPin, AlertTriangle } from 'lucide-react'
 
 const statusSteps = [
   { key: 'pending', label: 'Order Placed', icon: Clock, description: 'Your order has been received' },
@@ -28,6 +28,8 @@ export default function OrderTrackingPage() {
   const [order, setOrder] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [cancelling, setCancelling] = useState(false)
+  const [cancelMsg, setCancelMsg] = useState('')
   const { format } = useCurrency()
 
   const handleTrack = async (e: React.FormEvent) => {
@@ -52,6 +54,33 @@ export default function OrderTrackingPage() {
   }
 
   const currentStepIndex = order ? statusSteps.findIndex(s => s.key === order.status) : -1
+
+  const canCancel = order
+    && (order.status === 'pending' || order.status === 'confirmed')
+    && (Date.now() - new Date(order.created_at).getTime() < 60 * 60 * 1000)
+
+  const handleCancel = async () => {
+    if (!confirm('Are you sure you want to cancel this order?')) return
+    setCancelling(true)
+    setCancelMsg('')
+    try {
+      const res = await fetch('/api/cancel-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId: order.id, email }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setOrder({ ...order, status: 'cancelled' })
+        setCancelMsg('Order cancelled successfully')
+      } else {
+        setCancelMsg(data.error || 'Failed to cancel')
+      }
+    } catch {
+      setCancelMsg('Something went wrong')
+    }
+    setCancelling(false)
+  }
 
   // Build timeline from status_history
   const timeline = order?.status_history || []
@@ -200,6 +229,29 @@ export default function OrderTrackingPage() {
                   <span className="text-sm">{format(order.total || 0)}</span>
                 </div>
               </div>
+
+              {/* Cancel Order */}
+              {canCancel && (
+                <div className="border-t pt-4 mt-4">
+                  <div className="flex items-start gap-2 mb-3">
+                    <AlertTriangle className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                    <p className="text-xs text-marvvn-gray-500">You can cancel this order within 1 hour of placing it. Once shipped, cancellation is not possible.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    disabled={cancelling}
+                    className="w-full py-2.5 text-sm font-medium border border-red-300 text-red-600 hover:bg-red-50 transition-colors cursor-pointer disabled:opacity-50"
+                  >
+                    {cancelling ? 'Cancelling...' : 'Cancel Order'}
+                  </button>
+                </div>
+              )}
+              {cancelMsg && (
+                <div className={`mt-3 p-3 text-sm text-center rounded ${cancelMsg.includes('success') ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
+                  {cancelMsg}
+                </div>
+              )}
             </div>
           )}
         </div>

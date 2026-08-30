@@ -10,10 +10,11 @@ import { useCurrency } from '@/lib/hooks/useCurrency'
 import {
   ChevronRight, User, Package, Heart, LogOut, Settings,
   Copy, Check, Edit3, Save, X, Lock, Eye, EyeOff, Bell, Mail, MessageCircle,
-  Truck, Clock, CheckCircle, ArrowRight, Home, MapPin, Headphones
+  Truck, Clock, CheckCircle, ArrowRight, Home, MapPin, Headphones, RotateCcw
 } from 'lucide-react'
+import ReturnsTab from '@/components/ReturnsTab'
 
-type Tab = 'dashboard' | 'orders' | 'addresses' | 'settings'
+type Tab = 'dashboard' | 'orders' | 'addresses' | 'settings' | 'returns'
 
 interface OrderStats {
   totalOrders: number
@@ -144,6 +145,7 @@ export default function AccountPage() {
   const sidebarItems = [
     { id: 'dashboard' as Tab, label: 'Dashboard', icon: Home },
     { id: 'orders' as Tab, label: 'Orders', icon: Package },
+    { id: 'returns' as Tab, label: 'Returns', icon: RotateCcw },
     { id: 'addresses' as Tab, label: 'Saved Addresses', icon: MapPin },
     { id: 'settings' as Tab, label: 'Settings', icon: Settings },
   ]
@@ -406,6 +408,9 @@ export default function AccountPage() {
                 )}
               </div>
             )}
+
+            {/* Returns Tab */}
+            {activeTab === 'returns' && <ReturnsTab />}
 
             {/* Addresses Tab */}
             {activeTab === 'addresses' && (

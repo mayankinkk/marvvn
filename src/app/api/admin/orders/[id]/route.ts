@@ -41,12 +41,13 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   }
 
   const body = await request.json()
-  const { status, payment_status, notes } = body
+  const { status, payment_status, notes, tracking_number } = body
 
   const updateData: any = { updated_at: new Date().toISOString() }
   if (status) updateData.status = status
   if (payment_status) updateData.payment_status = payment_status
   if (notes !== undefined) updateData.notes = notes
+  if (tracking_number !== undefined) updateData.tracking_number = tracking_number
 
   // Get current order to append to status_history
   const { data: currentOrder } = await supabase
@@ -77,7 +78,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   if (status && data) {
     const { data: profile } = await supabase.from('profiles').select('email, name').eq('id', data.user_id).single()
     if (profile?.email) {
-      sendOrderStatusUpdate(id, profile.email, status).catch(console.error)
+      sendOrderStatusUpdate(id, profile.email, status, tracking_number).catch(console.error)
     }
     const phone = data.shipping_address?.phone
     if (phone) {

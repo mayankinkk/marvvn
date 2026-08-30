@@ -110,3 +110,26 @@ https://marvvn.online/cart`
     console.error('WhatsApp cart abandonment failed:', error)
   }
 }
+
+export async function sendWhatsAppMessage(phone: string, message: string) {
+  if (!PHONE_NUMBER_ID || !ACCESS_TOKEN || !phone) return
+
+  const res = await fetch(`${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${ACCESS_TOKEN}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      messaging_product: 'whatsapp',
+      to: phone,
+      type: 'text',
+      text: { body: message },
+    }),
+  })
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(err.error?.message || 'WhatsApp send failed')
+  }
+}

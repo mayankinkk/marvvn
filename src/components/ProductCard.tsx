@@ -61,6 +61,11 @@ export default function ProductCard({ product }: ProductCardProps) {
         {product.badge === 'bestseller' && (
           <span className="product-badge bg-marvvn-gold">Bestseller</span>
         )}
+        {typeof product.stock === 'number' && product.stock > 0 && product.stock <= 5 && (
+          <span className="absolute top-3 left-3 text-[10px] font-bold uppercase tracking-wider px-2 py-1 bg-red-600 text-white rounded-sm animate-pulse">
+            Only {product.stock} left!
+          </span>
+        )}
 
         <div className={cn(
           'absolute bottom-0 left-0 right-0 p-3 transition-all duration-300',

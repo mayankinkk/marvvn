@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export const dynamic = 'force-dynamic'
 
@@ -39,5 +40,23 @@ export async function generateMetadata({ params }: { params: Promise<{ handle: s
 }
 
 export default function ProductLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>
+  return (
+    <ErrorBoundary
+      fallback={
+        <div className="min-h-screen flex items-center justify-center p-8">
+          <div className="text-center max-w-md">
+            <h2 className="text-xl font-semibold mb-2">Product Unavailable</h2>
+            <p className="text-gray-600 mb-6 text-sm">
+              We couldn&apos;t load this product. It may be temporarily unavailable.
+            </p>
+            <a href="/" className="px-4 py-2 bg-black text-white text-sm font-medium hover:bg-gray-800 transition-colors inline-block">
+              Browse Products
+            </a>
+          </div>
+        </div>
+      }
+    >
+      {children}
+    </ErrorBoundary>
+  )
 }

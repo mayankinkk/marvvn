@@ -86,7 +86,7 @@ export async function sendOrderConfirmation(data: OrderEmailData) {
   })
 }
 
-export async function sendOrderStatusUpdate(orderId: string, email: string, status: string) {
+export async function sendOrderStatusUpdate(orderId: string, email: string, status: string, trackingNumber?: string) {
   const client = getResend()
   if (!client) return
 
@@ -111,6 +111,7 @@ export async function sendOrderStatusUpdate(orderId: string, email: string, stat
         <div style="padding:20px 0;text-align:center">
           <h2 style="color:#333">Order ${status.charAt(0).toUpperCase() + status.slice(1)}</h2>
           <p style="color:#666">${statusMessages[status] || 'Your order status has been updated.'}</p>
+          ${trackingNumber && status === 'shipped' ? `<p style="color:#333;font-size:14px;margin-top:12px"><strong>Tracking Number:</strong> ${trackingNumber}</p>` : ''}
           <p style="color:#999;font-size:14px">Order #${orderId.slice(0, 8).toUpperCase()}</p>
         </div>
         <div style="text-align:center;padding:20px 0;border-top:1px solid #eee;color:#999;font-size:12px">

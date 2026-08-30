@@ -110,14 +110,15 @@ export const useCartStore = create<CartStore>()(
 
       applyPromoCode: async (code) => {
         try {
-          const res = await fetch('/api/settings')
+          const res = await fetch('/api/coupons/validate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code }),
+          })
           if (!res.ok) return false
           const data = await res.json()
-          const validCoupons = data.valid_coupons || []
-          const upperCode = code.toUpperCase()
-          const coupon = validCoupons.find((c: any) => c.code === upperCode)
-          if (coupon) {
-            set({ promoCode: upperCode, discount: coupon.discount_value || 0 })
+          if (data.valid) {
+            set({ promoCode: data.code, discount: data.discount_value || 0 })
             return true
           }
         } catch (e) {

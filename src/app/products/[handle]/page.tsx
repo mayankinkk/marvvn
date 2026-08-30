@@ -321,6 +321,14 @@ export default function ProductPage() {
               )}
             </div>
 
+            {/* Low Stock Urgency */}
+            {!isOutOfStock && typeof product.stock === 'number' && product.stock > 0 && product.stock <= 5 && (
+              <div className="flex items-center gap-2 text-sm text-red-600 font-medium">
+                <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                Only {product.stock} left in stock — order soon!
+              </div>
+            )}
+
             {/* Out of Stock Alert */}
             {isOutOfStock && (
               <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
