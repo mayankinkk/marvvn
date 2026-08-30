@@ -54,7 +54,7 @@ export default function HeroBanner() {
       onMouseEnter={() => setIsAutoPlaying(false)}
       onMouseLeave={() => setIsAutoPlaying(true)}
     >
-      <div className="relative h-screen -mt-[calc(4rem+2.5rem)] md:-mt-[calc(5rem+2.5rem)]">
+      <div className="relative h-full">
         {slides.map((slide, index) => (
           <div
             key={index}

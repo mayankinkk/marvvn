@@ -502,11 +502,24 @@ export default function ProductPage() {
             {activeTab === 'size-fit' && (
               <div className="space-y-6">
                 <div className="space-y-3">
+                  {/* Per-product model info overrides global setting */}
                   <p className="text-sm text-marvvn-gray-600">
-                    {product.category === 'women'
-                      ? (settings.product_size_fit_women || "The model (Height 5'7\") is wearing size S")
-                      : (settings.product_size_fit_men || "The model (Height 5'10\") is wearing size M")}
+                    {product.model_info
+                      || (product.category === 'women'
+                        ? (settings.product_size_fit_women || "The model (Height 5'7\") is wearing size S")
+                        : (settings.product_size_fit_men || "The model (Height 5'10\") is wearing size M"))}
                   </p>
+
+                  {/* Per-product waist */}
+                  {product.waist && (
+                    <p className="text-sm text-marvvn-gray-600">Waist - {product.waist}</p>
+                  )}
+
+                  {/* Per-product length */}
+                  {product.length && (
+                    <p className="text-sm text-marvvn-gray-600">Length - {product.length}</p>
+                  )}
+
                   <p className="text-sm text-marvvn-gray-600">
                     {settings.product_size_fit_advice || 'Fits true to size. Do you need size advice? Please refer to our size chart.'}
                   </p>

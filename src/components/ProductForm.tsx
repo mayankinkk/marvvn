@@ -30,6 +30,11 @@ export default function ProductForm({ productId }: ProductFormProps) {
     is_new: false,
     is_bestseller: false,
     badge: '',
+    fabric_composition: '',
+    gsm: '',
+    waist: '',
+    length: '',
+    model_info: '',
   })
 
   useEffect(() => {
@@ -54,6 +59,11 @@ export default function ProductForm({ productId }: ProductFormProps) {
               is_new: p.is_new || false,
               is_bestseller: p.is_bestseller || false,
               badge: p.badge || '',
+              fabric_composition: p.fabric_composition || '',
+              gsm: p.gsm || '',
+              waist: p.waist || '',
+              length: p.length || '',
+              model_info: p.model_info || '',
             })
           }
         })
@@ -80,6 +90,11 @@ export default function ProductForm({ productId }: ProductFormProps) {
       is_new: form.is_new,
       is_bestseller: form.is_bestseller,
       badge: form.badge || null,
+      fabric_composition: form.fabric_composition,
+      gsm: form.gsm,
+      waist: form.waist,
+      length: form.length,
+      model_info: form.model_info,
     }
 
     try {
@@ -303,6 +318,67 @@ export default function ProductForm({ productId }: ProductFormProps) {
             <Save className="w-4 h-4" />
             {saving ? 'Saving...' : isEdit ? 'Update Product' : 'Create Product'}
           </button>
+        </div>
+
+        {/* Product Attributes — shown on product detail page */}
+        <div className="border-t pt-6 space-y-4">
+          <div>
+            <h3 className="font-medium text-sm mb-1">Product Attributes</h3>
+            <p className="text-xs text-marvvn-gray-500">Details shown on the product detail page (Size & Fit tab)</p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Fabric Composition</label>
+              <input
+                type="text"
+                value={form.fabric_composition}
+                onChange={(e) => setForm({ ...form, fabric_composition: e.target.value })}
+                className="input-field"
+                placeholder="60% Cotton 40% Polyester"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">GSM</label>
+              <input
+                type="text"
+                value={form.gsm}
+                onChange={(e) => setForm({ ...form, gsm: e.target.value })}
+                className="input-field"
+                placeholder="320"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Waist (Size info)</label>
+              <input
+                type="text"
+                value={form.waist}
+                onChange={(e) => setForm({ ...form, waist: e.target.value })}
+                className="input-field"
+                placeholder="28 - 30 inches"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Length / Inseam</label>
+              <input
+                type="text"
+                value={form.length}
+                onChange={(e) => setForm({ ...form, length: e.target.value })}
+                className="input-field"
+                placeholder="42 inches"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Model Info (per-product override)</label>
+            <input
+              type="text"
+              value={form.model_info}
+              onChange={(e) => setForm({ ...form, model_info: e.target.value })}
+              className="input-field"
+              placeholder="Model is 5'9&quot; and wears size M"
+            />
+            <p className="text-xs text-marvvn-gray-500 mt-1">Leave empty to use the global Size & Fit setting</p>
+          </div>
         </div>
       </form>
     </div>

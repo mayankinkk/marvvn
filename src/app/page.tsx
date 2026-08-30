@@ -38,10 +38,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen">
-      <Header />
+      {/* Hero section: header overlays this */}
+      <div className="relative h-screen">
+        <Header />
+        <HeroBanner />
+      </div>
 
       <main>
-        <HeroBanner />
 
         <ShopByGender />
 

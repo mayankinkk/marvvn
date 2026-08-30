@@ -19,6 +19,11 @@ export interface Product {
   flash_sale?: boolean
   flash_sale_price?: number
   flash_sale_ends_at?: string
+  fabric_composition?: string
+  gsm?: string
+  waist?: string
+  length?: string
+  model_info?: string
 }
 
 export interface Collection {

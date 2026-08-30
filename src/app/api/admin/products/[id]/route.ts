@@ -34,7 +34,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   }
 
   const body = await request.json()
-  const { handle, title, description, price, compare_at_price, images, category, collection, tags, sizes, colors, is_new, is_bestseller, badge } = body
+  const { handle, title, description, price, compare_at_price, images, category, collection, tags, sizes, colors, is_new, is_bestseller, badge, fabric_composition, gsm, waist, length, model_info } = body
 
   if (!handle || !title || price === undefined) {
     return NextResponse.json({ error: 'Handle, title, and price are required' }, { status: 400 })
@@ -61,6 +61,11 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       is_new: is_new || false,
       is_bestseller: is_bestseller || false,
       badge: badge || null,
+      fabric_composition: fabric_composition || '',
+      gsm: gsm || '',
+      waist: waist || '',
+      length: length || '',
+      model_info: model_info || '',
       updated_at: new Date().toISOString(),
     })
     .eq('id', id)
