@@ -190,7 +190,7 @@ export default function ProductPage() {
     <div className="min-h-screen">
       <Header />
 
-      <main className="container py-4 lg:py-8 page-content">
+      <main className="container py-4 lg:py-8">
         <nav className="flex items-center gap-2 text-xs text-marvvn-gray-500 mb-6">
           <Link href="/" className="hover:text-marvvn-black">Home</Link>
           <ChevronRight className="w-3 h-3" />

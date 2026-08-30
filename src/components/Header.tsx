@@ -113,7 +113,7 @@ export default function Header({ transparent = false }: { transparent?: boolean 
       <header
         className={cn(
           'top-0 left-0 right-0 z-50 transition-all duration-500',
-          transparent ? 'absolute' : 'fixed',
+          transparent ? 'absolute' : 'sticky',
           transparent
             ? isScrolled
               ? 'bg-white/98 backdrop-blur-xl shadow-sm border-b border-black/5'
