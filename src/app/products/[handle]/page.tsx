@@ -348,7 +348,15 @@ export default function ProductPage() {
             {/* Size */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-medium uppercase tracking-wider">Size</h3>
+                <div className="flex items-center gap-3 text-sm">
+                  <h3 className="font-medium uppercase tracking-wider">Size</h3>
+                  {product.waist && (
+                    <span className="text-marvvn-gray-500">| WAIST {product.waist.toUpperCase()}</span>
+                  )}
+                  {product.length && (
+                    <span className="text-marvvn-gray-500">| LENGTH {product.length.toUpperCase()}</span>
+                  )}
+                </div>
                 <SizeGuide category={product.category === 'women' ? 'women' : 'men'} />
               </div>
               <SizeRecommendations category={product.category} currentSize={selectedSize} />
@@ -524,6 +532,19 @@ export default function ProductPage() {
                     {settings.product_size_fit_advice || 'Fits true to size. Do you need size advice? Please refer to our size chart.'}
                   </p>
                 </div>
+
+                {/* Fabric Composition + GSM */}
+                {(product.fabric_composition || product.gsm) && (
+                  <div className="border-t pt-4 space-y-2">
+                    {product.fabric_composition && (
+                      <p className="text-sm text-marvvn-gray-600">Composition - {product.fabric_composition}</p>
+                    )}
+                    {product.gsm && (
+                      <p className="text-sm text-marvvn-gray-600">GSM - {product.gsm}</p>
+                    )}
+                  </div>
+                )}
+
                 <SizeGuide category={product.category === 'women' ? 'women' : 'men'} />
 
                 {/* Other Information — shown inline in Size & Fit tab like Bonkers */}
