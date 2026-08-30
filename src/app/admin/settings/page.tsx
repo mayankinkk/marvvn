@@ -1,15 +1,16 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Save, Store, Truck, Globe, Palette, Shield, Bell, Search, Loader2, FileText, Download, Newspaper, Plus, X } from 'lucide-react'
+import { Save, Store, Truck, Globe, Palette, Shield, Bell, Search, Loader2, FileText, Download, Newspaper, Plus, X, Package, Check } from 'lucide-react'
 
-type Tab = 'general' | 'shipping' | 'seo' | 'social' | 'notifications' | 'appearance' | 'maintenance' | 'invoice' | 'blog' | 'footer'
+type Tab = 'general' | 'shipping' | 'seo' | 'social' | 'notifications' | 'appearance' | 'maintenance' | 'invoice' | 'blog' | 'footer' | 'product-page'
 
 const tabs: { id: Tab; label: string; icon: any }[] = [
   { id: 'general', label: 'General', icon: Store },
   { id: 'shipping', label: 'Shipping', icon: Truck },
   { id: 'invoice', label: 'Invoice', icon: FileText },
   { id: 'blog', label: 'Blog Page', icon: Newspaper },
+  { id: 'product-page', label: 'Product Page', icon: Package },
   { id: 'seo', label: 'SEO', icon: Search },
   { id: 'social', label: 'Social', icon: Globe },
   { id: 'appearance', label: 'Appearance', icon: Palette },
@@ -690,6 +691,10 @@ export default function AdminSettingsPage() {
             <BlogTab settings={settings} update={update} />
           )}
 
+          {activeTab === 'product-page' && (
+            <ProductPageTab settings={settings} update={update} />
+          )}
+
           {activeTab === 'footer' && (
             <FooterLinksTab settings={settings} update={update} />
           )}
@@ -846,6 +851,254 @@ function BlogTab({ settings, update }: { settings: Record<string, string>; updat
               </span>
             ))}
           </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ProductPageTab({ settings, update }: { settings: Record<string, string>; update: (k: string, v: string) => void }) {
+  const whatYouGet: { icon: string; title: string; subtitle: string }[] = (() => {
+    try { return JSON.parse(settings.product_what_you_get || '[]') } catch { return [] }
+  })()
+
+  const addFeature = () => {
+    const updated = [...whatYouGet, { icon: 'package', title: '', subtitle: '' }]
+    update('product_what_you_get', JSON.stringify(updated))
+  }
+
+  const updateFeature = (index: number, field: string, value: string) => {
+    const updated = whatYouGet.map((f, i) => i === index ? { ...f, [field]: value } : f)
+    update('product_what_you_get', JSON.stringify(updated))
+  }
+
+  const removeFeature = (index: number) => {
+    update('product_what_you_get', JSON.stringify(whatYouGet.filter((_, i) => i !== index)))
+  }
+
+  const iconOptions = [
+    { value: 'package', label: 'Package' },
+    { value: 'credit-card', label: 'Credit Card' },
+    { value: 'zap', label: 'Lightning' },
+    { value: 'rotate-ccw', label: 'Rotate/Return' },
+    { value: 'truck', label: 'Truck' },
+    { value: 'shield', label: 'Shield' },
+    { value: 'heart', label: 'Heart' },
+    { value: 'star', label: 'Star' },
+  ]
+
+  const linesToList = (text: string) => text.split('\n').filter(Boolean).map((l) => l.trim())
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <h2 className="font-medium text-lg">Product Page</h2>
+        <p className="text-sm text-marvvn-gray-500 mt-1">Customize the product detail page sections</p>
+      </div>
+
+      {/* What You Get Section */}
+      <div className="border rounded-lg p-4 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="font-medium">What You Get Section</h3>
+            <p className="text-xs text-marvvn-gray-500 mt-0.5">Feature highlights shown below the add-to-cart button</p>
+          </div>
+          <button
+            type="button"
+            onClick={addFeature}
+            className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 border border-marvvn-gray-200 rounded hover:bg-marvvn-gray-50 transition-colors cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Add Feature
+          </button>
+        </div>
+        {whatYouGet.map((feat, i) => (
+          <div key={i} className="grid grid-cols-[120px_1fr_1fr] gap-2 items-end">
+            <div>
+              <label className="block text-xs font-medium mb-1">Icon</label>
+              <select
+                value={feat.icon}
+                onChange={(e) => updateFeature(i, 'icon', e.target.value)}
+                className="input-field w-full text-sm"
+              >
+                {iconOptions.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-medium mb-1">Title</label>
+              <input
+                type="text"
+                value={feat.title}
+                onChange={(e) => updateFeature(i, 'title', e.target.value)}
+                className="input-field w-full text-sm"
+                placeholder="Feature title"
+              />
+            </div>
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <label className="block text-xs font-medium mb-1">Subtitle</label>
+                <input
+                  type="text"
+                  value={feat.subtitle}
+                  onChange={(e) => updateFeature(i, 'subtitle', e.target.value)}
+                  className="input-field w-full text-sm"
+                  placeholder="Short description"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() => removeFeature(i)}
+                className="p-2 text-marvvn-gray-400 hover:text-red-500 mb-0.5 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        ))}
+
+        {/* Preview */}
+        {whatYouGet.length > 0 && (
+          <div className="border-t pt-4">
+            <h4 className="text-xs font-medium mb-2">Preview</h4>
+            <div className="space-y-3">
+              {whatYouGet.filter(f => f.title).map((feat, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <div className="w-9 h-9 bg-marvvn-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Check className="w-4 h-4 text-marvvn-gray-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">{feat.title}</p>
+                    <p className="text-xs text-marvvn-gray-500">{feat.subtitle}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Delivery Estimates */}
+      <div className="border rounded-lg p-4 space-y-4">
+        <h3 className="font-medium">Delivery Estimates</h3>
+        <div className="grid md:grid-cols-2 gap-4">
+          <Field
+            label="Min Delivery Days"
+            value={settings.product_delivery_min_days || '3'}
+            onChange={(v) => update('product_delivery_min_days', v)}
+            type="number"
+            placeholder="3"
+          />
+          <Field
+            label="Max Delivery Days"
+            value={settings.product_delivery_max_days || '5'}
+            onChange={(v) => update('product_delivery_max_days', v)}
+            type="number"
+            placeholder="5"
+          />
+        </div>
+      </div>
+
+      {/* Size & Fit */}
+      <div className="border rounded-lg p-4 space-y-4">
+        <h3 className="font-medium">Size & Fit</h3>
+        <Field
+          label="Men's Model Info"
+          value={settings.product_size_fit_men || ''}
+          onChange={(v) => update('product_size_fit_men', v)}
+          placeholder="The model (Height 5'10&quot;) is wearing size M"
+        />
+        <Field
+          label="Women's Model Info"
+          value={settings.product_size_fit_women || ''}
+          onChange={(v) => update('product_size_fit_women', v)}
+          placeholder="The model (Height 5'7&quot;) is wearing size S"
+        />
+        <div>
+          <label className="block text-sm font-medium mb-1">Size Advice</label>
+          <textarea
+            value={settings.product_size_fit_advice || ''}
+            onChange={(e) => update('product_size_fit_advice', e.target.value)}
+            className="input-field w-full min-h-[60px]"
+            placeholder="Fits true to size. Do you need size advice? Please refer to our size chart."
+          />
+        </div>
+      </div>
+
+      {/* Fabric & Care */}
+      <div className="border rounded-lg p-4 space-y-4">
+        <h3 className="font-medium">Fabric & Care</h3>
+        <div>
+          <label className="block text-sm font-medium mb-1">Care Instructions (one per line)</label>
+          <textarea
+            value={settings.product_fabric_care || ''}
+            onChange={(e) => update('product_fabric_care', e.target.value)}
+            className="input-field w-full min-h-[80px]"
+            placeholder="Machine wash cold with similar colors&#10;Tumble dry low&#10;Do not bleach or iron on print"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Fabric Notes (one per line)</label>
+          <textarea
+            value={settings.product_fabric_notes || ''}
+            onChange={(e) => update('product_fabric_notes', e.target.value)}
+            className="input-field w-full min-h-[60px]"
+            placeholder="Colors may slightly vary depending on your screen brightness.&#10;Actual product specifications may vary +/-5%"
+          />
+        </div>
+      </div>
+
+      {/* Shipping Tab Content */}
+      <div className="border rounded-lg p-4 space-y-4">
+        <h3 className="font-medium">Shipping Tab Content</h3>
+        <p className="text-xs text-marvvn-gray-500">Use {'{threshold}'} and {'{shipping_fee}'} as placeholders for dynamic values from settings.</p>
+        <div>
+          <label className="block text-sm font-medium mb-1">Shipping Text (one per line)</label>
+          <textarea
+            value={settings.product_shipping_text || ''}
+            onChange={(e) => update('product_shipping_text', e.target.value)}
+            className="input-field w-full min-h-[100px]"
+            placeholder="We currently offer 5% discount on all pre-paid orders.&#10;Free shipping on orders above {threshold}.&#10;Standard shipping fee of {shipping_fee} applies otherwise."
+          />
+        </div>
+      </div>
+
+      {/* Returns Tab Content */}
+      <div className="border rounded-lg p-4 space-y-4">
+        <h3 className="font-medium">Returns & Exchange Tab Content</h3>
+        <div>
+          <label className="block text-sm font-medium mb-1">Return Policy Text (one per line)</label>
+          <textarea
+            value={settings.product_returns_text || ''}
+            onChange={(e) => update('product_returns_text', e.target.value)}
+            className="input-field w-full min-h-[120px]"
+            placeholder="Returns accepted within 3 days of delivery only.&#10;Product must be unused, unworn, unwashed, with original tags and packaging."
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1">Refund Process</label>
+          <textarea
+            value={settings.product_returns_refund || ''}
+            onChange={(e) => update('product_returns_refund', e.target.value)}
+            className="input-field w-full min-h-[60px]"
+            placeholder="After we receive and inspect the returned item..."
+          />
+        </div>
+      </div>
+
+      {/* Other Information */}
+      <div className="border rounded-lg p-4 space-y-4">
+        <h3 className="font-medium">Other Information</h3>
+        <p className="text-xs text-marvvn-gray-500">Optional disclaimer shown in the Other Information tab. Leave blank to hide.</p>
+        <div>
+          <label className="block text-sm font-medium mb-1">Disclaimer Text (one per line)</label>
+          <textarea
+            value={settings.product_other_info || ''}
+            onChange={(e) => update('product_other_info', e.target.value)}
+            className="input-field w-full min-h-[80px]"
+            placeholder="Please note: Colors may vary slightly due to lighting and screen settings."
+          />
         </div>
       </div>
     </div>

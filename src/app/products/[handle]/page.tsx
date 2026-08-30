@@ -20,7 +20,18 @@ import { useAuthStore } from '@/lib/auth-store'
 import { useSettings } from '@/components/SettingsProvider'
 import { FlashSaleTimer, CrossSellProducts, SizeRecommendations } from '@/components/ProductExtras'
 
-type Tab = 'size-fit' | 'fabric-care' | 'reviews' | 'shipping' | 'returns'
+type Tab = 'size-fit' | 'fabric-care' | 'reviews' | 'shipping' | 'returns' | 'other-info'
+
+const featureIconMap: Record<string, any> = {
+  'package': Package,
+  'credit-card': CreditCard,
+  'zap': Zap,
+  'rotate-ccw': RotateCcw,
+  'truck': Truck,
+  'shield': Shield,
+  'heart': Heart,
+  'star': ChevronRight,
+}
 
 export default function ProductPage() {
   const params = useParams()
@@ -47,6 +58,31 @@ export default function ProductPage() {
 
   // Tabs
   const [activeTab, setActiveTab] = useState<Tab>('size-fit')
+
+  // Parse settings-driven content
+  const whatYouGetFeatures: { icon: string; title: string; subtitle: string }[] = (() => {
+    try { return JSON.parse(settings.product_what_you_get || '[]') } catch { return [] }
+  })()
+
+  const fabricCareLines = (settings.product_fabric_care || '').split('\n').filter(Boolean).map((l: string) => l.trim())
+  const fabricNotesLines = (settings.product_fabric_notes || '').split('\n').filter(Boolean).map((l: string) => l.trim())
+  const shippingLines = (settings.product_shipping_text || 'We currently offer 5% discount on all pre-paid orders.\nFree shipping on orders above {threshold}.\nStandard shipping fee of {shipping_fee} applies on orders below {threshold}.\nShips within 48 hours. Delivery in 4-7 business days across India.')
+    .replace(/{threshold}/g, `₹${settings.free_shipping_threshold || '999'}`)
+    .replace(/{shipping_fee}/g, `₹${settings.shipping_fee || '65'}`)
+    .split('\n').filter(Boolean).map((l: string) => l.trim())
+  const returnsLines = (settings.product_returns_text || 'Returns accepted within 3 days of delivery only.\nProduct must be unused, unworn, unwashed, with original tags and packaging.\nNo exchanges — refund only.\nDelivery charges are non-refundable.\nApplicable shipping charges will be deducted from refunds for returned free-shipping orders.\nDamaged or used items will not be accepted.\nIf you received a damaged item, contact us within 24 hours with photos/videos.')
+    .split('\n').filter(Boolean).map((l: string) => l.trim())
+  const otherInfoLines = (settings.product_other_info || '').split('\n').filter(Boolean).map((l: string) => l.trim())
+
+  // Add Other Information tab if content exists
+  const allTabs: { id: Tab; label: string; icon: any }[] = [
+    { id: 'size-fit', label: 'Size & Fit', icon: Package },
+    { id: 'fabric-care', label: 'Fabric & Care', icon: Shield },
+    { id: 'reviews', label: 'Reviews', icon: Heart },
+    { id: 'shipping', label: 'Shipping', icon: Truck },
+    { id: 'returns', label: 'Returns & Exchange', icon: RotateCcw },
+    ...(otherInfoLines.length > 0 ? [{ id: 'other-info' as Tab, label: 'Other Information', icon: Shield }] : []),
+  ]
 
   useEffect(() => {
     setSelectedSize('')
@@ -141,13 +177,7 @@ export default function ProductPage() {
     toggleCart()
   }
 
-  const tabs: { id: Tab; label: string; icon: any }[] = [
-    { id: 'size-fit', label: 'Size & Fit', icon: Package },
-    { id: 'fabric-care', label: 'Fabric & Care', icon: Shield },
-    { id: 'reviews', label: 'Reviews', icon: Heart },
-    { id: 'shipping', label: 'Shipping', icon: Truck },
-    { id: 'returns', label: 'Returns & Exchange', icon: RotateCcw },
-  ]
+  const tabs = allTabs
 
   return (
     <div className="min-h-screen">
@@ -393,42 +423,20 @@ export default function ProductPage() {
                 {product.title} designed for everyday comfort, durability, and hassle-free delivery.
               </p>
               <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 bg-marvvn-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Package className="w-4 h-4 text-marvvn-gray-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Premium Quality Fabric</p>
-                    <p className="text-xs text-marvvn-gray-500">Dense feel with lasting comfort</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 bg-marvvn-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <CreditCard className="w-4 h-4 text-marvvn-gray-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Flexible Payment Options</p>
-                    <p className="text-xs text-marvvn-gray-500">COD available + prepaid savings</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 bg-marvvn-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Zap className="w-4 h-4 text-marvvn-gray-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">Fast Delivery</p>
-                    <p className="text-xs text-marvvn-gray-500">Delivered within 4-7 working days</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 bg-marvvn-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <RotateCcw className="w-4 h-4 text-marvvn-gray-600" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium">3-Day Easy Returns</p>
-                    <p className="text-xs text-marvvn-gray-500">Easy returns within 3 days of delivery. Shipping charges deducted from refund on free-shipping orders.</p>
-                  </div>
-                </div>
+                {whatYouGetFeatures.map((feat, i) => {
+                  const Icon = featureIconMap[feat.icon] || Package
+                  return (
+                    <div key={i} className="flex items-start gap-3">
+                      <div className="w-9 h-9 bg-marvvn-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Icon className="w-4 h-4 text-marvvn-gray-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium">{feat.title}</p>
+                        <p className="text-xs text-marvvn-gray-500">{feat.subtitle}</p>
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             </div>
           </div>
@@ -461,11 +469,11 @@ export default function ProductPage() {
                 <h3 className="text-lg font-medium">Size & Fit</h3>
                 <p className="text-sm text-marvvn-gray-600">
                   {product.category === 'women'
-                    ? 'The model (Height 5\'7") is wearing size S'
-                    : 'The model (Height 5\'10") is wearing size M'}
+                    ? (settings.product_size_fit_women || "The model (Height 5'7\") is wearing size S")
+                    : (settings.product_size_fit_men || "The model (Height 5'10\") is wearing size M")}
                 </p>
                 <p className="text-sm text-marvvn-gray-600">
-                  Fits true to size. Do you need size advice? Please refer to our size chart.
+                  {settings.product_size_fit_advice || 'Fits true to size. Do you need size advice? Please refer to our size chart.'}
                 </p>
                 <SizeGuide category={product.category === 'women' ? 'women' : 'men'} />
               </div>
@@ -475,16 +483,13 @@ export default function ProductPage() {
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Fabric & Care</h3>
                 <div className="text-sm text-marvvn-gray-600 space-y-2">
-                  <p>Machine wash cold with similar colors</p>
-                  <p>Tumble dry low</p>
-                  <p>Do not bleach or iron on print</p>
-                  <p>Turn inside out before washing to preserve the design</p>
+                  {fabricCareLines.map((line: string, i: number) => <p key={i}>{line}</p>)}
                 </div>
-                <div className="mt-6 space-y-3 text-sm text-marvvn-gray-500 border-t pt-4">
-                  <p>Colors may slightly vary depending on your screen brightness.</p>
-                  <p>Actual product specifications may vary +/-5%</p>
-                  <p>All products have different sizes — refer to the size chart</p>
-                </div>
+                {fabricNotesLines.length > 0 && (
+                  <div className="mt-6 space-y-3 text-sm text-marvvn-gray-500 border-t pt-4">
+                    {fabricNotesLines.map((line: string, i: number) => <p key={i}>{line}</p>)}
+                  </div>
+                )}
               </div>
             )}
 
@@ -498,10 +503,7 @@ export default function ProductPage() {
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Shipping</h3>
                 <div className="text-sm text-marvvn-gray-600 space-y-3">
-                  <p>We currently offer 5% discount on all pre-paid orders.</p>
-                  <p>Free shipping on orders above {symbol}{settings.free_shipping_threshold || '999'}.</p>
-                  <p>Standard shipping fee of {symbol}{settings.shipping_fee || '65'} applies on orders below {symbol}{settings.free_shipping_threshold || '999'}.</p>
-                  <p>Ships within 48 hours. Delivery in 4-7 business days across India.</p>
+                  {shippingLines.map((line: string, i: number) => <p key={i}>{line}</p>)}
                 </div>
                 <div className="mt-4">
                   <h4 className="text-sm font-medium mb-2">Assistance</h4>
@@ -516,19 +518,22 @@ export default function ProductPage() {
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Returns & Exchange</h3>
                 <div className="text-sm text-marvvn-gray-600 space-y-3">
-                  <p>Returns accepted within 3 days of delivery only.</p>
-                  <p>Product must be unused, unworn, unwashed, with original tags and packaging.</p>
-                  <p>No exchanges — refund only.</p>
-                  <p>Delivery charges are non-refundable.</p>
-                  <p>Applicable shipping charges will be deducted from refunds for returned free-shipping orders.</p>
-                  <p>Damaged or used items will not be accepted.</p>
-                  <p>If you received a damaged item, contact us within 24 hours with photos/videos.</p>
+                  {returnsLines.map((line: string, i: number) => <p key={i}>{line}</p>)}
                 </div>
                 <div className="mt-4">
                   <h4 className="text-sm font-medium mb-2">Refund Process</h4>
                   <p className="text-sm text-marvvn-gray-600">
-                    After we receive and inspect the returned item, your refund will be credited to your original payment method within 5-7 business days.
+                    {settings.product_returns_refund || 'After we receive and inspect the returned item, your refund will be credited to your original payment method within 5-7 business days.'}
                   </p>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'other-info' && otherInfoLines.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Other Information</h3>
+                <div className="text-sm text-marvvn-gray-600 space-y-3">
+                  {otherInfoLines.map((line: string, i: number) => <p key={i}>{line}</p>)}
                 </div>
               </div>
             )}
