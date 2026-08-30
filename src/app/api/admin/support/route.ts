@@ -1,34 +1,44 @@
 import { NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
 
 export const dynamic = 'force-dynamic'
 
 export async function GET(request: Request) {
-  const admin = createAdminClient()
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    return NextResponse.json({ error: 'Missing env vars', tickets: [] })
+  }
+
   const { searchParams } = new URL(request.url)
   const status = searchParams.get('status')
   const search = searchParams.get('search')
 
-  let query = admin
-    .from('support_tickets')
-    .select('*')
-    .order('created_at', { ascending: false })
+  let restUrl = `${supabaseUrl}/rest/v1/support_tickets?select=*&order=created_at.desc`
 
   if (status && status !== 'all') {
-    query = query.eq('status', status)
+    restUrl += `&status=eq.${status}`
   }
 
-  const { data: tickets, error } = await query
+  const res = await fetch(restUrl, {
+    headers: {
+      apikey: serviceRoleKey,
+      Authorization: `Bearer ${serviceRoleKey}`,
+      'Content-Type': 'application/json',
+    },
+    cache: 'no-store',
+  })
 
-  if (error) {
-    return NextResponse.json({ error: error.message, tickets: [] })
+  if (!res.ok) {
+    const errText = await res.text()
+    return NextResponse.json({ error: errText, tickets: [] })
   }
 
-  let filtered = tickets || []
+  let tickets = await res.json()
 
   if (search) {
     const s = search.toLowerCase()
-    filtered = filtered.filter((t: any) =>
+    tickets = tickets.filter((t: any) =>
       t.subject.toLowerCase().includes(s) ||
       t.user_email.toLowerCase().includes(s) ||
       t.user_name?.toLowerCase().includes(s) ||
@@ -36,5 +46,5 @@ export async function GET(request: Request) {
     )
   }
 
-  return NextResponse.json({ tickets: filtered })
+  return NextResponse.json({ tickets })
 }
