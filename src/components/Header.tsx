@@ -270,25 +270,35 @@ export default function Header({ transparent = false }: { transparent?: boolean 
           </div>
         </div>
 
-        {/* Mega Menu - Desktop */}
+        {/* Mega Menu - Desktop — glassmorphism */}
         {activeMegaMenu && navLinks.map((link) => link.label === activeMegaMenu && (
           <div
             key={link.label}
-            className="absolute left-0 right-0 top-full bg-white border-t border-marvvn-gray-100 shadow-lg transition-all duration-200"
+            className="absolute left-0 right-0 top-full border-t border-white/20 shadow-2xl transition-all duration-300 animate-slide-down"
+            style={{
+              background: 'rgba(255,255,255,0.75)',
+              backdropFilter: 'blur(24px) saturate(180%)',
+              WebkitBackdropFilter: 'blur(24px) saturate(180%)',
+            }}
             onMouseEnter={() => handleMegaMenuEnter(link.label)}
             onMouseLeave={handleMegaMenuLeave}
           >
-            <div className="container py-8">
-              <div className="grid grid-cols-4 gap-8">
+            {/* Frosted inner gradient */}
+            <div className="absolute inset-0 bg-gradient-to-b from-white/30 to-white/10 pointer-events-none" />
+
+            <div className="container py-10 relative z-10">
+              <div className="grid grid-cols-4 gap-10">
                 {link.megaMenu.columns.map((column) => (
                   <div key={column.title}>
-                    <h3 className="font-medium text-sm uppercase tracking-wider mb-4">{column.title}</h3>
-                    <ul className="space-y-2">
+                    <h3 className="text-xs font-bold uppercase tracking-[0.15em] text-black mb-5 pb-2 border-b border-black/10">
+                      {column.title}
+                    </h3>
+                    <ul className="space-y-1.5">
                       {column.links.map((item) => (
                         <li key={item.label}>
                           <Link
                             href={item.href}
-                            className="text-sm text-marvvn-gray-600 hover:text-marvvn-black transition-colors"
+                            className="block text-sm text-black/60 hover:text-black hover:bg-black/5 px-2 py-1 -mx-2 transition-all duration-150 rounded-sm"
                           >
                             {item.label}
                           </Link>
@@ -298,18 +308,18 @@ export default function Header({ transparent = false }: { transparent?: boolean 
                   </div>
                 ))}
                 {link.megaMenu.featuredImage && (
-                  <div className="relative group overflow-hidden">
+                  <div className="relative group overflow-hidden rounded-sm">
                     <Link href={link.megaMenu.featuredImage.href}>
-                      <div className="aspect-[3/4] bg-marvvn-gray-100">
+                      <div className="aspect-[3/4] bg-black/5">
                         <img
                           src={link.megaMenu.featuredImage.src}
                           alt={link.megaMenu.featuredImage.alt}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                       </div>
-                      <div className="absolute bottom-4 left-4">
-                        <span className="text-sm font-medium uppercase">{link.megaMenu.featuredImage.label}</span>
-                        <div className="flex items-center gap-1 text-xs mt-1">
+                      <div className="absolute bottom-4 left-4 right-4">
+                        <span className="text-sm font-bold uppercase text-white drop-shadow-md">{link.megaMenu.featuredImage.label}</span>
+                        <div className="flex items-center gap-1 text-xs text-white/80 mt-1 drop-shadow-sm">
                           Shop <ChevronRight className="w-3 h-3" />
                         </div>
                       </div>

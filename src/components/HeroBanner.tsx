@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
@@ -10,6 +10,7 @@ export default function HeroBanner() {
   const settings = useSettings()
   const [current, setCurrent] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  const [isPaused, setIsPaused] = useState(false)
 
   const slides = [
     {
@@ -38,13 +39,17 @@ export default function HeroBanner() {
     },
   ]
 
+  const toggleAutoPlay = useCallback(() => {
+    setIsPaused((prev) => !prev)
+  }, [])
+
   useEffect(() => {
-    if (!isAutoPlaying) return
+    if (!isAutoPlaying || isPaused) return
     const timer = setInterval(() => {
       setCurrent((prev) => (prev + 1) % slides.length)
     }, 5000)
     return () => clearInterval(timer)
-  }, [isAutoPlaying, slides.length])
+  }, [isAutoPlaying, isPaused, slides.length])
 
   return (
     <section
@@ -102,8 +107,29 @@ export default function HeroBanner() {
         ))}
       </div>
 
-      {/* Dot indicators */}
-      <div className="absolute bottom-8 md:bottom-12 lg:bottom-16 right-8 md:right-12 lg:right-16 z-30 flex items-center gap-2">
+      {/* Dot indicators + Pause/Play */}
+      <div className="absolute bottom-8 md:bottom-12 lg:bottom-16 right-8 md:right-12 lg:right-16 z-30 flex items-center gap-3">
+        <button
+          type="button"
+          onClick={toggleAutoPlay}
+          className={cn(
+            'w-8 h-8 border border-white/60 backdrop-blur-sm flex items-center justify-center transition-all cursor-pointer',
+            isPaused
+              ? 'bg-white/20 hover:bg-white/30'
+              : 'bg-black/20 hover:bg-white hover:text-black'
+          )}
+          aria-label={isPaused ? 'Resume auto-play' : 'Pause auto-play'}
+        >
+          {isPaused ? (
+            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          ) : (
+            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+            </svg>
+          )}
+        </button>
         {slides.map((_, index) => (
           <button
             key={index}
