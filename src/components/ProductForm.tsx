@@ -306,20 +306,6 @@ export default function ProductForm({ productId }: ProductFormProps) {
           </div>
         </div>
 
-        <div className="flex gap-3 pt-4 border-t">
-          <Link href="/admin/products" className="btn-secondary px-6 py-3">
-            Cancel
-          </Link>
-          <button
-            type="submit"
-            disabled={saving}
-            className="btn-primary px-6 py-3 flex items-center gap-2 cursor-pointer disabled:opacity-50"
-          >
-            <Save className="w-4 h-4" />
-            {saving ? 'Saving...' : isEdit ? 'Update Product' : 'Create Product'}
-          </button>
-        </div>
-
         {/* Product Attributes — shown on product detail page */}
         <div className="border-t pt-6 space-y-4">
           <div>
@@ -379,6 +365,20 @@ export default function ProductForm({ productId }: ProductFormProps) {
             />
             <p className="text-xs text-marvvn-gray-500 mt-1">Leave empty to use the global Size & Fit setting</p>
           </div>
+        </div>
+
+        <div className="flex gap-3 pt-4 border-t">
+          <Link href="/admin/products" className="btn-secondary px-6 py-3">
+            Cancel
+          </Link>
+          <button
+            type="submit"
+            disabled={saving}
+            className="btn-primary px-6 py-3 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+          >
+            <Save className="w-4 h-4" />
+            {saving ? 'Saving...' : isEdit ? 'Update Product' : 'Create Product'}
+          </button>
         </div>
       </form>
     </div>
