@@ -148,7 +148,7 @@ export default function AccountPage() {
     { id: 'settings' as Tab, label: 'Settings', icon: Settings },
   ]
 
-  const supportLink = { href: '/support', label: 'Support Tickets', icon: Headphones }
+  const supportLink = { href: '/support', label: 'Support', icon: Headphones }
 
   return (
     <div className="min-h-screen bg-white">
