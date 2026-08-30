@@ -111,7 +111,7 @@ export default function Header() {
     <>
       {/* Announcement Bar */}
       {settings.announcement_bar && (
-        <div className="bg-marvvn-black text-white py-2 overflow-hidden">
+        <div className="bg-marvvn-black/90 backdrop-blur-sm text-white py-2 overflow-hidden">
           <div className="marquee-container whitespace-nowrap text-sm font-medium">
             {[...Array(6)].map((_, i) => (
               <span key={i} className="inline-block px-8 shrink-0">
@@ -125,8 +125,8 @@ export default function Header() {
       {/* Main Header */}
       <header
         className={cn(
-          'sticky top-0 z-50 bg-white transition-all duration-300',
-          isScrolled ? 'shadow-md' : ''
+          'absolute top-0 left-0 right-0 z-50 transition-all duration-300',
+          isScrolled ? 'bg-white shadow-md sticky' : 'bg-white/80 backdrop-blur-md'
         )}
       >
         {/* Logo and Main Nav */}

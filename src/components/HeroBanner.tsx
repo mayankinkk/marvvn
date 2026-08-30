@@ -54,7 +54,7 @@ export default function HeroBanner() {
       onMouseEnter={() => setIsAutoPlaying(false)}
       onMouseLeave={() => setIsAutoPlaying(true)}
     >
-      <div className="relative aspect-[16/7] md:aspect-[16/6] lg:aspect-[16/5]">
+      <div className="relative h-[85vh] md:h-[90vh]">
         {slides.map((slide, index) => (
           <div
             key={index}
@@ -79,8 +79,9 @@ export default function HeroBanner() {
               className="md:hidden object-cover"
               priority={index === 0}
             />
-            <div className="absolute inset-0 bg-black/20" />
-            <div className="absolute inset-0 flex items-center">
+            {/* Top gradient blur overlay */}
+            <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/40 via-black/10 to-transparent z-10" />
+            <div className="absolute inset-0 flex items-end pb-16 md:items-center md:pb-0">
               <div className="container">
                 <div className="max-w-xl">
                   <p className="text-white/80 text-xs md:text-sm uppercase tracking-[0.2em] mb-2 md:mb-3">
@@ -103,7 +104,7 @@ export default function HeroBanner() {
         ))}
       </div>
 
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
         {slides.map((_, index) => (
           <button
             key={index}
@@ -121,7 +122,7 @@ export default function HeroBanner() {
       <button
         type="button"
         onClick={() => setCurrent((prev) => (prev - 1 + slides.length) % slides.length)}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center transition-colors hidden md:flex cursor-pointer"
+        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 hover:bg-white rounded-full items-center justify-center transition-colors hidden md:flex cursor-pointer"
         aria-label="Previous slide"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -131,7 +132,7 @@ export default function HeroBanner() {
       <button
         type="button"
         onClick={() => setCurrent((prev) => (prev + 1) % slides.length)}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 hover:bg-white rounded-full flex items-center justify-center transition-colors hidden md:flex cursor-pointer"
+        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-white/80 hover:bg-white rounded-full items-center justify-center transition-colors hidden md:flex cursor-pointer"
         aria-label="Next slide"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
