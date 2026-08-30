@@ -40,7 +40,7 @@ export default function Home() {
     <div className="min-h-screen">
       {/* Hero section: header overlays this — full viewport height */}
       <div className="relative h-screen">
-        <Header />
+        <Header transparent />
         <HeroBanner />
       </div>
 

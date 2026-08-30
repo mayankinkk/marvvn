@@ -27,7 +27,7 @@ const topLinks = [
   { label: 'Contact', href: '/pages/get-in-touch' },
 ]
 
-export default function Header() {
+export default function Header({ transparent = false }: { transparent?: boolean }) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [activeMegaMenu, setActiveMegaMenu] = useState<string | null>(null)
@@ -109,13 +109,16 @@ export default function Header() {
 
   return (
     <>
-      {/* Main Header - absolute overlay with frosted glass */}
+      {/* Main Header */}
       <header
         className={cn(
-          'absolute top-0 left-0 right-0 z-50 transition-all duration-500',
-          isScrolled
-            ? 'bg-white/98 backdrop-blur-xl shadow-sm border-b border-black/5'
-            : 'bg-transparent backdrop-blur-sm'
+          'top-0 left-0 right-0 z-50 transition-all duration-500',
+          transparent ? 'absolute' : 'fixed',
+          transparent
+            ? isScrolled
+              ? 'bg-white/98 backdrop-blur-xl shadow-sm border-b border-black/5'
+              : 'bg-transparent'
+            : 'bg-white border-b border-black/8 shadow-sm'
         )}
       >
         {/* Announcement Bar */}
@@ -142,7 +145,7 @@ export default function Header() {
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Open menu"
             >
-              <Menu className={cn('w-6 h-6 transition-colors', isScrolled ? 'text-black' : 'text-white')} />
+              <Menu className={cn('w-6 h-6 transition-colors', (transparent && !isScrolled) ? 'text-white' : 'text-black')} />
             </button>
 
             {/* Desktop Navigation — Left side */}
@@ -158,7 +161,7 @@ export default function Header() {
                     href={link.href}
                     className={cn(
                       'text-xs font-bold uppercase tracking-widest transition-colors flex items-center gap-1',
-                      isScrolled ? 'text-black hover:text-black/60' : 'text-white hover:text-white/70'
+                      (transparent && !isScrolled) ? 'text-white hover:text-white/70' : 'text-black hover:text-black/60'
                     )}
                   >
                     {link.label}
@@ -171,9 +174,9 @@ export default function Header() {
             {/* Logo — Absolute center */}
             <Link href="/" className="absolute left-1/2 -translate-x-1/2 z-10">
               {settings.logo_url ? (
-                <img src={settings.logo_url} alt={settings.store_name || 'MARVVN'} className={cn('h-7 lg:h-9 transition-all', isScrolled ? '' : 'brightness-0 invert')} />
+                <img src={settings.logo_url} alt={settings.store_name || 'MARVVN'} className={cn('h-7 lg:h-9 transition-all', (transparent && !isScrolled) ? 'brightness-0 invert' : '')} />
               ) : (
-                <span className={cn('text-xl lg:text-2xl font-black uppercase tracking-[0.15em] transition-colors', isScrolled ? 'text-black' : 'text-white')}>
+                <span className={cn('text-xl lg:text-2xl font-black uppercase tracking-[0.15em] transition-colors', (transparent && !isScrolled) ? 'text-white' : 'text-black')}>
                   {settings.store_name || 'MARVVN'}
                 </span>
               )}
@@ -183,7 +186,7 @@ export default function Header() {
             <div className="flex items-center gap-1 lg:gap-2 ml-auto">
               <button
                 type="button"
-                className={cn('p-2 transition-colors', isScrolled ? 'text-black hover:text-black/60' : 'text-white hover:text-white/70')}
+                className={cn('p-2 transition-colors', (transparent && !isScrolled) ? 'text-white hover:text-white/70' : 'text-black hover:text-black/60')}
                 onClick={() => setSearchOpen(true)}
                 aria-label="Search"
               >
@@ -194,7 +197,7 @@ export default function Header() {
               <div className="relative hidden lg:block" ref={userMenuRef}>
                 <button
                   type="button"
-                  className={cn('p-2 transition-colors', isScrolled ? 'text-black hover:text-black/60' : 'text-white hover:text-white/70')}
+                  className={cn('p-2 transition-colors', (transparent && !isScrolled) ? 'text-white hover:text-white/70' : 'text-black hover:text-black/60')}
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   aria-label="Account"
                 >
@@ -239,7 +242,7 @@ export default function Header() {
               {/* Wishlist */}
               <Link
                 href="/wishlist"
-                className={cn('p-2 transition-colors relative hidden lg:flex', isScrolled ? 'text-black hover:text-black/60' : 'text-white hover:text-white/70')}
+                className={cn('p-2 transition-colors relative hidden lg:flex', (transparent && !isScrolled) ? 'text-white hover:text-white/70' : 'text-black hover:text-black/60')}
                 aria-label="Wishlist"
               >
                 <Heart className="w-5 h-5" />
@@ -252,7 +255,7 @@ export default function Header() {
 
               <button
                 type="button"
-                className={cn('p-2 transition-colors relative', isScrolled ? 'text-black hover:text-black/60' : 'text-white hover:text-white/70')}
+                className={cn('p-2 transition-colors relative', (transparent && !isScrolled) ? 'text-white hover:text-white/70' : 'text-black hover:text-black/60')}
                 onClick={toggleCart}
                 aria-label="Cart"
               >

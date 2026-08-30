@@ -156,4 +156,15 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+
+  /* Offset content below fixed header on all non-homepage pages */
+  .page-content {
+    padding-top: 5rem; /* 80px = header h-20 */
+  }
+
+  @media (min-width: 1024px) {
+    .page-content {
+      padding-top: 5.5rem; /* 88px = header h-20 + announcement bar allowance */
+    }
+  }
 }
