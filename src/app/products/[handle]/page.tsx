@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useParams } from 'next/navigation'
-import { Heart, ShoppingBag, Minus, Plus, ChevronRight, Truck, RotateCcw, Shield, Bell } from 'lucide-react'
+import { Heart, ShoppingBag, Minus, Plus, ChevronRight, Truck, RotateCcw, Shield, Bell, MapPin, ChevronDown, Package, CreditCard, Zap, ArrowRight } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
@@ -19,6 +19,8 @@ import { useWishlistStore } from '@/lib/wishlist-store'
 import { useAuthStore } from '@/lib/auth-store'
 import { useSettings } from '@/components/SettingsProvider'
 import { FlashSaleTimer, CrossSellProducts, SizeRecommendations } from '@/components/ProductExtras'
+
+type Tab = 'size-fit' | 'fabric-care' | 'reviews' | 'shipping' | 'returns'
 
 export default function ProductPage() {
   const params = useParams()
@@ -36,6 +38,15 @@ export default function ProductPage() {
   const settings = useSettings()
   const [stockAlertSigned, setStockAlertSigned] = useState(false)
   const [stockAlertEmail, setStockAlertEmail] = useState('')
+
+  // Delivery check
+  const [pincode, setPincode] = useState('')
+  const [deliveryInfo, setDeliveryInfo] = useState<{ estimate: string; startDate: string; endDate: string } | null>(null)
+  const [deliveryLoading, setDeliveryLoading] = useState(false)
+  const [deliveryError, setDeliveryError] = useState('')
+
+  // Tabs
+  const [activeTab, setActiveTab] = useState<Tab>('size-fit')
 
   useEffect(() => {
     setSelectedSize('')
@@ -62,6 +73,24 @@ export default function ProductPage() {
     setStockAlertSigned(true)
   }
 
+  const checkDelivery = async () => {
+    if (pincode.length !== 6) return
+    setDeliveryLoading(true)
+    setDeliveryError('')
+    try {
+      const res = await fetch(`/api/delivery-check?pincode=${pincode}`)
+      const data = await res.json()
+      if (data.error) {
+        setDeliveryError(data.error)
+      } else {
+        setDeliveryInfo(data)
+      }
+    } catch {
+      setDeliveryError('Could not check delivery')
+    }
+    setDeliveryLoading(false)
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen">
@@ -73,8 +102,6 @@ export default function ProductPage() {
               <div className="h-8 bg-marvvn-gray-100 rounded w-3/4" />
               <div className="h-6 bg-marvvn-gray-100 rounded w-1/4" />
               <div className="h-4 bg-marvvn-gray-100 rounded w-full" />
-              <div className="h-4 bg-marvvn-gray-100 rounded w-full" />
-              <div className="h-4 bg-marvvn-gray-100 rounded w-2/3" />
               <div className="h-12 bg-marvvn-gray-100 rounded w-full mt-8" />
             </div>
           </div>
@@ -105,6 +132,7 @@ export default function ProductPage() {
     .slice(0, 4)
   const inWishlist = isInWishlist(product.id)
   const isOutOfStock = product.stock !== undefined && product.stock <= 0
+  const displayPrice = product.flash_sale && product.flash_sale_price ? product.flash_sale_price : product.price
 
   const handleAddToCart = () => {
     const size = selectedSize || product.sizes[0]
@@ -112,6 +140,14 @@ export default function ProductPage() {
     addItem(product, size, color, quantity)
     toggleCart()
   }
+
+  const tabs: { id: Tab; label: string; icon: any }[] = [
+    { id: 'size-fit', label: 'Size & Fit', icon: Package },
+    { id: 'fabric-care', label: 'Fabric & Care', icon: Shield },
+    { id: 'reviews', label: 'Reviews', icon: Heart },
+    { id: 'shipping', label: 'Shipping', icon: Truck },
+    { id: 'returns', label: 'Returns & Exchange', icon: RotateCcw },
+  ]
 
   return (
     <div className="min-h-screen">
@@ -129,6 +165,7 @@ export default function ProductPage() {
         </nav>
 
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+          {/* Left — Images */}
           <div className="space-y-4">
             <div className="aspect-[3/4] bg-marvvn-gray-50 overflow-hidden relative">
               <Image
@@ -158,6 +195,7 @@ export default function ProductPage() {
             )}
           </div>
 
+          {/* Right — Product Info */}
           <div className="space-y-6">
             {/* Flash Sale Timer */}
             {product.flash_sale && product.flash_sale_ends_at && product.flash_sale_price && (
@@ -180,7 +218,7 @@ export default function ProductPage() {
                   'text-2xl font-medium',
                   product.compareAtPrice || product.flash_sale ? 'text-marvvn-red' : ''
                 )}>
-                  {formatPrice(product.flash_sale && product.flash_sale_price ? product.flash_sale_price : product.price)}
+                  {formatPrice(displayPrice)}
                 </span>
                 {discount > 0 && (
                   <span className="px-2 py-1 text-xs font-medium bg-marvvn-red text-white rounded">
@@ -191,6 +229,40 @@ export default function ProductPage() {
             </div>
 
             <p className="text-marvvn-gray-600">{product.description}</p>
+
+            {/* Check Delivery & Pickup */}
+            <div className="border rounded-xl p-4">
+              <p className="text-sm font-medium mb-3">Check Delivery and Pickup:</p>
+              <div className="flex gap-2">
+                <div className="flex-1 relative">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-marvvn-gray-400" />
+                  <input
+                    type="text"
+                    value={pincode}
+                    onChange={(e) => { setPincode(e.target.value.replace(/\D/g, '').slice(0, 6)); setDeliveryInfo(null); setDeliveryError('') }}
+                    placeholder="Enter pincode"
+                    className="w-full pl-10 pr-3 py-2.5 text-sm border border-marvvn-gray-300 focus:border-marvvn-black focus:outline-none"
+                    onKeyDown={(e) => e.key === 'Enter' && checkDelivery()}
+                  />
+                </div>
+                <button
+                  onClick={checkDelivery}
+                  disabled={pincode.length !== 6 || deliveryLoading}
+                  className="px-6 py-2.5 text-sm font-medium border border-marvvn-black hover:bg-marvvn-black hover:text-white transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  {deliveryLoading ? 'Checking...' : 'Check'}
+                </button>
+              </div>
+              {deliveryInfo && (
+                <div className="mt-3 flex items-center gap-2 text-sm text-green-700 bg-green-50 p-3 rounded">
+                  <Truck className="w-4 h-4 flex-shrink-0" />
+                  <span>{deliveryInfo.estimate}</span>
+                </div>
+              )}
+              {deliveryError && (
+                <p className="mt-2 text-sm text-red-600">{deliveryError}</p>
+              )}
+            </div>
 
             {/* Out of Stock Alert */}
             {isOutOfStock && (
@@ -219,6 +291,7 @@ export default function ProductPage() {
               </div>
             )}
 
+            {/* Size */}
             <div>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-medium uppercase tracking-wider">Size</h3>
@@ -244,6 +317,7 @@ export default function ProductPage() {
               </div>
             </div>
 
+            {/* Color */}
             <div>
               <h3 className="text-sm font-medium uppercase tracking-wider mb-3">Color</h3>
               <div className="flex flex-wrap gap-2">
@@ -265,6 +339,7 @@ export default function ProductPage() {
               </div>
             </div>
 
+            {/* Quantity */}
             <div>
               <h3 className="text-sm font-medium uppercase tracking-wider mb-3">Quantity</h3>
               <div className="flex items-center gap-3">
@@ -286,6 +361,7 @@ export default function ProductPage() {
               </div>
             </div>
 
+            {/* Add to Cart */}
             <div className="flex gap-3">
               <button
                 type="button"
@@ -310,24 +386,152 @@ export default function ProductPage() {
               </button>
             </div>
 
-            <div className="border-t pt-6 space-y-4">
-              <div className="flex items-center gap-3 text-sm">
-                <Truck className="w-5 h-5 text-marvvn-gray-400" />
-                <span>Free shipping on orders over {symbol}{settings.free_shipping_threshold || '999'}</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm">
-                <RotateCcw className="w-5 h-5 text-marvvn-gray-400" />
-                <span>3-day easy returns</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm">
-                <Shield className="w-5 h-5 text-marvvn-gray-400" />
-                <span>100% genuine products</span>
-              </div>
-              <div className="flex items-center gap-3 text-sm">
-                <RotateCcw className="w-5 h-5 text-marvvn-gray-400" />
-                <span>Applicable shipping charges will be deducted from refunds for returned free-shipping orders.</span>
+            {/* What You Get */}
+            <div className="border-t pt-6">
+              <h3 className="text-lg font-display font-medium mb-2">What You Get for {formatPrice(displayPrice)}</h3>
+              <p className="text-sm text-marvvn-gray-500 mb-4">
+                {product.title} designed for everyday comfort, durability, and hassle-free delivery.
+              </p>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 bg-marvvn-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Package className="w-4 h-4 text-marvvn-gray-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Premium Quality Fabric</p>
+                    <p className="text-xs text-marvvn-gray-500">Dense feel with lasting comfort</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 bg-marvvn-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <CreditCard className="w-4 h-4 text-marvvn-gray-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Flexible Payment Options</p>
+                    <p className="text-xs text-marvvn-gray-500">COD available + prepaid savings</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 bg-marvvn-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Zap className="w-4 h-4 text-marvvn-gray-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Fast Delivery</p>
+                    <p className="text-xs text-marvvn-gray-500">Delivered within 4-7 working days</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 bg-marvvn-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <RotateCcw className="w-4 h-4 text-marvvn-gray-600" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">3-Day Easy Returns</p>
+                    <p className="text-xs text-marvvn-gray-500">Easy returns within 3 days of delivery. Shipping charges deducted from refund on free-shipping orders.</p>
+                  </div>
+                </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Tabs Section */}
+        <div className="mt-12 lg:mt-16 border-t pt-8">
+          <div className="flex gap-2 flex-wrap mb-8">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn(
+                  'flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors cursor-pointer',
+                  activeTab === tab.id
+                    ? 'bg-marvvn-black text-white'
+                    : 'bg-marvvn-gray-100 text-marvvn-gray-600 hover:bg-marvvn-gray-200'
+                )}
+              >
+                <tab.icon className="w-4 h-4" />
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab Content */}
+          <div className="max-w-3xl">
+            {activeTab === 'size-fit' && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Size & Fit</h3>
+                <p className="text-sm text-marvvn-gray-600">
+                  {product.category === 'women'
+                    ? 'The model (Height 5\'7") is wearing size S'
+                    : 'The model (Height 5\'10") is wearing size M'}
+                </p>
+                <p className="text-sm text-marvvn-gray-600">
+                  Fits true to size. Do you need size advice? Please refer to our size chart.
+                </p>
+                <SizeGuide category={product.category === 'women' ? 'women' : 'men'} />
+              </div>
+            )}
+
+            {activeTab === 'fabric-care' && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Fabric & Care</h3>
+                <div className="text-sm text-marvvn-gray-600 space-y-2">
+                  <p>Machine wash cold with similar colors</p>
+                  <p>Tumble dry low</p>
+                  <p>Do not bleach or iron on print</p>
+                  <p>Turn inside out before washing to preserve the design</p>
+                </div>
+                <div className="mt-6 space-y-3 text-sm text-marvvn-gray-500 border-t pt-4">
+                  <p>Colors may slightly vary depending on your screen brightness.</p>
+                  <p>Actual product specifications may vary +/-5%</p>
+                  <p>All products have different sizes — refer to the size chart</p>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'reviews' && (
+              <div>
+                <ProductReviews productHandle={handle} />
+              </div>
+            )}
+
+            {activeTab === 'shipping' && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Shipping</h3>
+                <div className="text-sm text-marvvn-gray-600 space-y-3">
+                  <p>We currently offer 5% discount on all pre-paid orders.</p>
+                  <p>Free shipping on orders above {symbol}{settings.free_shipping_threshold || '999'}.</p>
+                  <p>Standard shipping fee of {symbol}{settings.shipping_fee || '65'} applies on orders below {symbol}{settings.free_shipping_threshold || '999'}.</p>
+                  <p>Ships within 48 hours. Delivery in 4-7 business days across India.</p>
+                </div>
+                <div className="mt-4">
+                  <h4 className="text-sm font-medium mb-2">Assistance</h4>
+                  <p className="text-sm text-marvvn-gray-600">
+                    Contact us at <a href={`mailto:${settings.store_email || 'marvvnclothing@gmail.com'}`} className="underline">{settings.store_email || 'marvvnclothing@gmail.com'}</a>
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'returns' && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Returns & Exchange</h3>
+                <div className="text-sm text-marvvn-gray-600 space-y-3">
+                  <p>Returns accepted within 3 days of delivery only.</p>
+                  <p>Product must be unused, unworn, unwashed, with original tags and packaging.</p>
+                  <p>No exchanges — refund only.</p>
+                  <p>Delivery charges are non-refundable.</p>
+                  <p>Applicable shipping charges will be deducted from refunds for returned free-shipping orders.</p>
+                  <p>Damaged or used items will not be accepted.</p>
+                  <p>If you received a damaged item, contact us within 24 hours with photos/videos.</p>
+                </div>
+                <div className="mt-4">
+                  <h4 className="text-sm font-medium mb-2">Refund Process</h4>
+                  <p className="text-sm text-marvvn-gray-600">
+                    After we receive and inspect the returned item, your refund will be credited to your original payment method within 5-7 business days.
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -345,8 +549,6 @@ export default function ProductPage() {
             </div>
           </section>
         )}
-
-        <ProductReviews productHandle={handle} />
       </main>
 
       <RecentlyViewed />
