@@ -78,8 +78,10 @@ export default function HeroBanner() {
               priority={index === 0}
             />
 
-            {/* Bonkers Corner: very subtle gradient only at bottom for text legibility */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/5 to-transparent z-10" />
+            {/* Top gradient: ensures header text (white) is always readable over any banner */}
+            <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-black/60 via-black/20 to-transparent z-10" />
+            {/* Bottom gradient: ensures CTA text is readable */}
+            <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10" />
 
             {/* Text block: bottom-left, stark and bold */}
             <div className="absolute bottom-0 left-0 right-0 z-20 p-8 md:p-12 lg:p-16">
