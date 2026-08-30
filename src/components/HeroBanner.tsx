@@ -50,7 +50,7 @@ export default function HeroBanner() {
 
   return (
     <section
-      className="relative w-full overflow-hidden"
+      className="relative w-full h-full overflow-hidden"
       onMouseEnter={() => setIsAutoPlaying(false)}
       onMouseLeave={() => setIsAutoPlaying(true)}
     >
