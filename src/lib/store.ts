@@ -7,6 +7,7 @@ import { trackAddToCart } from '@/components/Analytics'
 
 interface CartStore {
   items: CartItem[]
+  savedItems: CartItem[]
   isOpen: boolean
   promoCode: string
   discount: number
@@ -14,6 +15,9 @@ interface CartStore {
   removeItem: (productId: string, size: string, color: string) => void
   updateQuantity: (productId: string, size: string, color: string, quantity: number) => void
   clearCart: () => void
+  saveForLater: (productId: string, size: string, color: string) => void
+  moveToCart: (productId: string, size: string, color: string) => void
+  removeSavedItem: (productId: string, size: string, color: string) => void
   toggleCart: () => void
   setCartOpen: (open: boolean) => void
   applyPromoCode: (code: string) => Promise<boolean>
@@ -22,6 +26,7 @@ interface CartStore {
   totalPrice: () => number
   finalPrice: () => number
   loadFromServer: () => Promise<void>
+  loadSavedFromServer: () => Promise<void>
 }
 
 async function syncToServer(items: CartItem[]) {
@@ -54,10 +59,40 @@ async function syncToServer(items: CartItem[]) {
   }
 }
 
+async function syncSavedToServer(items: CartItem[]) {
+  try {
+    if (items.length === 0) {
+      await fetch('/api/saved-items', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ clearAll: true }),
+      })
+      return
+    }
+    await Promise.all(
+      items.map((item) =>
+        fetch('/api/saved-items', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productId: item.product.id,
+            size: item.size,
+            color: item.color,
+            quantity: item.quantity,
+          }),
+        })
+      )
+    )
+  } catch (e) {
+    console.error('Saved items sync failed:', e)
+  }
+}
+
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
+      savedItems: [],
       isOpen: false,
       promoCode: '',
       discount: 0,
@@ -105,6 +140,77 @@ export const useCartStore = create<CartStore>()(
         )
         set({ items: newItems })
         syncToServer(newItems)
+      },
+
+      saveForLater: (productId, size, color) => {
+        const item = get().items.find(
+          (i) => i.product.id === productId && i.size === size && i.color === color
+        )
+        if (!item) return
+
+        // Remove from cart
+        const newCartItems = get().items.filter(
+          (i) => !(i.product.id === productId && i.size === size && i.color === color)
+        )
+
+        // Add to saved (or update quantity if already exists)
+        const existingSaved = get().savedItems.find(
+          (i) => i.product.id === productId && i.size === size && i.color === color
+        )
+        let newSavedItems: CartItem[]
+        if (existingSaved) {
+          newSavedItems = get().savedItems.map((i) =>
+            i.product.id === productId && i.size === size && i.color === color
+              ? { ...i, quantity: i.quantity + item.quantity }
+              : i
+          )
+        } else {
+          newSavedItems = [...get().savedItems, item]
+        }
+
+        set({ items: newCartItems, savedItems: newSavedItems })
+        syncToServer(newCartItems)
+        syncSavedToServer(newSavedItems)
+      },
+
+      moveToCart: (productId, size, color) => {
+        const item = get().savedItems.find(
+          (i) => i.product.id === productId && i.size === size && i.color === color
+        )
+        if (!item) return
+
+        // Remove from saved
+        const newSavedItems = get().savedItems.filter(
+          (i) => !(i.product.id === productId && i.size === size && i.color === color)
+        )
+
+        // Add to cart (or update quantity if already exists)
+        const existingCart = get().items.find(
+          (i) => i.product.id === productId && i.size === size && i.color === color
+        )
+        let newCartItems: CartItem[]
+        if (existingCart) {
+          newCartItems = get().items.map((i) =>
+            i.product.id === productId && i.size === size && i.color === color
+              ? { ...i, quantity: Math.min(99, i.quantity + item.quantity) }
+              : i
+          )
+        } else {
+          newCartItems = [...get().items, item]
+        }
+
+        set({ items: newCartItems, savedItems: newSavedItems })
+        syncToServer(newCartItems)
+        syncSavedToServer(newSavedItems)
+        trackAddToCart(item.product.id, item.product.title, item.product.price)
+      },
+
+      removeSavedItem: (productId, size, color) => {
+        const newSavedItems = get().savedItems.filter(
+          (i) => !(i.product.id === productId && i.size === size && i.color === color)
+        )
+        set({ savedItems: newSavedItems })
+        syncSavedToServer(newSavedItems)
       },
 
       clearCart: () => {
@@ -179,12 +285,40 @@ export const useCartStore = create<CartStore>()(
           console.error('Failed to load cart from server:', e)
         }
       },
+
+      loadSavedFromServer: async () => {
+        try {
+          const res = await fetch('/api/saved-items')
+          if (!res.ok) return
+          const data = await res.json()
+          if (data.items && data.items.length > 0) {
+            const productRes = await fetch('/api/products')
+            const productData = await productRes.json()
+            const allProducts = productData.products || []
+
+            const items: CartItem[] = data.items.map((si: any) => {
+              const product = allProducts.find((p: any) => p.id === si.productId)
+              return product ? {
+                product,
+                quantity: si.quantity || 1,
+                size: si.size || '',
+                color: si.color || '',
+              } : null
+            }).filter(Boolean)
+
+            set({ savedItems: items })
+          }
+        } catch (e) {
+          console.error('Failed to load saved items from server:', e)
+        }
+      },
     }),
     {
       name: 'marvvn-cart',
       skipHydration: true,
       partialize: (state) => ({
         items: state.items,
+        savedItems: state.savedItems,
         promoCode: state.promoCode,
         discount: state.discount,
       }),

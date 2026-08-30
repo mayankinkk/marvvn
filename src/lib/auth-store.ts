@@ -54,6 +54,7 @@ export const useAuthStore = create<AuthStore>()(
           }
           set({ user, isAuthenticated: true, loading: false })
           useCartStore.getState().loadFromServer()
+          useCartStore.getState().loadSavedFromServer()
           return true
         } catch {
           set({ loading: false })
@@ -121,6 +122,7 @@ export const useAuthStore = create<AuthStore>()(
             if (data.user) {
               set({ user: data.user, isAuthenticated: true, loading: false })
               useCartStore.getState().loadFromServer()
+              useCartStore.getState().loadSavedFromServer()
               return
             }
           }
@@ -143,6 +145,7 @@ export const useAuthStore = create<AuthStore>()(
                 loading: false,
               })
               useCartStore.getState().loadFromServer()
+              useCartStore.getState().loadSavedFromServer()
               return
           }
         } catch {}

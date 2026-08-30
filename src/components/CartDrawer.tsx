@@ -3,12 +3,12 @@
 import { useState } from 'react'
 import { useCartStore } from '@/lib/store'
 import { formatPrice } from '@/lib/utils'
-import { X, Minus, Plus, ShoppingBag, ArrowRight, Tag } from 'lucide-react'
+import { X, Minus, Plus, ShoppingBag, ArrowRight, Tag, Bookmark } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 
 export default function CartDrawer() {
-  const { items, isOpen, setCartOpen, removeItem, updateQuantity, totalItems, totalPrice, finalPrice, promoCode, discount, applyPromoCode, removePromoCode } = useCartStore()
+  const { items, isOpen, setCartOpen, removeItem, updateQuantity, saveForLater, totalItems, totalPrice, finalPrice, promoCode, discount, applyPromoCode, removePromoCode } = useCartStore()
   const [promoInput, setPromoInput] = useState('')
   const [promoError, setPromoError] = useState('')
 
@@ -105,13 +105,23 @@ export default function CartDrawer() {
                         </button>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => removeItem(item.product.id, item.size, item.color)}
-                      className="p-1 hover:bg-marvvn-gray-50 rounded transition-colors self-start"
-                    >
-                      <X className="w-4 h-4 text-marvvn-gray-400" />
-                    </button>
+                    <div className="flex flex-col gap-1 self-start">
+                      <button
+                        type="button"
+                        onClick={() => saveForLater(item.product.id, item.size, item.color)}
+                        className="p-1 hover:bg-marvvn-gray-50 rounded transition-colors"
+                        title="Save for later"
+                      >
+                        <Bookmark className="w-4 h-4 text-marvvn-gray-400" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeItem(item.product.id, item.size, item.color)}
+                        className="p-1 hover:bg-marvvn-gray-50 rounded transition-colors"
+                      >
+                        <X className="w-4 h-4 text-marvvn-gray-400" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

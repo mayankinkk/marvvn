@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { Minus, Plus, X, ShoppingBag, ArrowRight, ChevronRight, Tag } from 'lucide-react'
+import { Minus, Plus, X, ShoppingBag, ArrowRight, ChevronRight, Tag, Bookmark, ShoppingCart } from 'lucide-react'
 import { useState } from 'react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
@@ -11,7 +11,7 @@ import { formatPrice } from '@/lib/utils'
 import { trackRemoveFromCart } from '@/components/Analytics'
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, totalItems, totalPrice, finalPrice, clearCart, promoCode, discount, applyPromoCode, removePromoCode } = useCartStore()
+  const { items, savedItems, removeItem, updateQuantity, saveForLater, moveToCart, removeSavedItem, totalItems, totalPrice, finalPrice, clearCart, promoCode, discount, applyPromoCode, removePromoCode } = useCartStore()
   const [promoInput, setPromoInput] = useState('')
   const [promoError, setPromoError] = useState('')
 
@@ -47,6 +47,59 @@ export default function CartPage() {
             <Link href="/collections/new-arrivals" className="btn-primary">
               Start Shopping
             </Link>
+
+            {/* Show saved items even when cart is empty */}
+            {savedItems.length > 0 && (
+              <div className="mt-12 text-left max-w-2xl mx-auto">
+                <h2 className="text-lg font-display font-medium mb-4 flex items-center gap-2 justify-center">
+                  <Bookmark className="w-5 h-5" />
+                  Saved for Later ({savedItems.length})
+                </h2>
+                <div className="divide-y border">
+                  {savedItems.map((item) => (
+                    <div key={`saved-${item.product.id}-${item.size}-${item.color}`} className="py-4 px-4 flex gap-4 items-center">
+                      <div className="w-16 h-20 bg-marvvn-gray-50 flex-shrink-0 relative overflow-hidden">
+                        <Image
+                          src={item.product.images?.[0] || '/placeholder.png'}
+                          alt={item.product.title}
+                          fill
+                          sizes="64px"
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <Link
+                          href={`/products/${item.product.handle}`}
+                          className="text-sm font-medium hover:text-marvvn-gray-600 transition-colors truncate block"
+                        >
+                          {item.product.title}
+                        </Link>
+                        <p className="text-xs text-marvvn-gray-500 mt-0.5">
+                          {item.size} / {item.color}
+                        </p>
+                        <p className="text-sm font-medium mt-1">{formatPrice(item.product.price)}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => moveToCart(item.product.id, item.size, item.color)}
+                          className="px-3 py-1.5 text-xs font-medium border border-marvvn-gray-300 hover:border-marvvn-black transition-colors flex items-center gap-1"
+                        >
+                          <ShoppingCart className="w-3 h-3" /> Move to Cart
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeSavedItem(item.product.id, item.size, item.color)}
+                          className="p-1 hover:bg-marvvn-gray-50 rounded transition-colors"
+                        >
+                          <X className="w-4 h-4 text-marvvn-gray-400" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div className="grid lg:grid-cols-3 gap-8">
@@ -82,16 +135,26 @@ export default function CartPage() {
                         <p className="text-xs text-marvvn-gray-500 mt-1">
                           {item.size} / {item.color}
                         </p>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            trackRemoveFromCart(item.product.id, item.product.title, item.product.price, item.quantity)
-                            removeItem(item.product.id, item.size, item.color)
-                          }}
-                          className="text-xs text-marvvn-gray-400 hover:text-marvvn-red mt-2 flex items-center gap-1"
-                        >
-                          <X className="w-3 h-3" /> Remove
-                        </button>
+                        <div className="flex items-center gap-3 mt-2">
+                          <button
+                            type="button"
+                            onClick={() => saveForLater(item.product.id, item.size, item.color)}
+                            className="text-xs text-marvvn-gray-400 hover:text-marvvn-black flex items-center gap-1"
+                          >
+                            <Bookmark className="w-3 h-3" /> Save for later
+                          </button>
+                          <span className="text-marvvn-gray-300">|</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              trackRemoveFromCart(item.product.id, item.product.title, item.product.price, item.quantity)
+                              removeItem(item.product.id, item.size, item.color)
+                            }}
+                            className="text-xs text-marvvn-gray-400 hover:text-marvvn-red flex items-center gap-1"
+                          >
+                            <X className="w-3 h-3" /> Remove
+                          </button>
+                        </div>
                       </div>
                     </div>
                     <div className="md:col-span-2 text-center">
@@ -133,6 +196,59 @@ export default function CartPage() {
                   Clear Cart
                 </button>
               </div>
+
+              {/* Saved for Later */}
+              {savedItems.length > 0 && (
+                <div className="mt-10">
+                  <h2 className="text-lg font-display font-medium mb-4 flex items-center gap-2">
+                    <Bookmark className="w-5 h-5" />
+                    Saved for Later ({savedItems.length})
+                  </h2>
+                  <div className="divide-y border">
+                    {savedItems.map((item) => (
+                      <div key={`saved-${item.product.id}-${item.size}-${item.color}`} className="py-4 px-4 flex gap-4 items-center">
+                        <div className="w-16 h-20 bg-marvvn-gray-50 flex-shrink-0 relative overflow-hidden">
+                          <Image
+                            src={item.product.images?.[0] || '/placeholder.png'}
+                            alt={item.product.title}
+                            fill
+                            sizes="64px"
+                            className="object-cover"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <Link
+                            href={`/products/${item.product.handle}`}
+                            className="text-sm font-medium hover:text-marvvn-gray-600 transition-colors truncate block"
+                          >
+                            {item.product.title}
+                          </Link>
+                          <p className="text-xs text-marvvn-gray-500 mt-0.5">
+                            {item.size} / {item.color}
+                          </p>
+                          <p className="text-sm font-medium mt-1">{formatPrice(item.product.price)}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => moveToCart(item.product.id, item.size, item.color)}
+                            className="px-3 py-1.5 text-xs font-medium border border-marvvn-gray-300 hover:border-marvvn-black transition-colors flex items-center gap-1"
+                          >
+                            <ShoppingCart className="w-3 h-3" /> Move to Cart
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => removeSavedItem(item.product.id, item.size, item.color)}
+                            className="p-1 hover:bg-marvvn-gray-50 rounded transition-colors"
+                          >
+                            <X className="w-4 h-4 text-marvvn-gray-400" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Summary */}
