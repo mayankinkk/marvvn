@@ -153,7 +153,7 @@ export default function AdminBlogsPage() {
     const end = ta.selectionEnd
     const selected = form.content.substring(start, end) || placeholder
     const newText = form.content.substring(0, start) + prefix + selected + suffix + form.content.substring(end)
-    setForm({ ...form, content: newText })
+    setForm(f => ({ ...f, content: newText }))
     setTimeout(() => {
       ta.focus()
       const newCursorPos = start + prefix.length + selected.length

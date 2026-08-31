@@ -22,6 +22,7 @@ import { useAuthStore } from '@/lib/auth-store'
 import { useSettings } from '@/components/SettingsProvider'
 import { FlashSaleTimer, CrossSellProducts, SizeRecommendations } from '@/components/ProductExtras'
 import { ProductJsonLd, BreadcrumbJsonLd } from '@/components/JsonLd'
+import StickyAddToCart from '@/components/StickyAddToCart'
 
 type Tab = 'size-fit' | 'fabric-care' | 'reviews' | 'shipping' | 'returns'
 
@@ -659,6 +660,14 @@ export default function ProductPage() {
       </main>
 
       <RecentlyViewed />
+
+      {/* Sticky Add to Cart - Mobile only */}
+      <StickyAddToCart
+        product={product}
+        selectedSize={selectedSize || product.sizes[0]}
+        selectedColor={selectedColor || product.colors[0]}
+        onAddToCart={handleAddToCart}
+      />
 
       <Footer />
     </div>

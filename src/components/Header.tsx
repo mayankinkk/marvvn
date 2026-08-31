@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Search, User, Heart, ShoppingBag, Menu, X, MapPin, ChevronDown, ChevronRight, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useCartStore } from '@/lib/store'
@@ -174,7 +175,14 @@ export default function Header({ transparent = false }: { transparent?: boolean 
             {/* Logo — Absolute center */}
             <Link href="/" className="absolute left-1/2 -translate-x-1/2 z-10">
               {settings.logo_url ? (
-                <img src={settings.logo_url} alt={settings.store_name || 'MARVVN'} className={cn('h-7 lg:h-9 transition-all', (transparent && !isScrolled) ? 'brightness-0 invert' : '')} />
+                <Image
+                  src={settings.logo_url}
+                  alt={settings.store_name || 'MARVVN'}
+                  width={120}
+                  height={36}
+                  className={cn('h-7 lg:h-9 w-auto transition-all', (transparent && !isScrolled) ? 'brightness-0 invert' : '')}
+                  priority
+                />
               ) : (
                 <span className={cn('text-xl lg:text-2xl font-black uppercase tracking-[0.15em] transition-colors', (transparent && !isScrolled) ? 'text-white' : 'text-black')}>
                   {settings.store_name || 'MARVVN'}
@@ -310,11 +318,13 @@ export default function Header({ transparent = false }: { transparent?: boolean 
                 {link.megaMenu.featuredImage && (
                   <div className="relative group overflow-hidden rounded-sm">
                     <Link href={link.megaMenu.featuredImage.href}>
-                      <div className="aspect-[3/4] bg-black/5">
-                        <img
+                      <div className="aspect-[3/4] bg-black/5 relative">
+                        <Image
                           src={link.megaMenu.featuredImage.src}
                           alt={link.megaMenu.featuredImage.alt}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          fill
+                          sizes="25vw"
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                       </div>
                       <div className="absolute bottom-4 left-4 right-4">

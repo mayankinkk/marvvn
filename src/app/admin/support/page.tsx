@@ -58,10 +58,6 @@ export default function AdminSupportPage() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
 
-  useEffect(() => {
-    fetchTickets()
-  }, [])
-
   const fetchTickets = async () => {
     setLoading(true)
     try {
@@ -74,7 +70,7 @@ export default function AdminSupportPage() {
 
   useEffect(() => {
     fetchTickets()
-  }, [statusFilter])
+  }, [statusFilter, search, fetchTickets])
 
   const fetchTicketMessages = async (ticketId: string) => {
     setSelectedTicket(ticketId)
