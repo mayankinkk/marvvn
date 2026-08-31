@@ -10,12 +10,16 @@ export async function GET() {
       .order('sort_order', { ascending: true })
 
     if (error) {
+      // If table doesn't exist, return empty array
+      if (error.message?.includes('does not exist') || error.code === '42P01') {
+        return NextResponse.json({ posts: [], setupRequired: true })
+      }
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     return NextResponse.json({ posts: posts || [] })
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch posts' }, { status: 500 })
+    return NextResponse.json({ posts: [], setupRequired: true })
   }
 }
 

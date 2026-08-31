@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Trash2, GripVertical, Save, Eye, EyeOff, ExternalLink, Loader2, Image as ImageIcon, Download } from 'lucide-react'
+import { Plus, Trash2, GripVertical, Save, Eye, EyeOff, ExternalLink, Loader2, Image as ImageIcon, Download, AlertTriangle, Copy } from 'lucide-react'
 
 interface InstagramPost {
   id: string
@@ -22,6 +22,24 @@ interface ProductImage {
   imported: boolean
 }
 
+const SETUP_SQL = `CREATE TABLE IF NOT EXISTS instagram_posts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  image_url TEXT NOT NULL,
+  caption TEXT DEFAULT '',
+  link TEXT DEFAULT '',
+  sort_order INTEGER DEFAULT 0,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE instagram_posts ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public can view active instagram posts" ON instagram_posts
+  FOR SELECT USING (is_active = true);
+
+CREATE POLICY "Authenticated users can manage instagram posts" ON instagram_posts
+  FOR ALL USING (auth.role() = 'authenticated');`
+
 export default function InstagramPostsPage() {
   const [posts, setPosts] = useState<InstagramPost[]>([])
   const [loading, setLoading] = useState(true)
@@ -31,6 +49,8 @@ export default function InstagramPostsPage() {
   const [productImages, setProductImages] = useState<ProductImage[]>([])
   const [loadingProducts, setLoadingProducts] = useState(false)
   const [importing, setImporting] = useState(false)
+  const [setupRequired, setSetupRequired] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     fetchPosts()
@@ -43,6 +63,9 @@ export default function InstagramPostsPage() {
       const res = await fetch('/api/admin/instagram-posts')
       const data = await res.json()
       setPosts(data.posts || [])
+      if (data.setupRequired) {
+        setSetupRequired(true)
+      }
     } catch {}
     setLoading(false)
   }
@@ -91,6 +114,7 @@ export default function InstagramPostsPage() {
     try {
       await fetch(`/api/admin/instagram-posts?id=${id}`, { method: 'DELETE' })
       fetchPosts()
+      fetchProductImages()
     } catch {}
   }
 
@@ -166,6 +190,12 @@ export default function InstagramPostsPage() {
     })
   }
 
+  const copySetupSQL = () => {
+    navigator.clipboard.writeText(SETUP_SQL)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -173,14 +203,45 @@ export default function InstagramPostsPage() {
           <h1 className="text-2xl font-display font-medium">Instagram Feed Posts</h1>
           <p className="text-sm text-marvvn-gray-500 mt-1">Manage which posts appear on your homepage Instagram section</p>
         </div>
-        <button
-          onClick={() => { setIsAdding(true); setEditingPost({ image_url: '', caption: '', link: '', sort_order: posts.length, is_active: true }) }}
-          className="flex items-center gap-2 px-4 py-2 bg-marvvn-black text-white text-sm font-medium hover:bg-marvvn-gray-800 cursor-pointer"
-        >
-          <Plus className="w-4 h-4" />
-          Add Post
-        </button>
+        {!setupRequired && (
+          <button
+            onClick={() => { setIsAdding(true); setEditingPost({ image_url: '', caption: '', link: '', sort_order: posts.length, is_active: true }) }}
+            className="flex items-center gap-2 px-4 py-2 bg-marvvn-black text-white text-sm font-medium hover:bg-marvvn-gray-800 cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            Add Post
+          </button>
+        )}
       </div>
+
+      {/* Setup Required Notice */}
+      {setupRequired && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
+          <h2 className="font-medium flex items-center gap-2 mb-3">
+            <AlertTriangle className="w-5 h-5 text-amber-500" />
+            Setup Required
+          </h2>
+          <p className="text-sm text-marvvn-gray-600 mb-3">
+            You need to create the <code className="bg-amber-100 px-1 rounded">instagram_posts</code> table in Supabase first.
+          </p>
+          <ol className="text-sm text-marvvn-gray-600 space-y-2 list-decimal pl-5 mb-4">
+            <li>Go to your <a href="https://supabase.com/dashboard" target="_blank" className="underline font-medium">Supabase Dashboard</a></li>
+            <li>Click <strong>SQL Editor</strong> in the left sidebar</li>
+            <li>Paste the SQL below and click <strong>Run</strong></li>
+            <li>Refresh this page</li>
+          </ol>
+          <div className="relative">
+            <pre className="bg-white border rounded p-3 text-xs font-mono overflow-x-auto max-h-48">{SETUP_SQL}</pre>
+            <button
+              onClick={copySetupSQL}
+              className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 bg-gray-100 hover:bg-gray-200 text-xs rounded cursor-pointer"
+            >
+              <Copy className="w-3 h-3" />
+              {copied ? 'Copied!' : 'Copy'}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Add/Edit Form */}
       {(isAdding || editingPost) && (
@@ -232,7 +293,7 @@ export default function InstagramPostsPage() {
         <div className="flex items-center justify-center py-20">
           <Loader2 className="w-8 h-8 animate-spin text-marvvn-gray-400" />
         </div>
-      ) : posts.length === 0 ? (
+      ) : posts.length === 0 && !setupRequired ? (
         <div className="text-center py-20 bg-white border rounded-xl">
           <ImageIcon className="w-12 h-12 mx-auto text-marvvn-gray-300 mb-4" />
           <p className="text-marvvn-gray-500 mb-4">No Instagram posts yet</p>
@@ -244,7 +305,7 @@ export default function InstagramPostsPage() {
             Add Manually
           </button>
         </div>
-      ) : (
+      ) : posts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {posts.map((post, idx) => (
             <div
@@ -273,20 +334,29 @@ export default function InstagramPostsPage() {
                     {post.is_active ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
                   </button>
                 </div>
-                <div className="absolute bottom-2 left-2 right-2 flex justify-between">
+                <div className="absolute bottom-2 left-2 right-2 flex justify-between items-center">
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => handleReorder(post.id, 'up')}
+                      disabled={idx === 0}
+                      className="p-1 bg-white/80 rounded disabled:opacity-30"
+                    >
+                      <GripVertical className="w-3 h-3 rotate-180" />
+                    </button>
+                    <button
+                      onClick={() => handleReorder(post.id, 'down')}
+                      disabled={idx === posts.length - 1}
+                      className="p-1 bg-white/80 rounded disabled:opacity-30"
+                    >
+                      <GripVertical className="w-3 h-3" />
+                    </button>
+                  </div>
                   <button
-                    onClick={() => handleReorder(post.id, 'up')}
-                    disabled={idx === 0}
-                    className="p-1 bg-white/80 rounded disabled:opacity-30"
+                    onClick={() => handleDelete(post.id)}
+                    className="p-1.5 bg-red-500 text-white rounded-full hover:bg-red-600"
+                    title="Delete post"
                   >
-                    <GripVertical className="w-3 h-3 rotate-180" />
-                  </button>
-                  <button
-                    onClick={() => handleReorder(post.id, 'down')}
-                    disabled={idx === posts.length - 1}
-                    className="p-1 bg-white/80 rounded disabled:opacity-30"
-                  >
-                    <GripVertical className="w-3 h-3" />
+                    <Trash2 className="w-3 h-3" />
                   </button>
                 </div>
               </div>
@@ -316,16 +386,17 @@ export default function InstagramPostsPage() {
                   </button>
                   <button
                     onClick={() => handleDelete(post.id)}
-                    className="text-xs text-red-500 hover:text-red-700 cursor-pointer"
+                    className="text-xs text-red-500 hover:text-red-700 cursor-pointer flex items-center gap-1"
                   >
                     <Trash2 className="w-3 h-3" />
+                    Delete
                   </button>
                 </div>
               </div>
             </div>
           ))}
         </div>
-      )}
+      ) : null}
     </div>
   )
 }
