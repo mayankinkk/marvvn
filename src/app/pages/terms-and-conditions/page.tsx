@@ -190,14 +190,7 @@ export default function TermsPage() {
             </section>
 
             <section>
-              <h2 className="text-lg font-medium text-marvvn-black mb-3">19. Governing Law</h2>
-              <p>
-                These Terms &amp; Conditions shall be governed by and interpreted in accordance with the laws of India. Any disputes shall be subject to the jurisdiction of the competent courts at Mumbai, Maharashtra, subject to applicable law.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="text-lg font-medium text-marvvn-black mb-3">20. Contact Us</h2>
+              <h2 className="text-lg font-medium text-marvvn-black mb-3">19. Contact Us</h2>
               <p className="mb-3">For any questions, complaints, or support, please contact us:</p>
               <ul className="space-y-1">
                 <li>
