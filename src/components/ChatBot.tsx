@@ -82,11 +82,26 @@ export default function ChatBot() {
 
       const data = await res.json()
 
+      let cleanReply = data.reply || "I'm here to help! How can I assist you today?"
+      if (typeof cleanReply === 'string' && (cleanReply.trim().startsWith('{') || cleanReply.includes('"action":'))) {
+        try {
+          const p = JSON.parse(cleanReply)
+          if (p.reply) cleanReply = p.reply
+        } catch {
+          const m = cleanReply.match(/"reply"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"/)
+          if (m && m[1]) {
+            cleanReply = m[1].replace(/\\"/g, '"')
+          } else {
+            cleanReply = "I'm here to help! How can I assist you today?"
+          }
+        }
+      }
+
       const actions = data.action === 'ask_category' || data.action === 'none'
         ? [{ label: '🛠️ Talk to support', action: 'show_categories' }]
         : undefined
 
-      addBotMessage(data.reply, actions)
+      addBotMessage(cleanReply, actions)
 
       if (data.action === 'ask_order_id') {
         setTicketMode(false)

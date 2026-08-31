@@ -88,7 +88,8 @@ IMPORTANT: Always respond with valid JSON only, no markdown, no code blocks.`,
     const chat = model.startChat({
       history: chatHistory.slice(-10),
       generationConfig: {
-        maxOutputTokens: 300,
+        responseMimeType: 'application/json',
+        maxOutputTokens: 2048,
         temperature: 0.3,
       },
     })
@@ -96,7 +97,7 @@ IMPORTANT: Always respond with valid JSON only, no markdown, no code blocks.`,
     const result = await chat.sendMessage(message)
     const responseText = result.response.text()
 
-    let parsed
+    let parsed: any = null
     try {
       const jsonStart = responseText.indexOf('{')
       const jsonEnd = responseText.lastIndexOf('}')
@@ -107,7 +108,29 @@ IMPORTANT: Always respond with valid JSON only, no markdown, no code blocks.`,
         throw new Error('No JSON object found')
       }
     } catch {
-      parsed = { action: 'auto_reply', reply: responseText.replace(/```json/g, '').replace(/```/g, '').trim() }
+      // Fallback regex in case JSON was truncated or malformed
+      const replyMatch = responseText.match(/"reply"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"/)
+      if (replyMatch && replyMatch[1]) {
+        parsed = { action: 'auto_reply', reply: replyMatch[1].replace(/\\"/g, '"') }
+      } else {
+        const cleaned = responseText.replace(/```json/g, '').replace(/```/g, '').trim()
+        if (cleaned.startsWith('{') || cleaned.includes('"action":')) {
+          parsed = { action: 'auto_reply', reply: "I'm here to help! How can I assist you with MARVVN today?" }
+        } else {
+          parsed = { action: 'auto_reply', reply: cleaned }
+        }
+      }
+    }
+
+    // Double check that parsed.reply is not raw JSON string
+    if (typeof parsed?.reply === 'string' && (parsed.reply.trim().startsWith('{') || parsed.reply.includes('"action":'))) {
+      try {
+        const inner = JSON.parse(parsed.reply)
+        if (inner.reply) parsed.reply = inner.reply
+      } catch {
+        const m = parsed.reply.match(/"reply"\s*:\s*"([^"\\]*(?:\\.[^"\\]*)*)"/)
+        if (m && m[1]) parsed.reply = m[1].replace(/\\"/g, '"')
+      }
     }
 
     // Auto-create ticket if needed
