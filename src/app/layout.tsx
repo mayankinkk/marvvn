@@ -64,7 +64,6 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <AnalyticsScripts />
-        <link rel="icon" type="image/png" sizes="32x32" href="/icons/image_logo.png" />
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/image_logo.png" />
       </head>
       <body className={`${inter.variable} ${playfair.variable} font-sans`}>
