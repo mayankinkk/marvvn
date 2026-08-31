@@ -95,6 +95,7 @@ export function CrossSellProducts({ currentProductId, category }: CrossSellProps
                 src={product.images?.[0] || '/placeholder.png'}
                 alt={product.title}
                 fill
+                loading="lazy"
                 sizes="(max-width: 768px) 50vw, 25vw"
                 className="object-cover group-hover:scale-105 transition-transform duration-300"
               />

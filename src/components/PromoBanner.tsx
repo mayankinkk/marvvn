@@ -23,6 +23,7 @@ export default function PromoBanner({ desktopImage, mobileImage, tagline, title,
             src={desktopImage}
             alt={title}
             fill
+            loading="lazy"
             sizes="100vw"
             className="hidden md:block object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out"
           />
@@ -30,6 +31,7 @@ export default function PromoBanner({ desktopImage, mobileImage, tagline, title,
             src={mobileImage}
             alt={title}
             fill
+            loading="lazy"
             sizes="100vw"
             className="md:hidden object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out"
           />

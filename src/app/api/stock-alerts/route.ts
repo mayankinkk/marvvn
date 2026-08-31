@@ -1,33 +1,42 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { rateLimit } from '@/lib/rate-limit'
+import { withErrorHandling, ApiError } from '@/lib/api-handler'
 
 export async function POST(request: Request) {
-  const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
-  const rl = rateLimit(`stock-alerts:${ip}`, 5, 60000)
-  if (!rl.success) {
-    return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 })
-  }
+  return withErrorHandling(async () => {
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
+    const rl = rateLimit(`stock-alerts:${ip}`, 5, 60000)
+    if (!rl.success) {
+      throw new ApiError(429, 'Too many requests. Please try again later.')
+    }
 
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
 
-  const { productId, email } = await request.json()
+    const { productId, email } = await request.json()
 
-  if (!productId || !email) {
-    return NextResponse.json({ error: 'Product ID and email required' }, { status: 400 })
-  }
+    if (!productId) {
+      throw new ApiError(400, 'Product ID is required')
+    }
 
-  const { error } = await supabase
-    .from('stock_alerts')
-    .upsert({
-      user_id: user?.id || null,
-      product_id: productId,
-      email,
-      notified: false,
-    }, { onConflict: 'user_id,product_id' })
+    if (!email || typeof email !== 'string') {
+      throw new ApiError(400, 'Email is required')
+    }
 
-  if (error) return NextResponse.json({ error: 'Failed to sign up' }, { status: 500 })
+    const { error } = await supabase
+      .from('stock_alerts')
+      .upsert({
+        user_id: user?.id || null,
+        product_id: productId,
+        email: email.toLowerCase().trim(),
+        notified: false,
+      }, { onConflict: 'user_id,product_id' })
 
-  return NextResponse.json({ success: true })
+    if (error) {
+      throw new ApiError(500, 'Failed to sign up for stock alert')
+    }
+
+    return NextResponse.json({ success: true })
+  })
 }

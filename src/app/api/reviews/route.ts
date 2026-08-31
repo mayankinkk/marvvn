@@ -1,54 +1,66 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { withErrorHandling, ApiError } from '@/lib/api-handler'
 
 export async function GET() {
-  const supabase = createClient()
+  return withErrorHandling(async () => {
+    const supabase = createClient()
 
-  const { data, error } = await supabase
-    .from('reviews')
-    .select('*')
-    .eq('featured', true)
-    .order('created_at', { ascending: false })
-    .limit(10)
+    const { data, error } = await supabase
+      .from('reviews')
+      .select('*')
+      .eq('featured', true)
+      .order('created_at', { ascending: false })
+      .limit(10)
 
-  if (error) {
-    return NextResponse.json({ reviews: [] })
-  }
+    if (error) {
+      return NextResponse.json({ reviews: [] })
+    }
 
-  return NextResponse.json({ reviews: data })
+    return NextResponse.json({ reviews: data })
+  })
 }
 
 export async function POST(request: Request) {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  return withErrorHandling(async () => {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+    if (!user) {
+      throw new ApiError(401, 'Unauthorized')
+    }
 
-  const body = await request.json()
-  const { product_handle, text, rating, verified, photos } = body
+    const body = await request.json()
+    const { product_handle, text, rating, verified, photos } = body
 
-  if (!product_handle || !text || !rating) {
-    return NextResponse.json({ error: 'Product handle, text, and rating are required' }, { status: 400 })
-  }
+    if (!product_handle || !text || !rating) {
+      throw new ApiError(400, 'Product handle, text, and rating are required')
+    }
 
-  const { data: profile } = await supabase.from('profiles').select('name').eq('id', user.id).single()
+    if (typeof rating !== 'number' || rating < 1 || rating > 5) {
+      throw new ApiError(400, 'Rating must be between 1 and 5')
+    }
 
-  const { data, error } = await supabase
-    .from('reviews')
-    .insert({
-      name: profile?.name || 'Customer',
-      email: user.email || null,
-      text,
-      rating,
-      product_handle,
-      verified: verified || false,
-      photos: photos || [],
-    })
-    .select()
-    .single()
+    const { data: profile } = await supabase.from('profiles').select('name').eq('id', user.id).single()
 
-  if (error) return NextResponse.json({ error: 'Failed to create review' }, { status: 500 })
-  return NextResponse.json({ review: data }, { status: 201 })
+    const { data, error } = await supabase
+      .from('reviews')
+      .insert({
+        name: profile?.name || 'Customer',
+        email: user.email || null,
+        text: text.trim(),
+        rating,
+        product_handle,
+        verified: verified || false,
+        photos: photos || [],
+      })
+      .select()
+      .single()
+
+    if (error) {
+      throw new ApiError(500, 'Failed to create review')
+    }
+
+    return NextResponse.json({ review: data }, { status: 201 })
+  })
 }

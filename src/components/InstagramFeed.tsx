@@ -59,6 +59,7 @@ export default function InstagramFeed({ count = 6 }: InstagramFeedProps) {
                   src={img}
                   alt={`MARVVN post ${i + 1}`}
                   fill
+                  loading="lazy"
                   sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 16vw"
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
                   unoptimized
