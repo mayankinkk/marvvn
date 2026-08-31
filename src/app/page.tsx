@@ -14,6 +14,7 @@ import BlogSection from '@/components/BlogSection'
 import ReviewsSection from '@/components/ReviewsSection'
 import InstagramFeed from '@/components/InstagramFeed'
 import RecentlyViewed from '@/components/RecentlyViewed'
+import TrustBadges from '@/components/TrustBadges'
 import Footer from '@/components/Footer'
 import { useProducts } from '@/lib/hooks/useProducts'
 import { useSettings } from '@/components/SettingsProvider'
@@ -101,6 +102,7 @@ export default function Home() {
         </section>
 
         <ReviewsSection />
+        <TrustBadges />
         <FeaturesBar />
         <AboutSection />
         <BlogSection />

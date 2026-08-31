@@ -6,7 +6,8 @@ import { useParams } from 'next/navigation'
 import { ChevronRight, SlidersHorizontal } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import ProductGrid from '@/components/ProductGrid'
+import ProductCard from '@/components/ProductCard'
+import InfiniteScroll from '@/components/InfiniteScroll'
 import { CollectionJsonLd, BreadcrumbJsonLd } from '@/components/JsonLd'
 import { collections } from '@/lib/data'
 import { useProducts } from '@/lib/hooks/useProducts'
@@ -48,8 +49,6 @@ export default function CollectionPage() {
   const [selectedColors, setSelectedColors] = useState<string[]>([])
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000])
   const [showFilters, setShowFilters] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
-  const productsPerPage = 12
 
   const collection = collections.find((c) => c.handle === handle)
 
@@ -93,12 +92,6 @@ export default function CollectionPage() {
     return result
   }, [handle, sortBy, selectedSizes, selectedColors, priceRange, products])
 
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage)
-  const paginatedProducts = filteredProducts.slice(
-    (currentPage - 1) * productsPerPage,
-    currentPage * productsPerPage
-  )
-
   useEffect(() => {
     if (filteredProducts.length > 0) {
       trackViewItemList(
@@ -120,14 +113,12 @@ export default function CollectionPage() {
     setSelectedSizes((prev) =>
       prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
     )
-    setCurrentPage(1)
   }
 
   const toggleColor = (color: string) => {
     setSelectedColors((prev) =>
       prev.includes(color) ? prev.filter((c) => c !== color) : [...prev, color]
     )
-    setCurrentPage(1)
   }
 
   return (
@@ -253,7 +244,7 @@ export default function CollectionPage() {
                       min="0"
                       max={priceRange[1]}
                       value={priceRange[0]}
-                      onChange={(e) => { setPriceRange([Number(e.target.value), priceRange[1]]); setCurrentPage(1) }}
+                      onChange={(e) => setPriceRange([Number(e.target.value), priceRange[1]])}
                       className="w-full px-2 py-1.5 text-xs border border-marvvn-gray-300 focus:outline-none focus:border-marvvn-black"
                       placeholder="0"
                     />
@@ -265,7 +256,7 @@ export default function CollectionPage() {
                       type="number"
                       min={priceRange[0]}
                       value={priceRange[1]}
-                      onChange={(e) => { setPriceRange([priceRange[0], Number(e.target.value)]); setCurrentPage(1) }}
+                      onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
                       className="w-full px-2 py-1.5 text-xs border border-marvvn-gray-300 focus:outline-none focus:border-marvvn-black"
                       placeholder="5000"
                     />
@@ -276,7 +267,7 @@ export default function CollectionPage() {
                   min="0"
                   max="10000"
                   value={priceRange[1]}
-                  onChange={(e) => { setPriceRange([priceRange[0], Number(e.target.value)]); setCurrentPage(1) }}
+                  onChange={(e) => setPriceRange([priceRange[0], Number(e.target.value)])}
                   className="w-full"
                 />
                 <div className="flex items-center justify-between text-xs text-marvvn-gray-500">
@@ -293,7 +284,6 @@ export default function CollectionPage() {
                   setSelectedSizes([])
                   setSelectedColors([])
                   setPriceRange([0, 5000])
-                  setCurrentPage(1)
                 }}
                 className="text-sm text-marvvn-gray-500 underline underline-offset-4 hover:text-marvvn-black transition-colors cursor-pointer"
               >
@@ -304,45 +294,13 @@ export default function CollectionPage() {
 
           <div className="flex-1">
             {filteredProducts.length > 0 ? (
-              <>
-                <ProductGrid products={paginatedProducts} columns={4} />
-
-                {totalPages > 1 && (
-                  <div className="flex items-center justify-center gap-2 mt-8">
-                    <button
-                      type="button"
-                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                      disabled={currentPage === 1}
-                      className="px-3 py-2 text-sm border border-marvvn-gray-300 hover:border-marvvn-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
-                    >
-                      Previous
-                    </button>
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                      <button
-                        key={page}
-                        type="button"
-                        onClick={() => setCurrentPage(page)}
-                        className={cn(
-                          'w-10 h-10 text-sm border transition-colors cursor-pointer',
-                          currentPage === page
-                            ? 'border-marvvn-black bg-marvvn-black text-white'
-                            : 'border-marvvn-gray-300 hover:border-marvvn-black'
-                        )}
-                      >
-                        {page}
-                      </button>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                      disabled={currentPage === totalPages}
-                      className="px-3 py-2 text-sm border border-marvvn-gray-300 hover:border-marvvn-black disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
-                    >
-                      Next
-                    </button>
-                  </div>
+              <InfiniteScroll
+                items={filteredProducts}
+                itemsPerPage={12}
+                renderItem={(product) => (
+                  <ProductCard key={product.id} product={product} />
                 )}
-              </>
+              />
             ) : (
               <div className="text-center py-16">
                 <p className="text-marvvn-gray-500 mb-4">No products found matching your filters.</p>
@@ -351,8 +309,7 @@ export default function CollectionPage() {
                   onClick={() => {
                     setSelectedSizes([])
                     setSelectedColors([])
-                  setPriceRange([0, 10000])
-                    setCurrentPage(1)
+                    setPriceRange([0, 10000])
                   }}
                   className="btn-primary cursor-pointer"
                 >

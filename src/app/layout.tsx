@@ -29,6 +29,10 @@ export const metadata: Metadata = {
   },
   description: 'Luxury streetwear clothing brand for men and women. Shop oversized t-shirts, joggers, hoodies, and more. Made in India.',
   keywords: ['streetwear', 'oversized t-shirts', 'joggers', 'hoodies', 'marvvn', 'luxury streetwear', 'indian fashion'],
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://marvvn.online'),
+  alternates: {
+    canonical: '/',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_IN',

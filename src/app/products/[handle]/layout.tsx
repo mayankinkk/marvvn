@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ handle: s
     const supabase = createClient()
     const { data: product } = await supabase
       .from('products')
-      .select('title, description')
+      .select('title, description, images, price, category')
       .eq('handle', handle)
       .single()
 
@@ -30,9 +30,37 @@ export async function generateMetadata({ params }: { params: Promise<{ handle: s
       return { title: 'Product Not Found | MARVVN' }
     }
 
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://marvvn.online'
+    const productUrl = `${baseUrl}/products/${handle}`
+    const ogImage = product.images?.[0] || '/og.png'
+
     return {
       title: `${product.title} | MARVVN`,
       description: product.description,
+      alternates: {
+        canonical: productUrl,
+      },
+      openGraph: {
+        title: product.title,
+        description: product.description,
+        url: productUrl,
+        siteName: 'MARVVN',
+        images: [
+          {
+            url: ogImage.startsWith('http') ? ogImage : `${baseUrl}${ogImage}`,
+            width: 1200,
+            height: 630,
+            alt: product.title,
+          },
+        ],
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: product.title,
+        description: product.description,
+        images: [ogImage.startsWith('http') ? ogImage : `${baseUrl}${ogImage}`],
+      },
     }
   } catch {
     return { title: 'Product | MARVVN' }
