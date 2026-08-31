@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Plus, Trash2, GripVertical, Save, Eye, EyeOff, ExternalLink, Loader2, Image as ImageIcon } from 'lucide-react'
+import { Plus, Trash2, GripVertical, Save, Eye, EyeOff, ExternalLink, Loader2, Image as ImageIcon, Download } from 'lucide-react'
 
 interface InstagramPost {
   id: string
@@ -13,15 +13,28 @@ interface InstagramPost {
   created_at: string
 }
 
+interface ProductImage {
+  id: string
+  title: string
+  handle: string
+  image: string
+  price: number
+  imported: boolean
+}
+
 export default function InstagramPostsPage() {
   const [posts, setPosts] = useState<InstagramPost[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [editingPost, setEditingPost] = useState<Partial<InstagramPost> | null>(null)
   const [isAdding, setIsAdding] = useState(false)
+  const [productImages, setProductImages] = useState<ProductImage[]>([])
+  const [loadingProducts, setLoadingProducts] = useState(false)
+  const [importing, setImporting] = useState(false)
 
   useEffect(() => {
     fetchPosts()
+    fetchProductImages()
   }, [])
 
   const fetchPosts = async () => {
@@ -32,6 +45,27 @@ export default function InstagramPostsPage() {
       setPosts(data.posts || [])
     } catch {}
     setLoading(false)
+  }
+
+  const fetchProductImages = async () => {
+    setLoadingProducts(true)
+    try {
+      const res = await fetch('/api/products')
+      const data = await res.json()
+      const existingUrls = new Set(posts.map(p => p.image_url))
+      const images = (data.products || [])
+        .flatMap((p: any) => (p.images || []).map((img: string) => ({
+          id: p.id + '-' + img,
+          title: p.title,
+          handle: p.handle,
+          image: img,
+          price: p.price,
+          imported: existingUrls.has(img),
+        })))
+        .filter((img: ProductImage) => img.image && img.image.startsWith('http'))
+      setProductImages(images.slice(0, 50))
+    } catch {}
+    setLoadingProducts(false)
   }
 
   const handleSave = async (post: Partial<InstagramPost>) => {
@@ -62,6 +96,49 @@ export default function InstagramPostsPage() {
 
   const handleToggleActive = async (post: InstagramPost) => {
     await handleSave({ ...post, is_active: !post.is_active })
+  }
+
+  const handleImportImage = async (image: ProductImage) => {
+    setImporting(true)
+    try {
+      await fetch('/api/admin/instagram-posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          image_url: image.image,
+          caption: image.title,
+          link: `/products/${image.handle}`,
+          sort_order: posts.length,
+          is_active: true,
+        }),
+      })
+      fetchPosts()
+      setProductImages(prev => prev.map(p => 
+        p.image === image.image ? { ...p, imported: true } : p
+      ))
+    } catch {}
+    setImporting(false)
+  }
+
+  const handleImportAll = async () => {
+    setImporting(true)
+    const unimported = productImages.filter(p => !p.imported).slice(0, 6)
+    for (const image of unimported) {
+      await fetch('/api/admin/instagram-posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          image_url: image.image,
+          caption: image.title,
+          link: `/products/${image.handle}`,
+          sort_order: posts.length,
+          is_active: true,
+        }),
+      })
+    }
+    fetchPosts()
+    fetchProductImages()
+    setImporting(false)
   }
 
   const handleReorder = async (id: string, direction: 'up' | 'down') => {
@@ -115,6 +192,41 @@ export default function InstagramPostsPage() {
         />
       )}
 
+      {/* Import from Products */}
+      {productImages.length > 0 && (
+        <div className="bg-white border rounded-xl p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-medium text-sm">Import from Products</h3>
+            <button
+              onClick={handleImportAll}
+              disabled={importing || productImages.filter(p => !p.imported).length === 0}
+              className="flex items-center gap-2 px-3 py-1.5 bg-marvvn-black text-white text-xs font-medium hover:bg-marvvn-gray-800 disabled:opacity-50 cursor-pointer"
+            >
+              {importing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
+              Import First 6
+            </button>
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {productImages.slice(0, 20).map((img) => (
+              <div
+                key={img.id}
+                className={`relative flex-shrink-0 w-20 h-20 rounded overflow-hidden border ${
+                  img.imported ? 'border-green-500 opacity-50' : 'border-gray-200 hover:border-marvvn-black cursor-pointer'
+                }`}
+                onClick={() => !img.imported && handleImportImage(img)}
+              >
+                <img src={img.image} alt={img.title} className="w-full h-full object-cover" />
+                {img.imported && (
+                  <div className="absolute inset-0 bg-green-500/20 flex items-center justify-center">
+                    <span className="text-[10px] font-bold text-green-700 bg-white px-1 rounded">Added</span>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Posts Grid */}
       {loading ? (
         <div className="flex items-center justify-center py-20">
@@ -124,11 +236,12 @@ export default function InstagramPostsPage() {
         <div className="text-center py-20 bg-white border rounded-xl">
           <ImageIcon className="w-12 h-12 mx-auto text-marvvn-gray-300 mb-4" />
           <p className="text-marvvn-gray-500 mb-4">No Instagram posts yet</p>
+          <p className="text-xs text-marvvn-gray-400 mb-4">Import from products above or add manually</p>
           <button
             onClick={() => { setIsAdding(true); setEditingPost({ image_url: '', caption: '', link: '', sort_order: 0, is_active: true }) }}
             className="px-4 py-2 bg-marvvn-black text-white text-sm cursor-pointer"
           >
-            Add Your First Post
+            Add Manually
           </button>
         </div>
       ) : (
