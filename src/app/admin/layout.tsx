@@ -40,7 +40,7 @@ const navGroups: NavGroup[] = [
       { href: '/admin/abandoned-carts', label: 'Abandoned Carts', icon: Clock },
       { href: '/admin/whatsapp-campaigns', label: 'WhatsApp Campaigns', icon: MessageCircle },
       { href: '/admin/instagram', label: 'Instagram Shop Sync', icon: Image },
-      { href: '/api/shop/feed', label: 'Instagram Shop Feed', icon: Image, external: true },
+      { href: '/admin/instagram-posts', label: 'Instagram Feed Posts', icon: Image },
     ],
   },
   {
