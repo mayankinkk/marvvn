@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
+import LazyImage from './LazyImage'
 import { Heart, ShoppingBag, Eye } from 'lucide-react'
 import { Product } from '@/lib/types'
 import { formatPrice, calculateDiscount, cn } from '@/lib/utils'
@@ -51,14 +51,13 @@ export default function ProductCard({ product }: ProductCardProps) {
         onMouseLeave={() => setIsHovered(false)}
       >
         <div className="relative overflow-hidden bg-marvvn-gray-50 aspect-[3/4]">
-          <Image
+          <LazyImage
             src={product.images?.[0] || '/placeholder.png'}
             alt={product.title}
             fill
-            loading="lazy"
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className={cn(
-              'object-cover transition-transform duration-500',
+              'transition-transform duration-500',
               isHovered && 'scale-105'
             )}
           />

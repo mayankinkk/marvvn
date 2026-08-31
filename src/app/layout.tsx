@@ -69,6 +69,19 @@ export default function RootLayout({
       <head>
         <AnalyticsScripts />
         <link rel="apple-touch-icon" sizes="180x180" href="/icons/image_logo.png" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.lazySizesConfig = window.lazySizesConfig || {};
+              window.lazySizesConfig.expand = 250;
+              window.lazySizesConfig.loadMode = 1;
+              window.lazySizesConfig.loadHidden = false;
+              window.lazySizesConfig.blurUp: true;
+            `,
+          }}
+        />
+        <script src="https://cdn.jsdelivr.net/npm/lazysizes@5/lazysizes.min.js" async />
+        <script src="https://cdn.jsdelivr.net/npm/lazysizes@5/plugins/blur-up/ls.blur-up.min.js" async />
       </head>
       <body className={`${inter.variable} ${playfair.variable} font-sans`}>
         <Suspense fallback={null}>

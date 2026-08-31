@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
+import LazyImage from './LazyImage'
 import { ChevronRight } from 'lucide-react'
 import { blogPosts as defaultBlogPosts } from '@/lib/data'
 
@@ -87,13 +87,12 @@ export default function BlogSection() {
           {posts.slice(0, 3).map((post) => (
             <Link key={post.id} href={`/blogs/${post.handle}`} className="group">
               <div className="aspect-[16/9] bg-marvvn-gray-100 mb-4 overflow-hidden relative">
-                <Image
+                <LazyImage
                   src={post.image}
                   alt={post.title}
                   fill
-                  loading="lazy"
                   sizes="(max-width: 768px) 100vw, 33vw"
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="group-hover:scale-105 transition-transform duration-500"
                 />
               </div>
               <p className="text-xs text-marvvn-gray-500 mb-2">{post.date}</p>

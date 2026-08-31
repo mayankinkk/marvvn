@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
+import LazyImage from './LazyImage'
 import { useSettings } from '@/components/SettingsProvider'
 
 export default function ShopByGender() {
@@ -30,13 +30,12 @@ export default function ShopByGender() {
             className="group relative overflow-hidden bg-[#1a1a1a] aspect-[3/4] md:aspect-[4/5] block"
           >
             {category.image ? (
-              <Image
+              <LazyImage
                 src={category.image}
                 alt={category.title}
                 fill
-                loading="lazy"
                 sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+                className="group-hover:scale-[1.03] transition-transform duration-700 ease-out"
               />
             ) : (
               <div className="w-full h-full bg-[#2a2a2a] flex items-center justify-center">

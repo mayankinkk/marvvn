@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSettings } from '@/components/SettingsProvider'
-import Image from 'next/image'
+import LazyImage from './LazyImage'
 
 interface InstagramFeedProps {
   count?: number
@@ -55,14 +55,12 @@ export default function InstagramFeed({ count = 6 }: InstagramFeedProps) {
                 rel="noopener noreferrer"
                 className="aspect-square bg-marvvn-gray-50 overflow-hidden group relative"
               >
-                <Image
+                <LazyImage
                   src={post.image_url}
                   alt={post.caption || 'MARVVN Instagram post'}
                   fill
-                  loading="lazy"
                   sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 16vw"
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  unoptimized
+                  className="group-hover:scale-105 transition-transform duration-500"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
                   <svg className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="currentColor" viewBox="0 0 24 24">

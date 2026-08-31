@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
+import LazyImage from './LazyImage'
 
 interface PromoBannerProps {
   desktopImage: string
@@ -19,21 +19,19 @@ export default function PromoBanner({ desktopImage, mobileImage, tagline, title,
       <Link href={ctaLink}>
         {/* Bonkers Corner: tall portrait-ish ratio, edge-to-edge */}
         <div className="relative aspect-[16/9] md:aspect-[21/9]">
-          <Image
+          <LazyImage
             src={desktopImage}
             alt={title}
             fill
-            loading="lazy"
             sizes="100vw"
-            className="hidden md:block object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out"
+            className="hidden md:block group-hover:scale-[1.02] transition-transform duration-700 ease-out"
           />
-          <Image
+          <LazyImage
             src={mobileImage}
             alt={title}
             fill
-            loading="lazy"
             sizes="100vw"
-            className="md:hidden object-cover group-hover:scale-[1.02] transition-transform duration-700 ease-out"
+            className="md:hidden group-hover:scale-[1.02] transition-transform duration-700 ease-out"
           />
           {/* Gradient: bottom-heavy so text pops */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />

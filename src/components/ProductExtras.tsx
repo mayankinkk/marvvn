@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Image from 'next/image'
+import LazyImage from './LazyImage'
 import Link from 'next/link'
 import { formatPrice } from '@/lib/utils'
 import { Product } from '@/lib/types'
@@ -91,13 +91,12 @@ export function CrossSellProducts({ currentProductId, category }: CrossSellProps
         {products.map((product) => (
           <Link key={product.id} href={`/products/${product.handle}`} className="group">
             <div className="aspect-[3/4] bg-marvvn-gray-50 overflow-hidden relative mb-2">
-              <Image
+              <LazyImage
                 src={product.images?.[0] || '/placeholder.png'}
                 alt={product.title}
                 fill
-                loading="lazy"
                 sizes="(max-width: 768px) 50vw, 25vw"
-                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                className="group-hover:scale-105 transition-transform duration-300"
               />
             </div>
             <p className="text-sm font-medium truncate">{product.title}</p>
