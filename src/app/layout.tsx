@@ -37,6 +37,10 @@ export const metadata: Metadata = {
     description: 'Luxury streetwear clothing brand for men and women. Shop oversized t-shirts, joggers, hoodies, and more.',
     images: [{ url: '/og.png', width: 1200, height: 630 }],
   },
+  icons: {
+    icon: '/icons/image_logo.png',
+    apple: '/icons/image_logo.png',
+  },
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
