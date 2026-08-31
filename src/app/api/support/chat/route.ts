@@ -98,9 +98,16 @@ IMPORTANT: Always respond with valid JSON only, no markdown, no code blocks.`,
 
     let parsed
     try {
-      parsed = JSON.parse(responseText.replace(/```json?\n?/g, '').replace(/```/g, '').trim())
+      const jsonStart = responseText.indexOf('{')
+      const jsonEnd = responseText.lastIndexOf('}')
+      if (jsonStart !== -1 && jsonEnd !== -1) {
+        const jsonStr = responseText.substring(jsonStart, jsonEnd + 1)
+        parsed = JSON.parse(jsonStr)
+      } else {
+        throw new Error('No JSON object found')
+      }
     } catch {
-      parsed = { action: 'auto_reply', reply: responseText }
+      parsed = { action: 'auto_reply', reply: responseText.replace(/```json/g, '').replace(/```/g, '').trim() }
     }
 
     // Auto-create ticket if needed

@@ -1,4 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
   <rect fill="#000" width="512" height="512"/>
-  <text fill="#fff" font-family="Arial,sans-serif" font-size="96" font-weight="bold" letter-spacing="8" text-anchor="middle" x="256" y="280">MARVVN</text>
+  <g transform="translate(256,256) scale(1.35)" fill="none" stroke="#fff" stroke-width="12" stroke-linejoin="miter">
+    <path d="M-60,40 L-30,-40 L0,10 L30,-40 L60,40"/>
+  </g>
 </svg>
