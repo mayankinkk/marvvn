@@ -59,6 +59,8 @@ export default function CheckoutPage() {
     pincode: '',
   })
 
+  const [shippingPhone, setShippingPhone] = useState('')
+
   const [payment, setPayment] = useState({
     method: 'upi' as 'cod' | 'upi' | 'card',
   })
@@ -148,7 +150,9 @@ export default function CheckoutPage() {
 
   const handleNext = () => {
     if (step === 'contact') {
-      if (validate({ email: contact.email, phone: contact.phone })) {
+      const contactFields: Record<string, string> = { email: contact.email }
+      if (!isAuthenticated) contactFields.phone = contact.phone
+      if (validate(contactFields)) {
         setStep('shipping')
         setOpenSection('shipping')
       }
@@ -219,7 +223,7 @@ export default function CheckoutPage() {
             firstName: shipping.firstName,
             lastName: shipping.lastName,
             email: contact.email,
-            phone: contact.phone,
+            phone: contact.phone || shippingPhone,
             address: shipping.address,
             apartment: shipping.apartment,
             city: shipping.city,
@@ -379,22 +383,27 @@ export default function CheckoutPage() {
                 <div className="px-4 pb-4 pt-0 space-y-3">
                   {/* Logged in state */}
                   {isAuthenticated && (
-                    <div className="flex items-center justify-between p-3 bg-marvvn-gray-50 border border-marvvn-gray-200">
-                      <div className="flex items-center gap-2">
-                        <Check className="w-4 h-4 text-green-600" />
-                        <span className="text-sm">{user?.email}</span>
+                    <>
+                      <div className="flex items-center justify-between p-3 bg-marvvn-gray-50 border border-marvvn-gray-200">
+                        <div className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-green-600" />
+                          <span className="text-sm">{user?.email}</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            await fetch('/api/auth/logout', { method: 'POST' })
+                            window.location.reload()
+                          }}
+                          className="text-xs text-marvvn-gray-500 hover:text-marvvn-black underline cursor-pointer"
+                        >
+                          Sign out
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        onClick={async () => {
-                          await fetch('/api/auth/logout', { method: 'POST' })
-                          window.location.reload()
-                        }}
-                        className="text-xs text-marvvn-gray-500 hover:text-marvvn-black underline cursor-pointer"
-                      >
-                        Sign out
+                      <button type="button" onClick={handleNext} className="w-full bg-marvvn-black text-white py-3 text-sm font-semibold hover:bg-marvvn-gray-900 transition-colors cursor-pointer">
+                        Continue to Shipping
                       </button>
-                    </div>
+                    </>
                   )}
 
                   {/* Not authenticated - Bonkers style: simple guest first */}
@@ -595,6 +604,15 @@ export default function CheckoutPage() {
                       className={`col-span-1 px-3 py-2.5 text-sm border ${v.pincode ? 'border-red-500' : 'border-marvvn-gray-300'} focus:border-marvvn-black focus:outline-none`}
                     />
                   </div>
+                  {isAuthenticated && !contact.phone && (
+                    <input
+                      type="tel"
+                      placeholder="Phone number (for delivery updates)"
+                      value={shippingPhone}
+                      onChange={(e) => setShippingPhone(e.target.value)}
+                      className="w-full px-3 py-2.5 text-sm border border-marvvn-gray-300 focus:border-marvvn-black focus:outline-none"
+                    />
+                  )}
                   {(v.firstName || v.lastName || v.address || v.city || v.state || v.pincode) && (
                     <p className="text-xs text-red-500">Please fill in all required fields</p>
                   )}
