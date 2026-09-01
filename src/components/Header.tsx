@@ -25,6 +25,7 @@ const topLinks = [
   { label: 'New Arrivals', href: '/collections/new-arrivals' },
   { label: 'Premium', href: '/collections/premium' },
   { label: 'Bestsellers', href: '/collections/best-sellers' },
+  { label: 'Store Locator', href: '/pages/store-locator' },
   { label: 'Contact', href: '/pages/get-in-touch' },
 ]
 

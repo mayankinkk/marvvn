@@ -35,19 +35,24 @@ export default function UpsellProducts() {
   }, [items])
 
   const handleAdd = (product: UpsellProduct) => {
-    addItem({
-      product: {
+    addItem(
+      {
         id: product.id,
         title: product.title,
         price: product.price,
         handle: product.handle,
         images: product.images,
-        compare_at_price: null,
-      },
-      quantity: 1,
-      size: 'M',
-      color: null,
-    })
+        description: '',
+        category: 'men',
+        collection: [],
+        tags: [],
+        sizes: ['S', 'M', 'L', 'XL'],
+        colors: [],
+      } as any,
+      'M',
+      '',
+      1
+    )
     setAddedId(product.id)
     setTimeout(() => setAddedId(null), 2000)
   }

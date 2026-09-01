@@ -61,10 +61,10 @@ export default function ProductCard({ product }: ProductCardProps) {
               isHovered && 'scale-105'
             )}
           />
-          {product.badge === 'sale' && discount > 0 && (
+          {product.compareAtPrice && discount > 0 && (
             <span className="product-badge">Save {discount}%</span>
           )}
-          {product.badge === 'new' && (
+          {product.badge === 'new' && !product.compareAtPrice && (
             <span className="product-badge bg-marvvn-black">New</span>
           )}
           {product.badge === 'bestseller' && (
@@ -114,17 +114,22 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div className="mt-3 space-y-1">
           <h3 className="text-sm font-medium truncate">{product.title}</h3>
           <div className="flex items-center gap-2">
-            {product.compareAtPrice && (
-              <span className="text-sm text-marvvn-gray-400 line-through">
-                {formatPrice(product.compareAtPrice)}
-              </span>
-            )}
             <span className={cn(
-              'text-sm font-medium',
+              'text-sm font-bold',
               product.compareAtPrice ? 'text-marvvn-red' : ''
             )}>
               {formatPrice(product.price)}
             </span>
+            {product.compareAtPrice && product.compareAtPrice > product.price && (
+              <>
+                <span className="text-xs text-marvvn-gray-400 line-through">
+                  {formatPrice(product.compareAtPrice)}
+                </span>
+                <span className="text-[10px] font-bold text-marvvn-red bg-marvvn-red/10 px-1.5 py-0.5 rounded-sm">
+                  -{discount}%
+                </span>
+              </>
+            )}
           </div>
         </div>
       </Link>

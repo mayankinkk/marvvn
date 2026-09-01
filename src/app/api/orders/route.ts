@@ -149,8 +149,13 @@ export async function POST(request: Request) {
   }
 
   // Send confirmation email
-  const customerEmail = shippingAddress.email || user?.email
-  const customerName = shippingAddress.firstName || user?.name || 'Customer'
+  const customerEmail = shippingAddress.email || user?.email || ''
+  
+  let customerName = shippingAddress.firstName || 'Customer'
+  if (user && !shippingAddress.firstName) {
+    const { data: profile } = await supabase.from('profiles').select('name').eq('id', user.id).single()
+    if (profile?.name) customerName = profile.name
+  }
 
   if (customerEmail) {
     const { data: productDetails } = await supabase.from('products').select('id, title').in('id', productIds)
