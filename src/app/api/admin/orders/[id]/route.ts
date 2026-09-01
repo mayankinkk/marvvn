@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendOrderStatusUpdate } from '@/lib/email'
 import { sendWhatsAppOrderStatusUpdate } from '@/lib/whatsapp'
+import { scheduleWinBack } from '@/lib/scheduled-emails'
 
 async function isAdmin(supabase: any) {
   const { data: { user } } = await supabase.auth.getUser()
@@ -84,6 +85,17 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     const phone = data.shipping_address?.phone
     if (phone) {
       sendWhatsAppOrderStatusUpdate(phone, id, status).catch(console.error)
+    }
+
+    // Schedule win-back email when order is delivered (30 days later)
+    if (status === 'delivered' && profile?.email) {
+      scheduleWinBack(
+        id,
+        data.user_id,
+        profile.email,
+        profile.name || 'there',
+        30
+      ).catch(console.error)
     }
   }
 

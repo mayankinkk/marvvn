@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/instagram-sync",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/process-emails",
+      "schedule": "0 0 * * *"
     }
   ]
 }

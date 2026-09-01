@@ -1,8 +1,27 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 
-export async function checkInventory(productId: string, size: string, quantity: number): Promise<{ available: boolean; stock: number }> {
+export async function checkInventory(productId: string, size: string, quantity: number, color?: string): Promise<{ available: boolean; stock: number }> {
   const admin = createAdminClient()
 
+  // Try variant stock first
+  if (size && color) {
+    const { data: variant } = await admin
+      .from('product_variants')
+      .select('stock')
+      .eq('product_id', productId)
+      .eq('size', size)
+      .eq('color', color)
+      .single()
+
+    if (variant) {
+      return {
+        available: variant.stock >= quantity,
+        stock: variant.stock,
+      }
+    }
+  }
+
+  // Fall back to product-level stock
   const { data: product } = await admin
     .from('products')
     .select('stock, low_stock_threshold')
@@ -19,9 +38,45 @@ export async function checkInventory(productId: string, size: string, quantity: 
   }
 }
 
-export async function decrementStock(productId: string, quantity: number): Promise<boolean> {
+export async function decrementStock(productId: string, quantity: number, size?: string, color?: string): Promise<boolean> {
   const admin = createAdminClient()
 
+  // Try variant stock first
+  if (size && color) {
+    const { data: variant } = await admin
+      .from('product_variants')
+      .select('stock')
+      .eq('product_id', productId)
+      .eq('size', size)
+      .eq('color', color)
+      .single()
+
+    if (variant) {
+      if (variant.stock < quantity) return false
+
+      const { error } = await admin
+        .from('product_variants')
+        .update({ stock: variant.stock - quantity })
+        .eq('product_id', productId)
+        .eq('size', size)
+        .eq('color', color)
+
+      if (!error) {
+        // Check if low stock and trigger alert
+        if (variant.stock - quantity <= 5 && variant.stock - quantity > 0) {
+          triggerLowStockAlert().catch(console.error)
+        }
+        // Check if out of stock and trigger back-in-stock check
+        if (variant.stock - quantity === 0) {
+          triggerBackInStockCheck(productId).catch(console.error)
+        }
+      }
+
+      return !error
+    }
+  }
+
+  // Fall back to product-level stock
   const { data: product } = await admin
     .from('products')
     .select('stock, low_stock_threshold, title')

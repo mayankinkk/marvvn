@@ -56,27 +56,66 @@ export async function POST(request: Request) {
   // Restore stock
   const { data: items } = await supabase
     .from('order_items')
-    .select('product_id, quantity')
+    .select('product_id, quantity, size, color')
     .eq('order_id', orderId)
 
   if (items) {
     for (const item of items) {
-      try {
-        await supabase.rpc('increment_stock', {
-          p_product_id: item.product_id,
-          p_quantity: item.quantity,
-        })
-      } catch {
-        // Fallback: manual increment
-        const { data: prod } = await supabase
-          .from('products')
-          .select('stock')
-          .eq('id', item.product_id)
-          .single()
-        if (prod) {
-          await supabase.from('products')
-            .update({ stock: (prod.stock || 0) + item.quantity })
+      const size = item.size || ''
+      const color = item.color || ''
+
+      // Check if this product has variants
+      const { data: variant } = await supabase
+        .from('product_variants')
+        .select('id')
+        .eq('product_id', item.product_id)
+        .eq('size', size)
+        .eq('color', color)
+        .single()
+
+      if (variant) {
+        // Restore variant stock
+        try {
+          await supabase.rpc('increment_variant_stock', {
+            p_product_id: item.product_id,
+            p_size: size,
+            p_color: color,
+            p_quantity: item.quantity,
+          })
+        } catch {
+          const { data: v } = await supabase
+            .from('product_variants')
+            .select('stock')
+            .eq('product_id', item.product_id)
+            .eq('size', size)
+            .eq('color', color)
+            .single()
+          if (v) {
+            await supabase.from('product_variants')
+              .update({ stock: v.stock + item.quantity })
+              .eq('product_id', item.product_id)
+              .eq('size', size)
+              .eq('color', color)
+          }
+        }
+      } else {
+        // Fall back to product-level stock
+        try {
+          await supabase.rpc('increment_stock', {
+            p_product_id: item.product_id,
+            p_quantity: item.quantity,
+          })
+        } catch {
+          const { data: prod } = await supabase
+            .from('products')
+            .select('stock')
             .eq('id', item.product_id)
+            .single()
+          if (prod) {
+            await supabase.from('products')
+              .update({ stock: (prod.stock || 0) + item.quantity })
+              .eq('id', item.product_id)
+          }
         }
       }
     }

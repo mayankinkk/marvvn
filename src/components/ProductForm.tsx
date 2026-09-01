@@ -40,6 +40,8 @@ export default function ProductForm({ productId }: ProductFormProps) {
     size_fit_text: '',
   })
 
+  const [variantStock, setVariantStock] = useState<Record<string, number>>({})
+
   useEffect(() => {
     if (isEdit) {
       fetch(`/api/admin/products/${productId}`)
@@ -70,10 +72,21 @@ export default function ProductForm({ productId }: ProductFormProps) {
               what_you_get: JSON.stringify(p.what_you_get || []),
               size_fit_text: p.size_fit_text || '',
             })
+            // Load existing variants
+            if (p.variants && Array.isArray(p.variants)) {
+              const stockMap: Record<string, number> = {}
+              for (const v of p.variants) {
+                stockMap[`${v.size}|${v.color}`] = v.stock
+              }
+              setVariantStock(stockMap)
+            }
           }
         })
     }
   }, [productId, isEdit])
+
+  const parsedSizes = form.sizes.split(',').map(s => s.trim()).filter(Boolean)
+  const parsedColors = form.colors.split(',').map(s => s.trim()).filter(Boolean)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -108,6 +121,12 @@ export default function ProductForm({ productId }: ProductFormProps) {
       model_info: form.model_info,
       what_you_get: (() => { try { return JSON.parse(form.what_you_get || '[]') } catch { return [] } })(),
       size_fit_text: form.size_fit_text,
+      variants: Object.entries(variantStock)
+        .filter(([_, stock]) => stock > 0)
+        .map(([key, stock]) => {
+          const [size, color] = key.split('|')
+          return { size, color, stock }
+        }),
     }
 
     try {
@@ -280,6 +299,55 @@ export default function ProductForm({ productId }: ProductFormProps) {
             />
           </div>
         </div>
+
+        {/* Per-variant stock grid */}
+        {parsedSizes.length > 0 && parsedColors.length > 0 && (
+          <div className="border-t pt-6 space-y-3">
+            <div>
+              <h3 className="font-medium text-sm mb-1">Stock by Size & Color</h3>
+              <p className="text-xs text-marvvn-gray-500">Set inventory for each size/color combination. Leave at 0 for out of stock.</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr>
+                    <th className="text-left py-2 px-3 font-medium text-marvvn-gray-500">Size \ Color</th>
+                    {parsedColors.map((color) => (
+                      <th key={color} className="py-2 px-3 font-medium text-marvvn-gray-500 text-center">{color}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {parsedSizes.map((size) => (
+                    <tr key={size} className="border-t border-marvvn-gray-100">
+                      <td className="py-2 px-3 font-medium">{size}</td>
+                      {parsedColors.map((color) => {
+                        const key = `${size}|${color}`
+                        return (
+                          <td key={color} className="py-2 px-3">
+                            <input
+                              type="number"
+                              min="0"
+                              value={variantStock[key] ?? 0}
+                              onChange={(e) => setVariantStock({
+                                ...variantStock,
+                                [key]: Math.max(0, parseInt(e.target.value) || 0),
+                              })}
+                              className="w-full text-center input-field py-1 text-xs"
+                            />
+                          </td>
+                        )
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-marvvn-gray-400">
+              Total stock: {Object.values(variantStock).reduce((a, b) => a + b, 0)} units across {parsedSizes.length * parsedColors.length} variants
+            </p>
+          </div>
+        )}
 
         <div className="grid md:grid-cols-3 gap-6">
           <div>

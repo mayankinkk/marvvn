@@ -17,6 +17,13 @@ export async function GET(
     return NextResponse.json({ error: 'Product not found' }, { status: 404 })
   }
 
+  // Fetch variants for this product
+  const { data: variants } = await supabase
+    .from('product_variants')
+    .select('id, size, color, stock, sku')
+    .eq('product_id', data.id)
+    .order('size')
+
   const product = {
     id: data.id,
     handle: data.handle,
@@ -33,6 +40,19 @@ export async function GET(
     isNew: data.is_new,
     isBestseller: data.is_bestseller,
     badge: data.badge,
+    stock: data.stock,
+    low_stock_threshold: data.low_stock_threshold,
+    flash_sale: data.flash_sale,
+    flash_sale_price: data.flash_sale_price,
+    flash_sale_ends_at: data.flash_sale_ends_at,
+    fabric_composition: data.fabric_composition,
+    gsm: data.gsm,
+    waist: data.waist,
+    length: data.length,
+    model_info: data.model_info,
+    what_you_get: data.what_you_get,
+    size_fit_text: data.size_fit_text,
+    variants: variants || [],
   }
 
   return NextResponse.json({ product })

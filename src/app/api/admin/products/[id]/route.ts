@@ -22,7 +22,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: 'Product not found' }, { status: 404 })
   }
 
-  return NextResponse.json({ product: data })
+  // Fetch variants
+  const { data: variants } = await supabase
+    .from('product_variants')
+    .select('*')
+    .eq('product_id', id)
+    .order('size')
+
+  return NextResponse.json({ product: { ...data, variants: variants || [] } })
 }
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -34,7 +41,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   }
 
   const body = await request.json()
-  const { handle, title, description, price, compare_at_price, images, category, collection, tags, sizes, colors, is_new, is_bestseller, badge, fabric_composition, gsm, waist, length, model_info, what_you_get, size_fit_text } = body
+  const { handle, title, description, price, compare_at_price, images, category, collection, tags, sizes, colors, is_new, is_bestseller, badge, fabric_composition, gsm, waist, length, model_info, what_you_get, size_fit_text, variants } = body
 
   if (!handle || !title || price === undefined) {
     return NextResponse.json({ error: 'Handle, title, and price are required' }, { status: 400 })
@@ -79,6 +86,22 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
       return NextResponse.json({ error: 'A product with this handle already exists' }, { status: 409 })
     }
     return NextResponse.json({ error: 'Failed to update product' }, { status: 500 })
+  }
+
+  // Sync variants if provided
+  if (variants && Array.isArray(variants)) {
+    // Delete existing variants and re-insert
+    await supabase.from('product_variants').delete().eq('product_id', id)
+    if (variants.length > 0) {
+      const variantRows = variants.map((v: any) => ({
+        product_id: id,
+        size: v.size,
+        color: v.color,
+        stock: v.stock || 0,
+        sku: v.sku || null,
+      }))
+      await supabase.from('product_variants').insert(variantRows)
+    }
   }
 
   return NextResponse.json({ product: data })

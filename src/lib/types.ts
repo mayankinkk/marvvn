@@ -1,3 +1,14 @@
+export interface ProductVariant {
+  id: string
+  product_id: string
+  size: string
+  color: string
+  stock: number
+  sku?: string
+  created_at?: string
+  updated_at?: string
+}
+
 export interface Product {
   id: string
   handle: string
@@ -16,6 +27,7 @@ export interface Product {
   badge?: 'new' | 'sale' | 'bestseller' | null
   stock?: number
   low_stock_threshold?: number
+  variants?: ProductVariant[]
   flash_sale?: boolean
   flash_sale_price?: number
   flash_sale_ends_at?: string

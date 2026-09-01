@@ -180,8 +180,20 @@ export default function ProductPage() {
     .filter((p) => p.id !== product.id && p.category === product.category)
     .slice(0, 4)
   const inWishlist = isInWishlist(product.id)
-  const isOutOfStock = product.stock !== undefined && product.stock <= 0
   const displayPrice = product.flash_sale && product.flash_sale_price ? product.flash_sale_price : product.price
+
+  // Compute variant stock
+  const activeSize = selectedSize || product.sizes[0]
+  const activeColor = selectedColor || product.colors[0]
+  const hasVariants = product.variants && product.variants.length > 0
+  const selectedVariant = hasVariants
+    ? product.variants!.find(v => v.size === activeSize && v.color === activeColor)
+    : null
+  const variantStock = selectedVariant?.stock
+  // Use variant stock if available, fall back to product-level stock
+  const effectiveStock = hasVariants ? (variantStock ?? 0) : product.stock
+  const isOutOfStock = effectiveStock !== undefined && effectiveStock <= 0
+  const lowStock = !isOutOfStock && typeof effectiveStock === 'number' && effectiveStock > 0 && effectiveStock <= 5
 
   const handleAddToCart = () => {
     const size = selectedSize || product.sizes[0]
@@ -344,10 +356,10 @@ export default function ProductPage() {
             </div>
 
             {/* Low Stock Urgency */}
-            {!isOutOfStock && typeof product.stock === 'number' && product.stock > 0 && product.stock <= 5 && (
+            {lowStock && (
               <div className="flex items-center gap-2 text-sm text-red-600 font-medium">
                 <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                Only {product.stock} left in stock — order soon!
+                Only {effectiveStock} left in stock — order soon!
               </div>
             )}
 
