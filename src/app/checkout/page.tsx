@@ -40,6 +40,13 @@ export default function CheckoutPage() {
   const [orderNotes, setOrderNotes] = useState('')
   const [giftMessage, setGiftMessage] = useState('')
   const [isGift, setIsGift] = useState(false)
+  const [loginMode, setLoginMode] = useState<'guest' | 'login' | 'signup' | null>(null)
+  const [loginEmail, setLoginEmail] = useState('')
+  const [loginPassword, setLoginPassword] = useState('')
+  const [loginError, setLoginError] = useState('')
+  const [loginLoading, setLoginLoading] = useState(false)
+  const [signupName, setSignupName] = useState('')
+  const [signupPassword, setSignupPassword] = useState('')
 
   const [contact, setContact] = useState({
     email: user?.email || '',
@@ -162,6 +169,50 @@ export default function CheckoutPage() {
         setOpenSection('payment')
       }
     }
+  }
+
+  const handleLogin = async () => {
+    if (!loginEmail || !loginPassword) return
+    setLoginLoading(true)
+    setLoginError('')
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
+      })
+      if (res.ok) {
+        window.location.reload()
+      } else {
+        const data = await res.json()
+        setLoginError(data.error || 'Invalid credentials')
+      }
+    } catch {
+      setLoginError('Something went wrong')
+    }
+    setLoginLoading(false)
+  }
+
+  const handleSignup = async () => {
+    if (!loginEmail || !signupPassword || !signupName) return
+    setLoginLoading(true)
+    setLoginError('')
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: loginEmail, password: signupPassword, name: signupName }),
+      })
+      if (res.ok) {
+        window.location.reload()
+      } else {
+        const data = await res.json()
+        setLoginError(data.error || 'Failed to create account')
+      }
+    } catch {
+      setLoginError('Something went wrong')
+    }
+    setLoginLoading(false)
   }
 
   const handlePlaceOrder = async () => {
@@ -368,59 +419,191 @@ export default function CheckoutPage() {
                 {openSection === 'contact' ? <ChevronUp className="w-4 h-4 text-marvvn-gray-400" /> : <ChevronDown className="w-4 h-4 text-marvvn-gray-400" />}
               </button>
               {openSection === 'contact' && (
-                <div className="px-4 pb-4 pt-0 space-y-3">
-                  {!isAuthenticated && (
-                    <p className="text-xs text-marvvn-gray-500">
-                      <Link href="/account/login" className="text-marvvn-black font-medium underline">Already have an account? Login</Link> for faster checkout
-                    </p>
-                  )}
-                  <div>
-                    <input
-                      type="email"
-                      placeholder="Email"
-                      value={contact.email}
-                      onChange={(e) => setContact({ ...contact, email: e.target.value })}
-                      className={`w-full px-3 py-2.5 text-sm border ${v.email ? 'border-red-500' : 'border-marvvn-gray-300'} focus:border-marvvn-black focus:outline-none transition-colors`}
-                    />
-                    {v.email && <p className="text-xs text-red-500 mt-1">{v.email}</p>}
-                  </div>
-                  <div>
-                    <input
-                      type="tel"
-                      placeholder="Phone number"
-                      value={contact.phone}
-                      onChange={(e) => setContact({ ...contact, phone: e.target.value })}
-                      className={`w-full px-3 py-2.5 text-sm border ${v.phone ? 'border-red-500' : 'border-marvvn-gray-300'} focus:border-marvvn-black focus:outline-none transition-colors`}
-                    />
-                    {v.phone && <p className="text-xs text-red-500 mt-1">{v.phone}</p>}
-                  </div>
-                  {!isAuthenticated && (
-                    <label className="flex items-start gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={createAccount}
-                        onChange={(e) => setCreateAccount(e.target.checked)}
-                        className="mt-0.5 accent-marvvn-black"
-                      />
-                      <div className="text-xs text-marvvn-gray-600">
-                        Create an account for faster checkout next time
+                <div className="px-4 pb-4 pt-0">
+                  {/* Logged in state */}
+                  {isAuthenticated && (
+                    <div className="flex items-center justify-between p-3 bg-marvvn-gray-50 border border-marvvn-gray-200">
+                      <div className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-green-600" />
+                        <span className="text-sm">{user?.email}</span>
                       </div>
-                    </label>
-                  )}
-                  {createAccount && !isAuthenticated && (
-                    <div>
-                      <input
-                        type="password"
-                        placeholder="Create password (min 6 chars)"
-                        value={accountPassword}
-                        onChange={(e) => setAccountPassword(e.target.value)}
-                        className="w-full px-3 py-2.5 text-sm border border-marvvn-gray-300 focus:border-marvvn-black focus:outline-none transition-colors"
-                      />
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          await fetch('/api/auth/logout', { method: 'POST' })
+                          window.location.reload()
+                        }}
+                        className="text-xs text-marvvn-gray-500 hover:text-marvvn-black underline cursor-pointer"
+                      >
+                        Sign out
+                      </button>
                     </div>
                   )}
-                  <button type="button" onClick={handleNext} className="w-full bg-marvvn-black text-white py-3 text-sm font-semibold hover:bg-marvvn-gray-900 transition-colors cursor-pointer">
-                    Continue to Shipping
-                  </button>
+
+                  {/* Not authenticated - show login/signup/guest options */}
+                  {!isAuthenticated && (
+                    <div className="space-y-4">
+                      {/* Login Form */}
+                      {loginMode === 'login' && (
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-semibold text-marvvn-black">Sign in to your account</p>
+                            <button
+                              type="button"
+                              onClick={() => { setLoginMode(null); setLoginError('') }}
+                              className="text-xs text-marvvn-gray-500 hover:text-marvvn-black underline cursor-pointer"
+                            >
+                              Back
+                            </button>
+                          </div>
+                          {loginError && <p className="text-xs text-red-600">{loginError}</p>}
+                          <input
+                            type="email"
+                            placeholder="Email"
+                            value={loginEmail}
+                            onChange={(e) => setLoginEmail(e.target.value)}
+                            className="w-full px-3 py-2.5 text-sm border border-marvvn-gray-300 focus:border-marvvn-black focus:outline-none"
+                          />
+                          <input
+                            type="password"
+                            placeholder="Password"
+                            value={loginPassword}
+                            onChange={(e) => setLoginPassword(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+                            className="w-full px-3 py-2.5 text-sm border border-marvvn-gray-300 focus:border-marvvn-black focus:outline-none"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleLogin}
+                            disabled={loginLoading || !loginEmail || !loginPassword}
+                            className="w-full bg-marvvn-black text-white py-3 text-sm font-semibold hover:bg-marvvn-gray-900 transition-colors cursor-pointer disabled:opacity-50"
+                          >
+                            {loginLoading ? 'Signing in...' : 'Sign In'}
+                          </button>
+                          <p className="text-xs text-marvvn-gray-400 text-center">
+                            <Link href="/account/forgot-password" className="underline hover:text-marvvn-black">Forgot password?</Link>
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Signup Form */}
+                      {loginMode === 'signup' && (
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-semibold text-marvvn-black">Create your account</p>
+                            <button
+                              type="button"
+                              onClick={() => { setLoginMode(null); setLoginError('') }}
+                              className="text-xs text-marvvn-gray-500 hover:text-marvvn-black underline cursor-pointer"
+                            >
+                              Back
+                            </button>
+                          </div>
+                          {loginError && <p className="text-xs text-red-600">{loginError}</p>}
+                          <input
+                            type="text"
+                            placeholder="Full name"
+                            value={signupName}
+                            onChange={(e) => setSignupName(e.target.value)}
+                            className="w-full px-3 py-2.5 text-sm border border-marvvn-gray-300 focus:border-marvvn-black focus:outline-none"
+                          />
+                          <input
+                            type="email"
+                            placeholder="Email"
+                            value={loginEmail}
+                            onChange={(e) => setLoginEmail(e.target.value)}
+                            className="w-full px-3 py-2.5 text-sm border border-marvvn-gray-300 focus:border-marvvn-black focus:outline-none"
+                          />
+                          <input
+                            type="password"
+                            placeholder="Password (min 6 chars)"
+                            value={signupPassword}
+                            onChange={(e) => setSignupPassword(e.target.value)}
+                            className="w-full px-3 py-2.5 text-sm border border-marvvn-gray-300 focus:border-marvvn-black focus:outline-none"
+                          />
+                          <button
+                            type="button"
+                            onClick={handleSignup}
+                            disabled={loginLoading || !loginEmail || !signupPassword || !signupName}
+                            className="w-full bg-marvvn-black text-white py-3 text-sm font-semibold hover:bg-marvvn-gray-900 transition-colors cursor-pointer disabled:opacity-50"
+                          >
+                            {loginLoading ? 'Creating account...' : 'Create Account'}
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Initial state - show options */}
+                      {loginMode === null && (
+                        <>
+                          {/* Sign in option */}
+                          <div className="border border-marvvn-gray-200 p-4">
+                            <p className="text-sm font-semibold text-marvvn-black mb-2">Already have an account?</p>
+                            <button
+                              type="button"
+                              onClick={() => setLoginMode('login')}
+                              className="w-full bg-marvvn-black text-white py-3 text-sm font-semibold hover:bg-marvvn-gray-900 transition-colors cursor-pointer"
+                            >
+                              Sign In
+                            </button>
+                          </div>
+
+                          <div className="relative">
+                            <div className="absolute inset-0 flex items-center">
+                              <div className="w-full border-t border-marvvn-gray-200" />
+                            </div>
+                            <div className="relative flex justify-center text-xs">
+                              <span className="px-3 bg-white text-marvvn-gray-400">or</span>
+                            </div>
+                          </div>
+
+                          {/* Guest checkout */}
+                          <div className="border border-marvvn-gray-200 p-4">
+                            <p className="text-sm font-semibold text-marvvn-black mb-1">Continue as guest</p>
+                            <p className="text-xs text-marvvn-gray-500 mb-3">Checkout quickly without creating an account</p>
+                            <div className="space-y-3">
+                              <input
+                                type="email"
+                                placeholder="Email"
+                                value={contact.email}
+                                onChange={(e) => setContact({ ...contact, email: e.target.value })}
+                                className={`w-full px-3 py-2.5 text-sm border ${v.email ? 'border-red-500' : 'border-marvvn-gray-300'} focus:border-marvvn-black focus:outline-none`}
+                              />
+                              {v.email && <p className="text-xs text-red-500">{v.email}</p>}
+                              <input
+                                type="tel"
+                                placeholder="Phone number"
+                                value={contact.phone}
+                                onChange={(e) => setContact({ ...contact, phone: e.target.value })}
+                                className={`w-full px-3 py-2.5 text-sm border ${v.phone ? 'border-red-500' : 'border-marvvn-gray-300'} focus:border-marvvn-black focus:outline-none`}
+                              />
+                              {v.phone && <p className="text-xs text-red-500">{v.phone}</p>}
+                              <button
+                                type="button"
+                                onClick={handleNext}
+                                className="w-full bg-marvvn-black text-white py-3 text-sm font-semibold hover:bg-marvvn-gray-900 transition-colors cursor-pointer"
+                              >
+                                Continue to Shipping
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Create account option */}
+                          <div className="text-center">
+                            <p className="text-xs text-marvvn-gray-500">
+                              New customer?{' '}
+                              <button
+                                type="button"
+                                onClick={() => setLoginMode('signup')}
+                                className="text-marvvn-black font-medium underline hover:no-underline cursor-pointer"
+                              >
+                                Create an account
+                              </button>
+                            </p>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
