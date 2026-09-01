@@ -42,8 +42,8 @@ export const metadata: Metadata = {
     images: [{ url: '/og.png', width: 1200, height: 630 }],
   },
   icons: {
-    icon: '/icons/image_logo.png',
-    apple: '/icons/image_logo.png',
+    icon: '/icons/image_logo_circle.png',
+    apple: '/icons/image_logo_circle.png',
   },
   manifest: '/manifest.json',
   appleWebApp: {
