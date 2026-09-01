@@ -133,3 +133,54 @@ export async function sendWhatsAppMessage(phone: string, message: string) {
     throw new Error(err.error?.message || 'WhatsApp send failed')
   }
 }
+
+export async function sendWhatsAppCustomerOrderConfirmation(order: {
+  id: string
+  total: number
+  items: { title: string; quantity: number; size?: string }[]
+  customerName: string
+  customerPhone: string
+  shippingAddress: any
+}) {
+  if (!PHONE_NUMBER_ID || !ACCESS_TOKEN || !order.customerPhone) return
+
+  const itemsList = order.items.map(i => `  ${i.quantity}x ${i.title}${i.size ? ` (${i.size})` : ''}`).join('\n')
+  const address = order.shippingAddress
+  const addressText = address ? `${address.address || ''}, ${address.city || ''}, ${address.state || ''} ${address.pincode || ''}` : ''
+
+  const message = `Thank you for your order, ${order.customerName}! 🎉
+
+*Order #${order.id.slice(0, 8).toUpperCase()}*
+
+*Items:*
+${itemsList}
+
+*Total:* ₹${order.total.toLocaleString()}
+
+*Delivery Address:*
+${addressText}
+
+*Estimated Delivery:* 3-5 business days
+
+Track your order: https://marvvn.online/account/orders
+
+Need help? Reply to this message or visit https://marvvn.online/support`
+
+  try {
+    await fetch(`${WHATSAPP_API_URL}/${PHONE_NUMBER_ID}/messages`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${ACCESS_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messaging_product: 'whatsapp',
+        to: order.customerPhone,
+        type: 'text',
+        text: { body: message },
+      }),
+    })
+  } catch (error) {
+    console.error('WhatsApp customer confirmation failed:', error)
+  }
+}

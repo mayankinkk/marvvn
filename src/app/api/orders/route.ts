@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendOrderConfirmation } from '@/lib/email'
-import { sendWhatsAppOrderNotification } from '@/lib/whatsapp'
+import { sendWhatsAppOrderNotification, sendWhatsAppCustomerOrderConfirmation } from '@/lib/whatsapp'
 
 export async function GET() {
   const supabase = createClient()
@@ -217,16 +217,29 @@ export async function POST(request: Request) {
     const { data: whatsappProducts } = await supabase.from('products').select('id, title').in('id', productIds)
     const whatsappTitleMap = new Map(whatsappProducts?.map((p: any) => [p.id, p.title]) || [])
 
+    const whatsappItems = items.map((item: any) => ({
+      title: whatsappTitleMap.get(item.productId) || 'Product',
+      quantity: item.quantity,
+      size: item.size,
+    }))
+
+    // Notify admin
     sendWhatsAppOrderNotification({
       id: order.id,
       total: finalTotal,
-      items: items.map((item: any) => ({
-        title: whatsappTitleMap.get(item.productId) || 'Product',
-        quantity: item.quantity,
-        size: item.size,
-      })),
+      items: whatsappItems,
       customerName,
       customerPhone: shippingAddress.phone,
+    }).catch(console.error)
+
+    // Send customer confirmation
+    sendWhatsAppCustomerOrderConfirmation({
+      id: order.id,
+      total: finalTotal,
+      items: whatsappItems,
+      customerName,
+      customerPhone: shippingAddress.phone,
+      shippingAddress: shippingAddress,
     }).catch(console.error)
   }
 
