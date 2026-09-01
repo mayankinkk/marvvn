@@ -135,18 +135,6 @@ export default function Header({ transparent = false }: { transparent?: boolean 
             </div>
           </div>
         )}
-        {/* Promo Code Bar */}
-        {settings.promo_code && (
-          <div className="bg-white text-marvvn-black py-1.5 overflow-hidden border-b border-marvvn-gray-200">
-            <div className="marquee-container whitespace-nowrap text-xs font-semibold tracking-wider">
-              {[...Array(8)].map((_, i) => (
-                <span key={i} className="inline-block px-10 shrink-0">
-                  ✦ Use code <span className="font-black underline">{settings.promo_code}</span> for extra {settings.promo_discount || '10%'} off — Min. cart ₹{settings.promo_min_cart || '999'} ✦
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Logo center, Nav left, Icons right — Bonkers Corner layout */}
         <div className="container">
