@@ -32,6 +32,8 @@ export default function CheckoutPage() {
   const [v, setV] = useState<Record<string, string>>({})
   const [openSection, setOpenSection] = useState<string | null>('contact')
   const [showItems, setShowItems] = useState(false)
+  const [createAccount, setCreateAccount] = useState(false)
+  const [accountPassword, setAccountPassword] = useState('')
 
   const [contact, setContact] = useState({
     email: user?.email || '',
@@ -178,6 +180,23 @@ export default function CheckoutPage() {
 
       const orderData = await orderRes.json()
 
+      // Create account if guest opted in
+      if (createAccount && !isAuthenticated && accountPassword.length >= 6) {
+        try {
+          await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: contact.email,
+              password: accountPassword,
+              name: `${shipping.firstName} ${shipping.lastName}`,
+            }),
+          })
+        } catch {
+          // Account creation failed, but order is still placed
+        }
+      }
+
       if (payment.method !== 'cod') {
         const payRes = await fetch('/api/payment', {
           method: 'POST',
@@ -316,6 +335,11 @@ export default function CheckoutPage() {
               </button>
               {openSection === 'contact' && (
                 <div className="px-4 pb-4 pt-0 space-y-3">
+                  {!isAuthenticated && (
+                    <p className="text-xs text-marvvn-gray-500">
+                      <Link href="/account/login" className="text-marvvn-black font-medium underline">Already have an account? Login</Link> for faster checkout
+                    </p>
+                  )}
                   <div>
                     <input
                       type="email"
@@ -336,6 +360,30 @@ export default function CheckoutPage() {
                     />
                     {v.phone && <p className="text-xs text-red-500 mt-1">{v.phone}</p>}
                   </div>
+                  {!isAuthenticated && (
+                    <label className="flex items-start gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={createAccount}
+                        onChange={(e) => setCreateAccount(e.target.checked)}
+                        className="mt-0.5 accent-marvvn-black"
+                      />
+                      <div className="text-xs text-marvvn-gray-600">
+                        Create an account for faster checkout next time
+                      </div>
+                    </label>
+                  )}
+                  {createAccount && !isAuthenticated && (
+                    <div>
+                      <input
+                        type="password"
+                        placeholder="Create password (min 6 chars)"
+                        value={accountPassword}
+                        onChange={(e) => setAccountPassword(e.target.value)}
+                        className="w-full px-3 py-2.5 text-sm border border-marvvn-gray-300 focus:border-marvvn-black focus:outline-none transition-colors"
+                      />
+                    </div>
+                  )}
                   <button type="button" onClick={handleNext} className="w-full bg-marvvn-black text-white py-3 text-sm font-semibold hover:bg-marvvn-gray-900 transition-colors cursor-pointer">
                     Continue to Shipping
                   </button>

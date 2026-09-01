@@ -29,10 +29,6 @@ export async function POST(request: Request) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
   const { items, promoCode, shippingAddress, paymentMethod } = await request.json()
 
   if (!items || !Array.isArray(items) || items.length === 0) {
@@ -113,18 +109,23 @@ export async function POST(request: Request) {
 
   const finalTotal = Math.max(0, serverTotal - discount)
 
+  const orderData: any = {
+    total: finalTotal,
+    discount,
+    promo_code: promoCode || null,
+    shipping_address: { ...shippingAddress, email: shippingAddress.email || user?.email },
+    payment_method: paymentMethod,
+    status: 'pending',
+    payment_status: paymentMethod === 'cod' ? 'pending' : 'pending',
+  }
+
+  if (user) {
+    orderData.user_id = user.id
+  }
+
   const { data: order, error: orderError } = await supabase
     .from('orders')
-    .insert({
-      user_id: user.id,
-      total: finalTotal,
-      discount,
-      promo_code: promoCode || null,
-      shipping_address: shippingAddress,
-      payment_method: paymentMethod,
-      status: 'pending',
-      payment_status: paymentMethod === 'cod' ? 'pending' : 'pending',
-    })
+    .insert(orderData)
     .select()
     .single()
 
@@ -145,16 +146,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to create order items', details: itemsError.message }, { status: 500 })
   }
 
-  const { data: profile } = await supabase.from('profiles').select('name, email').eq('id', user.id).single()
+  // Send confirmation email
+  const customerEmail = shippingAddress.email || user?.email
+  const customerName = shippingAddress.firstName || user?.name || 'Customer'
 
-  if (profile?.email) {
+  if (customerEmail) {
     const { data: productDetails } = await supabase.from('products').select('id, title').in('id', productIds)
     const titleMap = new Map(productDetails?.map((p: any) => [p.id, p.title]) || [])
 
     sendOrderConfirmation({
       orderId: order.id,
-      customerName: profile.name || 'Customer',
-      customerEmail: profile.email,
+      customerName,
+      customerEmail,
       items: items.map((item: any) => ({
         title: titleMap.get(item.productId) || 'Product',
         quantity: item.quantity,
@@ -220,10 +223,10 @@ export async function POST(request: Request) {
         quantity: item.quantity,
         size: item.size,
       })),
-      customerName: profile?.name || 'Customer',
+      customerName,
       customerPhone: shippingAddress.phone,
     }).catch(console.error)
   }
 
-  return NextResponse.json({ order }, { status: 201 })
+  return NextResponse.json({ order, guestCheckout: !user }, { status: 201 })
 }
