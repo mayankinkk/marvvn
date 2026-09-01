@@ -274,6 +274,7 @@ export default function AdminProductsPage() {
                 <th className="px-4 py-3 font-medium">Product</th>
                 <th className="px-4 py-3 font-medium">Category</th>
                 <th className="px-4 py-3 font-medium">Price</th>
+                <th className="px-4 py-3 font-medium">Stock</th>
                 <th className="px-4 py-3 font-medium">Badge</th>
                 <th className="px-4 py-3 font-medium text-right">Actions</th>
               </tr>
@@ -308,6 +309,15 @@ export default function AdminProductsPage() {
                       <span className="text-marvvn-gray-400 line-through ml-1 text-xs">
                         {formatPrice(product.compareAtPrice)}
                       </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {typeof product.stock === 'number' ? (
+                      <span className={`font-medium ${product.stock <= 0 ? 'text-red-600' : product.stock <= 5 ? 'text-amber-600' : 'text-green-600'}`}>
+                        {product.stock <= 0 ? 'Out of stock' : product.stock}
+                      </span>
+                    ) : (
+                      <span className="text-marvvn-gray-400">—</span>
                     )}
                   </td>
                   <td className="px-4 py-3">

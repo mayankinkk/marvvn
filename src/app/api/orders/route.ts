@@ -52,19 +52,18 @@ export async function POST(request: Request) {
 
   const productMap = new Map(products?.map((p: any) => [p.id, p]) || [])
 
-  // Fetch variants for all products (may not exist yet if migration not run)
+  // Fetch variants for all products
   let variantMap = new Map<string, number>()
-  try {
-    const { data: allVariants } = await supabase
-      .from('product_variants')
-      .select('product_id, size, color, stock')
-      .in('product_id', productIds)
+  const { data: allVariants, error: variantError } = await supabase
+    .from('product_variants')
+    .select('product_id, size, color, stock')
+    .in('product_id', productIds)
 
-    for (const v of allVariants || []) {
+  // Only use variant data if the table exists (no error)
+  if (!variantError && allVariants) {
+    for (const v of allVariants) {
       variantMap.set(`${v.product_id}|${v.size}|${v.color}`, v.stock)
     }
-  } catch {
-    // product_variants table may not exist yet
   }
 
   // Check stock availability for all items
@@ -79,17 +78,13 @@ export async function POST(request: Request) {
     const variantKey = `${item.productId}|${size}|${color}`
     const variantStock = variantMap.get(variantKey)
 
-    // Use variant stock if available, otherwise fall back to product-level stock
-    if (variantStock !== undefined) {
-      if (variantStock < quantity) {
+    // Variant stock check (when product_variants table exists)
+    if (variantMap.size > 0 || !variantError) {
+      if (variantStock !== undefined && variantStock < quantity) {
         return NextResponse.json({
           error: `Insufficient stock for "${product.title || 'product'}" (${size}/${color}). Only ${variantStock} available.`,
         }, { status: 400 })
       }
-    } else if (product.stock !== undefined && product.stock < quantity) {
-      return NextResponse.json({
-        error: `Insufficient stock for "${product.title || 'product'}". Only ${product.stock} available.`,
-      }, { status: 400 })
     }
   }
 
@@ -208,61 +203,43 @@ export async function POST(request: Request) {
   }
 
   // Atomic stock decrement using admin client to bypass RLS
-  for (const item of orderItems) {
-    const size = item.size || ''
-    const color = item.color || ''
-    const variantKey = `${item.product_id}|${size}|${color}`
-    const hasVariant = variantMap.has(variantKey)
+  // Only if product_variants table exists (variantError is null)
+  if (!variantError) {
+    for (const item of orderItems) {
+      const size = item.size || ''
+      const color = item.color || ''
+      const variantKey = `${item.product_id}|${size}|${color}`
+      const hasVariant = variantMap.has(variantKey)
 
-    if (hasVariant) {
-      // Decrement variant stock
-      const { error: variantError } = await admin
-        .rpc('decrement_variant_stock', {
-          p_product_id: item.product_id,
-          p_size: size,
-          p_color: color,
-          p_quantity: item.quantity,
-        })
-        .single()
-
-      if (variantError) {
-        // Fallback: manual variant stock decrement
-        const { data: variant } = await admin
-          .from('product_variants')
-          .select('stock')
-          .eq('product_id', item.product_id)
-          .eq('size', size)
-          .eq('color', color)
+      if (hasVariant) {
+        // Decrement variant stock
+        const { error: rpcError } = await admin
+          .rpc('decrement_variant_stock', {
+            p_product_id: item.product_id,
+            p_size: size,
+            p_color: color,
+            p_quantity: item.quantity,
+          })
           .single()
 
-        if (variant && variant.stock >= item.quantity) {
-          await admin
+        if (rpcError) {
+          // Fallback: manual variant stock decrement
+          const { data: variant } = await admin
             .from('product_variants')
-            .update({ stock: variant.stock - item.quantity })
+            .select('stock')
             .eq('product_id', item.product_id)
             .eq('size', size)
             .eq('color', color)
-        }
-      }
-    } else {
-      // Fall back to product-level stock
-      const { error: stockError } = await admin
-        .rpc('decrement_stock', { p_product_id: item.product_id, p_quantity: item.quantity })
-        .single()
+            .single()
 
-      if (stockError) {
-        const { data: product } = await admin
-          .from('products')
-          .select('stock')
-          .eq('id', item.product_id)
-          .single()
-
-        if (product && (product.stock || 0) >= item.quantity) {
-          await admin
-            .from('products')
-            .update({ stock: (product.stock || 0) - item.quantity })
-            .eq('id', item.product_id)
-            .lte('stock', product.stock!)
+          if (variant && variant.stock >= item.quantity) {
+            await admin
+              .from('product_variants')
+              .update({ stock: variant.stock - item.quantity })
+              .eq('product_id', item.product_id)
+              .eq('size', size)
+              .eq('color', color)
+          }
         }
       }
     }

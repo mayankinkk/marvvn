@@ -355,6 +355,13 @@ export default function ProductPage() {
               )}
             </div>
 
+            {/* Stock display */}
+            {hasVariants && !isOutOfStock && typeof effectiveStock === 'number' && effectiveStock > 5 && (
+              <div className="text-sm text-marvvn-gray-500">
+                {effectiveStock} in stock
+              </div>
+            )}
+
             {/* Low Stock Urgency */}
             {lowStock && (
               <div className="flex items-center gap-2 text-sm text-red-600 font-medium">

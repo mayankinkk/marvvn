@@ -24,7 +24,31 @@ export async function GET() {
     return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 })
   }
 
-  return NextResponse.json({ products: data })
+  // Fetch all variants to compute total stock per product
+  const productIds = (data || []).map(p => p.id)
+  let variantMap = new Map<string, number>()
+
+  try {
+    const { data: variants } = await supabase
+      .from('product_variants')
+      .select('product_id, stock')
+      .in('product_id', productIds)
+
+    for (const v of variants || []) {
+      const current = variantMap.get(v.product_id) || 0
+      variantMap.set(v.product_id, current + (v.stock || 0))
+    }
+  } catch {
+    // product_variants table may not exist yet
+  }
+
+  // Attach total stock to each product
+  const productsWithStock = (data || []).map(p => ({
+    ...p,
+    stock: variantMap.has(p.id) ? variantMap.get(p.id) : (p.stock || 0),
+  }))
+
+  return NextResponse.json({ products: productsWithStock })
 }
 
 export async function POST(request: Request) {
