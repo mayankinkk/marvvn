@@ -74,12 +74,12 @@ export default function Footer() {
   }
 
   const socialLinks = [
-    settings.facebook_url && { icon: Facebook, href: settings.facebook_url, label: 'Facebook' },
-    settings.twitter_url && { icon: Twitter, href: settings.twitter_url, label: 'X' },
     settings.instagram_url && { icon: Instagram, href: settings.instagram_url, label: 'Instagram' },
+    settings.facebook_url && { icon: Facebook, href: settings.facebook_url, label: 'Facebook' },
+    settings.twitter_url && { icon: Twitter, href: settings.twitter_url, label: 'X (Twitter)' },
     settings.youtube_url && { icon: Youtube, href: settings.youtube_url, label: 'YouTube' },
-    settings.instagram_dm_url && { icon: MessageCircle, href: settings.instagram_dm_url, label: 'Instagram DM' },
-    settings.facebook_dm_url && { icon: MessageCircle, href: settings.facebook_dm_url, label: 'Facebook Messenger' },
+    settings.pinterest_url && { icon: Globe, href: settings.pinterest_url, label: 'Pinterest' },
+    settings.whatsapp_number && { icon: MessageCircle, href: `https://wa.me/${settings.whatsapp_number}`, label: 'WhatsApp' },
   ].filter(Boolean) as { icon: any; href: string; label: string }[]
 
   return (

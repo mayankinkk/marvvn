@@ -24,6 +24,7 @@ const DEFAULTS: Record<string, string> = {
   facebook_url: '',
   twitter_url: '',
   youtube_url: '',
+  pinterest_url: '',
   instagram_dm_url: '',
   facebook_dm_url: '',
   tawk_to_id: '',

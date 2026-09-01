@@ -29,7 +29,7 @@ export async function POST(request: Request) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const { items, promoCode, shippingAddress, paymentMethod } = await request.json()
+  const { items, promoCode, shippingAddress, paymentMethod, orderNotes, giftMessage } = await request.json()
 
   if (!items || !Array.isArray(items) || items.length === 0) {
     return NextResponse.json({ error: 'No items provided' }, { status: 400 })
@@ -117,6 +117,8 @@ export async function POST(request: Request) {
     payment_method: paymentMethod,
     status: 'pending',
     payment_status: paymentMethod === 'cod' ? 'pending' : 'pending',
+    order_notes: orderNotes || null,
+    gift_message: giftMessage || null,
   }
 
   if (user) {

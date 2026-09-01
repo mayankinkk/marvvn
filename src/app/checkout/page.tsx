@@ -36,6 +36,9 @@ export default function CheckoutPage() {
   const [accountPassword, setAccountPassword] = useState('')
   const [savedAddresses, setSavedAddresses] = useState<any[]>([])
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
+  const [orderNotes, setOrderNotes] = useState('')
+  const [giftMessage, setGiftMessage] = useState('')
+  const [isGift, setIsGift] = useState(false)
 
   const [contact, setContact] = useState({
     email: user?.email || '',
@@ -198,6 +201,8 @@ export default function CheckoutPage() {
             pincode: shipping.pincode,
           },
           paymentMethod: payment.method,
+          orderNotes: orderNotes || null,
+          giftMessage: isGift ? giftMessage : null,
         }),
       })
 
@@ -601,6 +606,61 @@ export default function CheckoutPage() {
                       `Place Order — ${formatPrice(total)}`
                     )}
                   </button>
+                </div>
+              )}
+            </div>
+
+            {/* Order Notes & Gift */}
+            <div className="border border-marvvn-gray-200 mb-3">
+              <button
+                type="button"
+                onClick={() => setOpenSection(openSection === 'notes' ? null : 'notes')}
+                className="w-full flex items-center justify-between p-4 cursor-pointer"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold border border-marvvn-gray-300 text-marvvn-gray-500">
+                    <span className="text-[10px]">+</span>
+                  </span>
+                  <span className="text-sm font-semibold text-marvvn-black">Order notes & gift options</span>
+                </div>
+                {openSection === 'notes' ? <ChevronUp className="w-4 h-4 text-marvvn-gray-400" /> : <ChevronDown className="w-4 h-4 text-marvvn-gray-400" />}
+              </button>
+              {openSection === 'notes' && (
+                <div className="px-4 pb-4 pt-0 space-y-4">
+                  <div>
+                    <label className="block text-xs font-medium text-marvvn-gray-600 mb-1">Order notes (optional)</label>
+                    <textarea
+                      value={orderNotes}
+                      onChange={(e) => setOrderNotes(e.target.value)}
+                      placeholder="Special instructions for delivery, etc."
+                      rows={2}
+                      className="w-full px-3 py-2 text-sm border border-marvvn-gray-300 focus:border-marvvn-black focus:outline-none resize-none"
+                    />
+                  </div>
+                  <div className="border-t border-marvvn-gray-100 pt-4">
+                    <label className="flex items-center gap-2 cursor-pointer mb-3">
+                      <input
+                        type="checkbox"
+                        checked={isGift}
+                        onChange={(e) => setIsGift(e.target.checked)}
+                        className="accent-marvvn-black"
+                      />
+                      <span className="text-sm font-medium text-marvvn-black">This is a gift</span>
+                    </label>
+                    {isGift && (
+                      <div>
+                        <label className="block text-xs font-medium text-marvvn-gray-600 mb-1">Gift message</label>
+                        <textarea
+                          value={giftMessage}
+                          onChange={(e) => setGiftMessage(e.target.value)}
+                          placeholder="Add a personal message for the recipient"
+                          rows={3}
+                          className="w-full px-3 py-2 text-sm border border-marvvn-gray-300 focus:border-marvvn-black focus:outline-none resize-none"
+                        />
+                        <p className="text-[11px] text-marvvn-gray-400 mt-1">The price tag will be removed from the product</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
