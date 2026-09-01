@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Facebook, Twitter, Instagram, Youtube, Send, MapPin, Phone, Mail, MessageCircle } from 'lucide-react'
+import { Facebook, Twitter, Instagram, Youtube, Send, MapPin, Phone, Mail, MessageCircle, Globe } from 'lucide-react'
 import { useState, useMemo } from 'react'
 import { useSettings } from '@/components/SettingsProvider'
 

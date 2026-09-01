@@ -631,13 +631,41 @@ export default function CheckoutPage() {
                       <div key={`${item.product.id}-${item.size}-${item.color}`} className="flex gap-3">
                         <div className="w-14 h-16 bg-marvvn-gray-50 relative flex-shrink-0">
                           <Image src={item.product.images?.[0] || '/placeholder.png'} alt={item.product.title} fill sizes="56px" className="object-cover" />
-                          <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-marvvn-gray-500 text-white text-[10px] font-semibold rounded-full flex items-center justify-center">{item.quantity}</span>
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-xs font-medium truncate">{item.product.title}</p>
                           <p className="text-[11px] text-marvvn-gray-400">{item.size}{item.color ? ` / ${item.color}` : ''}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <button
+                              onClick={() => {
+                                if (item.quantity <= 1) {
+                                  useCartStore.getState().removeItem(item.product.id, item.size, item.color)
+                                } else {
+                                  useCartStore.getState().updateQuantity(item.product.id, item.size, item.color, item.quantity - 1)
+                                }
+                              }}
+                              className="w-6 h-6 border border-marvvn-gray-300 flex items-center justify-center text-marvvn-gray-500 hover:border-marvvn-black cursor-pointer"
+                            >
+                              -
+                            </button>
+                            <span className="text-xs font-medium w-4 text-center">{item.quantity}</span>
+                            <button
+                              onClick={() => useCartStore.getState().updateQuantity(item.product.id, item.size, item.color, item.quantity + 1)}
+                              className="w-6 h-6 border border-marvvn-gray-300 flex items-center justify-center text-marvvn-gray-500 hover:border-marvvn-black cursor-pointer"
+                            >
+                              +
+                            </button>
+                          </div>
                         </div>
-                        <span className="text-xs font-medium">{formatPrice(item.product.price * item.quantity)}</span>
+                        <div className="flex flex-col items-end justify-between">
+                          <span className="text-xs font-medium">{formatPrice(item.product.price * item.quantity)}</span>
+                          <button
+                            onClick={() => useCartStore.getState().removeItem(item.product.id, item.size, item.color)}
+                            className="text-marvvn-gray-400 hover:text-marvvn-red cursor-pointer"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -653,13 +681,41 @@ export default function CheckoutPage() {
                     <div key={`${item.product.id}-${item.size}-${item.color}`} className="flex gap-3">
                       <div className="w-14 h-16 bg-marvvn-gray-50 relative flex-shrink-0">
                         <Image src={item.product.images?.[0] || '/placeholder.png'} alt={item.product.title} fill sizes="56px" className="object-cover" />
-                        <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-marvvn-gray-500 text-white text-[10px] font-semibold rounded-full flex items-center justify-center">{item.quantity}</span>
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-medium truncate">{item.product.title}</p>
                         <p className="text-[11px] text-marvvn-gray-400">{item.size}{item.color ? ` / ${item.color}` : ''}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <button
+                            onClick={() => {
+                              if (item.quantity <= 1) {
+                                useCartStore.getState().removeItem(item.product.id, item.size, item.color)
+                              } else {
+                                useCartStore.getState().updateQuantity(item.product.id, item.size, item.color, item.quantity - 1)
+                              }
+                            }}
+                            className="w-6 h-6 border border-marvvn-gray-300 flex items-center justify-center text-marvvn-gray-500 hover:border-marvvn-black cursor-pointer"
+                          >
+                            -
+                          </button>
+                          <span className="text-xs font-medium w-4 text-center">{item.quantity}</span>
+                          <button
+                            onClick={() => useCartStore.getState().updateQuantity(item.product.id, item.size, item.color, item.quantity + 1)}
+                            className="w-6 h-6 border border-marvvn-gray-300 flex items-center justify-center text-marvvn-gray-500 hover:border-marvvn-black cursor-pointer"
+                          >
+                            +
+                          </button>
+                        </div>
                       </div>
-                      <span className="text-xs font-medium">{formatPrice(item.product.price * item.quantity)}</span>
+                      <div className="flex flex-col items-end justify-between">
+                        <span className="text-xs font-medium">{formatPrice(item.product.price * item.quantity)}</span>
+                        <button
+                          onClick={() => useCartStore.getState().removeItem(item.product.id, item.size, item.color)}
+                          className="text-marvvn-gray-400 hover:text-marvvn-red cursor-pointer"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
