@@ -43,7 +43,7 @@ export async function POST(request: Request) {
   const productIds = items.map((item: any) => item.productId)
   const { data: products, error: productsError } = await supabase
     .from('products')
-    .select('id, title, price, stock')
+    .select('id, title, price')
     .in('id', productIds)
 
   if (productsError) {
@@ -52,15 +52,19 @@ export async function POST(request: Request) {
 
   const productMap = new Map(products?.map((p: any) => [p.id, p]) || [])
 
-  // Fetch variants for all products
-  const { data: allVariants } = await supabase
-    .from('product_variants')
-    .select('product_id, size, color, stock')
-    .in('product_id', productIds)
+  // Fetch variants for all products (may not exist yet if migration not run)
+  let variantMap = new Map<string, number>()
+  try {
+    const { data: allVariants } = await supabase
+      .from('product_variants')
+      .select('product_id, size, color, stock')
+      .in('product_id', productIds)
 
-  const variantMap = new Map<string, number>()
-  for (const v of allVariants || []) {
-    variantMap.set(`${v.product_id}|${v.size}|${v.color}`, v.stock)
+    for (const v of allVariants || []) {
+      variantMap.set(`${v.product_id}|${v.size}|${v.color}`, v.stock)
+    }
+  } catch {
+    // product_variants table may not exist yet
   }
 
   // Check stock availability for all items
