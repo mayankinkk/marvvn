@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 async function isAdmin(supabase: any) {
   const { data: { user } } = await supabase.auth.getUser()
@@ -12,11 +13,12 @@ export async function GET() {
   const supabase = createClient()
   if (!(await isAdmin(supabase))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
+  const admin = createAdminClient()
   const [ordersRes, productsRes, usersRes, itemsRes] = await Promise.all([
-    supabase.from('orders').select('id, status, total, created_at, payment_method, shipping_address, promo_code, discount'),
-    supabase.from('products').select('id, title, price, stock, category, images'),
-    supabase.from('profiles').select('id, created_at'),
-    supabase.from('order_items').select('id, order_id, product_id, quantity, price, size, color'),
+    admin.from('orders').select('id, status, total, created_at, payment_method, shipping_address, promo_code, discount'),
+    admin.from('products').select('id, title, price, stock, category, images'),
+    admin.from('profiles').select('id, created_at'),
+    admin.from('order_items').select('id, order_id, product_id, quantity, price, size, color'),
   ])
 
   const orders = ordersRes.data || []

@@ -19,7 +19,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
-  const { data, error } = await supabase
+  const admin = createAdminClient()
+  const { data, error } = await admin
     .from('orders')
     .select('*, order_items(*, products(title, handle, images))')
     .eq('id', id)
@@ -40,6 +41,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
+  const admin = createAdminClient()
   const body = await request.json()
   const { status, payment_status, notes, tracking_number } = body
 
@@ -49,8 +51,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   if (notes !== undefined) updateData.notes = notes
   if (tracking_number !== undefined) updateData.tracking_number = tracking_number
 
-  // Get current order to append to status_history
-  const { data: currentOrder } = await supabase
+  const { data: currentOrder } = await admin
     .from('orders')
     .select('status_history')
     .eq('id', id)
@@ -64,7 +65,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     ]
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await admin
     .from('orders')
     .update(updateData)
     .eq('id', id)
@@ -76,7 +77,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   }
 
   if (status && data) {
-    const { data: profile } = await supabase.from('profiles').select('email, name').eq('id', data.user_id).single()
+    const { data: profile } = await admin.from('profiles').select('email, name').eq('id', data.user_id).single()
     if (profile?.email) {
       sendOrderStatusUpdate(id, profile.email, status, tracking_number).catch(console.error)
     }

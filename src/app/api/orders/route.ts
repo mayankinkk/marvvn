@@ -125,7 +125,9 @@ export async function POST(request: Request) {
     orderData.user_id = user.id
   }
 
-  const { data: order, error: orderError } = await supabase
+  // Use admin client for insert to bypass RLS (guest orders have no user_id)
+  const admin = createAdminClient()
+  const { data: order, error: orderError } = await admin
     .from('orders')
     .insert(orderData)
     .select()
@@ -140,11 +142,11 @@ export async function POST(request: Request) {
     order_id: order.id,
   }))
 
-  const { error: itemsError } = await supabase.from('order_items').insert(itemsWithOrderId)
+  const { error: itemsError } = await admin.from('order_items').insert(itemsWithOrderId)
 
   if (itemsError) {
     console.error('Order items insert error:', itemsError)
-    await supabase.from('orders').delete().eq('id', order.id)
+    await admin.from('orders').delete().eq('id', order.id)
     return NextResponse.json({ error: 'Failed to create order items', details: itemsError.message }, { status: 500 })
   }
 
@@ -178,7 +180,6 @@ export async function POST(request: Request) {
   }
 
   // Atomic stock decrement using admin client to bypass RLS
-  const admin = createAdminClient()
   for (const item of orderItems) {
     const { error: stockError } = await admin
       .rpc('decrement_stock', { p_product_id: item.product_id, p_quantity: item.quantity })

@@ -81,6 +81,7 @@ export default function AdminOrdersPage() {
               <tr className="border-b text-left text-marvvn-gray-500">
                 <th className="px-4 py-3 font-medium">Order</th>
                 <th className="px-4 py-3 font-medium">Customer</th>
+                <th className="px-4 py-3 font-medium">Phone</th>
                 <th className="px-4 py-3 font-medium">Items</th>
                 <th className="px-4 py-3 font-medium">Total</th>
                 <th className="px-4 py-3 font-medium">Status</th>
@@ -92,7 +93,7 @@ export default function AdminOrdersPage() {
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-12 text-center text-marvvn-gray-400">
+                  <td colSpan={9} className="px-4 py-12 text-center text-marvvn-gray-400">
                     No orders found
                   </td>
                 </tr>
@@ -106,6 +107,7 @@ export default function AdminOrdersPage() {
                       </p>
                       <p className="text-xs text-marvvn-gray-400">{order.shipping_address?.email}</p>
                     </td>
+                    <td className="px-4 py-3 text-xs text-marvvn-gray-500">{order.shipping_address?.phone || '—'}</td>
                     <td className="px-4 py-3">{order.order_items?.length || 0}</td>
                     <td className="px-4 py-3 font-medium">{formatPrice(order.total)}</td>
                     <td className="px-4 py-3">
