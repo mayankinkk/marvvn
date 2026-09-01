@@ -1,12 +1,12 @@
-import { Truck, Shield, RotateCcw, CreditCard, Lock, Package } from 'lucide-react'
+import { Truck, Shield, RotateCcw, CreditCard, Lock, Package, Percent } from 'lucide-react'
 import { useSettings } from '@/components/SettingsProvider'
 
 const defaultBadges = [
   { icon: 'truck', title: 'Free Shipping', subtitle: 'On orders above ₹999' },
+  { icon: 'percent', title: '5% OFF Prepaid', subtitle: 'Extra discount on UPI/Cards' },
   { icon: 'shield', title: 'Secure Payment', subtitle: '100% secure checkout' },
   { icon: 'rotate', title: 'Easy Returns', subtitle: '3-day return policy' },
   { icon: 'credit-card', title: 'Multiple Payment', subtitle: 'UPI, Cards, Wallets, COD' },
-  { icon: 'lock', title: 'SSL Encrypted', subtitle: 'Your data is protected' },
   { icon: 'package', title: 'Quality Assured', subtitle: 'Premium streetwear' },
 ]
 
@@ -17,6 +17,7 @@ const iconMap: Record<string, any> = {
   'credit-card': CreditCard,
   lock: Lock,
   package: Package,
+  percent: Percent,
 }
 
 export default function TrustBadges() {

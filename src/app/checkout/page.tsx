@@ -34,6 +34,8 @@ export default function CheckoutPage() {
   const [showItems, setShowItems] = useState(false)
   const [createAccount, setCreateAccount] = useState(false)
   const [accountPassword, setAccountPassword] = useState('')
+  const [savedAddresses, setSavedAddresses] = useState<any[]>([])
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
 
   const [contact, setContact] = useState({
     email: user?.email || '',
@@ -62,6 +64,32 @@ export default function CheckoutPage() {
       document.body.appendChild(script)
     }
   }, [payment.method])
+
+  // Fetch saved addresses for logged-in users
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetch('/api/addresses')
+        .then((res) => res.json())
+        .then((data) => setSavedAddresses(data.addresses || []))
+        .catch(() => {})
+    }
+  }, [isAuthenticated])
+
+  const handleSelectAddress = (addr: any) => {
+    setSelectedAddressId(addr.id)
+    setShipping({
+      firstName: addr.first_name,
+      lastName: addr.last_name,
+      address: addr.address,
+      apartment: addr.apartment || '',
+      city: addr.city,
+      state: addr.state,
+      pincode: addr.pincode,
+    })
+    if (addr.phone) {
+      setContact({ ...contact, phone: addr.phone })
+    }
+  }
 
   // Track cart abandonment — fires on tab close OR after 15 minutes
   useEffect(() => {
@@ -410,6 +438,43 @@ export default function CheckoutPage() {
               </button>
               {openSection === 'shipping' && (
                 <div className="px-4 pb-4 pt-0 space-y-3">
+                  {savedAddresses.length > 0 && (
+                    <div className="mb-4">
+                      <p className="text-xs font-medium text-marvvn-gray-500 mb-2">Saved Addresses</p>
+                      <div className="space-y-2">
+                        {savedAddresses.map((addr: any) => (
+                          <label
+                            key={addr.id}
+                            className={`flex items-start gap-3 p-3 border cursor-pointer transition-colors ${
+                              selectedAddressId === addr.id ? 'border-marvvn-black bg-marvvn-gray-50' : 'border-marvvn-gray-200 hover:border-marvvn-gray-400'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="savedAddress"
+                              checked={selectedAddressId === addr.id}
+                              onChange={() => handleSelectAddress(addr)}
+                              className="mt-0.5 accent-marvvn-black"
+                            />
+                            <div className="text-sm">
+                              <p className="font-medium">{addr.first_name} {addr.last_name}</p>
+                              <p className="text-marvvn-gray-600">{addr.address}{addr.apartment ? `, ${addr.apartment}` : ''}</p>
+                              <p className="text-marvvn-gray-600">{addr.city}, {addr.state} {addr.pincode}</p>
+                              {addr.phone && <p className="text-marvvn-gray-500 text-xs">{addr.phone}</p>}
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                      <div className="relative my-3">
+                        <div className="absolute inset-0 flex items-center">
+                          <div className="w-full border-t border-marvvn-gray-200" />
+                        </div>
+                        <div className="relative flex justify-center text-xs">
+                          <span className="px-2 bg-white text-marvvn-gray-400">or enter new address</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   <div className="grid grid-cols-2 gap-3">
                     <input
                       type="text"

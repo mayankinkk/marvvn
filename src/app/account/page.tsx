@@ -13,6 +13,7 @@ import {
   Truck, Clock, CheckCircle, ArrowRight, Home, MapPin, Headphones, RotateCcw
 } from 'lucide-react'
 import ReturnsTab from '@/components/ReturnsTab'
+import AddressesManager from '@/components/AddressesManager'
 
 type Tab = 'dashboard' | 'orders' | 'addresses' | 'settings' | 'returns'
 
@@ -437,21 +438,7 @@ export default function AccountPage() {
             {activeTab === 'returns' && <ReturnsTab />}
 
             {/* Addresses Tab */}
-            {activeTab === 'addresses' && (
-              <div>
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="font-medium text-lg">Saved Addresses</h2>
-                </div>
-                <div className="border border-dashed border-marvvn-gray-300 p-8 text-center">
-                  <MapPin className="w-12 h-12 text-marvvn-gray-300 mx-auto mb-3" />
-                  <p className="text-marvvn-gray-500 mb-1">No saved addresses yet</p>
-                  <p className="text-sm text-marvvn-gray-400 mb-4">Your saved addresses will appear here after checkout</p>
-                  <Link href="/collections/new-arrivals" className="btn-primary text-sm inline-block">
-                    Start Shopping
-                  </Link>
-                </div>
-              </div>
-            )}
+            {activeTab === 'addresses' && <AddressesManager />}
 
             {/* Settings Tab */}
             {activeTab === 'settings' && (
