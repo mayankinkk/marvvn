@@ -12,6 +12,7 @@ import { useSettings } from '@/components/SettingsProvider'
 import { formatPrice } from '@/lib/utils'
 import { trackBeginCheckout } from '@/components/Analytics'
 import { ChevronDown, ChevronUp, Check, Truck, ShieldCheck, RotateCcw, Tag, X, Loader2, CreditCard, Wallet, Banknote } from 'lucide-react'
+import UpsellProducts from '@/components/UpsellProducts'
 
 type Step = 'contact' | 'shipping' | 'payment'
 
@@ -817,6 +818,9 @@ export default function CheckoutPage() {
                   )}
                   {promoError && <p className="text-[11px] text-red-500 mt-1">{promoError}</p>}
                 </div>
+
+                {/* Upsell Products */}
+                <UpsellProducts />
 
                 {/* Totals */}
                 <div className="border-t border-marvvn-gray-100 pt-3 space-y-2 text-xs">
