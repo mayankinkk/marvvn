@@ -80,51 +80,51 @@ $$ LANGUAGE plpgsql;
 -- Only runs if the stock column exists on products table
 DO $$
 DECLARE
-  product RECORD;
-  size TEXT;
-  color TEXT;
-  variant_count INTEGER;
-  stock_per_variant INTEGER;
-  has_stock_column BOOLEAN;
+  prod RECORD;
+  v_size TEXT;
+  v_color TEXT;
+  v_variant_count INTEGER;
+  v_stock_per_variant INTEGER;
+  v_has_stock_column BOOLEAN;
 BEGIN
   -- Check if stock column exists
   SELECT EXISTS (
     SELECT 1 FROM information_schema.columns
     WHERE table_name = 'products' AND column_name = 'stock'
-  ) INTO has_stock_column;
+  ) INTO v_has_stock_column;
 
-  IF NOT has_stock_column THEN
+  IF NOT v_has_stock_column THEN
     -- No stock column, create variants with 0 stock
-    FOR product IN
+    FOR prod IN
       SELECT id, sizes, colors
       FROM products
       WHERE array_length(sizes, 1) > 0
         AND NOT EXISTS (SELECT 1 FROM product_variants WHERE product_id = products.id)
     LOOP
-      FOREACH size IN ARRAY product.sizes LOOP
-        FOREACH color IN ARRAY product.colors LOOP
+      FOREACH v_size IN ARRAY prod.sizes LOOP
+        FOREACH v_color IN ARRAY prod.colors LOOP
           INSERT INTO product_variants (product_id, size, color, stock)
-          VALUES (product.id, size, color, 0)
+          VALUES (prod.id, v_size, v_color, 0)
           ON CONFLICT (product_id, size, color) DO NOTHING;
         END LOOP;
       END LOOP;
     END LOOP;
   ELSE
     -- Stock column exists, seed from it
-    FOR product IN
+    FOR prod IN
       SELECT id, sizes, colors, stock
       FROM products
       WHERE stock IS NOT NULL AND stock > 0
         AND array_length(sizes, 1) > 0
         AND NOT EXISTS (SELECT 1 FROM product_variants WHERE product_id = products.id)
     LOOP
-      variant_count := array_length(product.sizes, 1) * array_length(product.colors, 1);
-      IF variant_count > 0 THEN
-        stock_per_variant := GREATEST(1, product.stock / variant_count);
-        FOREACH size IN ARRAY product.sizes LOOP
-          FOREACH color IN ARRAY product.colors LOOP
+      v_variant_count := array_length(prod.sizes, 1) * array_length(prod.colors, 1);
+      IF v_variant_count > 0 THEN
+        v_stock_per_variant := GREATEST(1, prod.stock / v_variant_count);
+        FOREACH v_size IN ARRAY prod.sizes LOOP
+          FOREACH v_color IN ARRAY prod.colors LOOP
             INSERT INTO product_variants (product_id, size, color, stock)
-            VALUES (product.id, size, color, stock_per_variant)
+            VALUES (prod.id, v_size, v_color, v_stock_per_variant)
             ON CONFLICT (product_id, size, color) DO NOTHING;
           END LOOP;
         END LOOP;
