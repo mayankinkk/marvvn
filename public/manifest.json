@@ -9,19 +9,19 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icons/image_logo.png",
+      "src": "/icons/image_logo_circle.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/image_logo.png",
+      "src": "/icons/image_logo_circle.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/image_logo.png",
+      "src": "/icons/image_logo_circle.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

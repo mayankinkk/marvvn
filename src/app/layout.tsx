@@ -68,7 +68,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <AnalyticsScripts />
-        <link rel="apple-touch-icon" sizes="180x180" href="/icons/image_logo.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/icons/image_logo_circle.png" />
         <script
           dangerouslySetInnerHTML={{
             __html: `
