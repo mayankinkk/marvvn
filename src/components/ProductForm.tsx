@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Save, ArrowLeft, Plus, X } from 'lucide-react'
 import Link from 'next/link'
+import MultiImageUpload from './MultiImageUpload'
 
 interface ProductFormProps {
   productId?: string
@@ -21,7 +22,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
     description: '',
     price: '',
     compare_at_price: '',
-    images: '',
+    images: [] as string[],
     category: 'men',
     collection: '',
     tags: '',
@@ -52,7 +53,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
               description: p.description || '',
               price: p.price?.toString() || '',
               compare_at_price: p.compare_at_price?.toString() || '',
-              images: (p.images || []).join('\n'),
+              images: p.images || [],
               category: p.category || 'men',
               collection: (p.collection || []).join(', '),
               tags: (p.tags || []).join(', '),
@@ -79,13 +80,19 @@ export default function ProductForm({ productId }: ProductFormProps) {
     setSaving(true)
     setError('')
 
+    if (form.images.length === 0) {
+      setError('At least one product image is required')
+      setSaving(false)
+      return
+    }
+
     const body = {
       handle: form.handle,
       title: form.title,
       description: form.description,
       price: parseFloat(form.price),
       compare_at_price: form.compare_at_price ? parseFloat(form.compare_at_price) : null,
-      images: form.images.split('\n').map((s) => s.trim()).filter(Boolean),
+      images: form.images,
       category: form.category,
       collection: form.collection.split(',').map((s) => s.trim()).filter(Boolean),
       tags: form.tags.split(',').map((s) => s.trim()).filter(Boolean),
@@ -217,14 +224,12 @@ export default function ProductForm({ productId }: ProductFormProps) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Images (one URL per line) *</label>
-          <textarea
-            value={form.images}
-            onChange={(e) => setForm({ ...form, images: e.target.value })}
-            className="input-field font-mono text-xs"
-            rows={4}
-            required
-            placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg"
+          <label className="block text-sm font-medium mb-1">Product Images *</label>
+          <MultiImageUpload
+            images={form.images}
+            onChange={(images) => setForm({ ...form, images })}
+            folder="products"
+            maxImages={10}
           />
         </div>
 
