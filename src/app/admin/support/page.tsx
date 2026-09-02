@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Search, MessageSquare, Send, Loader2, Filter } from 'lucide-react'
 
 interface Ticket {
@@ -58,7 +58,7 @@ export default function AdminSupportPage() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
 
-  const fetchTickets = async () => {
+  const fetchTickets = useCallback(async () => {
     setLoading(true)
     try {
       const res = await fetch(`/api/admin/support?status=${statusFilter}&search=${search}`)
@@ -66,11 +66,11 @@ export default function AdminSupportPage() {
       setTickets(data.tickets || [])
     } catch {}
     setLoading(false)
-  }
+  }, [statusFilter, search])
 
   useEffect(() => {
     fetchTickets()
-  }, [statusFilter, search, fetchTickets])
+  }, [fetchTickets])
 
   const fetchTicketMessages = async (ticketId: string) => {
     setSelectedTicket(ticketId)
