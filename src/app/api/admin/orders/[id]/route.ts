@@ -70,7 +70,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     .from('orders')
     .update(updateData)
     .eq('id', id)
-    .select()
+    .select('*, order_items(*, products(title, handle, images))')
     .single()
 
   if (error) {
