@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 async function isAdmin(supabase: any) {
   const { data: { user } } = await supabase.auth.getUser()
@@ -24,12 +25,13 @@ export async function GET() {
     return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 })
   }
 
-  // Fetch all variants to compute total stock per product
+  // Fetch all variants to compute total stock per product (use admin client to bypass RLS)
   const productIds = (data || []).map(p => p.id)
   let variantMap = new Map<string, number>()
 
   try {
-    const { data: variants } = await supabase
+    const admin = createAdminClient()
+    const { data: variants } = await admin
       .from('product_variants')
       .select('product_id, stock')
       .in('product_id', productIds)
