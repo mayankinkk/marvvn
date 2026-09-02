@@ -315,6 +315,13 @@ export default function OrdersPage() {
                       <span className="font-semibold">Total: {formatPrice(order.total)}</span>
                     </div>
                   </div>
+                  {order.tracking_number && (
+                    <div className="flex items-center gap-2 mt-2 pt-2 border-t border-marvvn-gray-100">
+                      <Truck className="w-3.5 h-3.5 text-marvvn-gray-400" />
+                      <span className="text-xs text-marvvn-gray-500">Tracking:</span>
+                      <span className="text-xs font-mono font-medium">{order.tracking_number}</span>
+                    </div>
+                  )}
                   <div className="flex items-center gap-3 mt-2 pt-2 border-t border-marvvn-gray-100">
                     <InvoiceButton orderId={order.id} />
                     {order.status === 'delivered' && (
