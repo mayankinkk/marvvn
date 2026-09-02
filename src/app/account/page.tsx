@@ -12,6 +12,46 @@ import {
   Copy, Check, Edit3, Save, X, Lock, Eye, EyeOff, Bell, Mail, MessageCircle,
   Truck, Clock, CheckCircle, ArrowRight, Home, MapPin, Headphones, RotateCcw
 } from 'lucide-react'
+
+const statusSteps = [
+  { key: 'pending', label: 'Order Placed', icon: Clock },
+  { key: 'confirmed', label: 'Confirmed', icon: CheckCircle },
+  { key: 'shipped', label: 'Shipped', icon: Truck },
+  { key: 'delivered', label: 'Delivered', icon: MapPin },
+]
+
+function OrderProgress({ status }: { status: string }) {
+  const isCancelled = status === 'cancelled'
+  const currentStepIndex = statusSteps.findIndex(s => s.key === status)
+  return (
+    <div className="px-4 py-3 border-b border-marvvn-gray-100">
+      <div className="flex items-start justify-between">
+        {statusSteps.map((step, i) => {
+          const isCompleted = currentStepIndex >= i && !isCancelled
+          return (
+            <div key={step.key} className="flex-1 flex flex-col items-center text-center relative">
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center mb-1 ${
+                isCancelled ? 'bg-marvvn-gray-100 text-marvvn-gray-400' :
+                isCompleted ? 'bg-marvvn-black text-white' :
+                'bg-marvvn-gray-100 text-marvvn-gray-400'
+              }`}>
+                <step.icon className="w-3.5 h-3.5" />
+              </div>
+              <p className={`text-[10px] font-medium ${isCompleted && !isCancelled ? 'text-marvvn-black' : 'text-marvvn-gray-400'}`}>
+                {step.label}
+              </p>
+              {i < statusSteps.length - 1 && (
+                <div className={`absolute top-3.5 left-1/2 w-full h-0.5 ${
+                  isCompleted && !isCancelled ? 'bg-marvvn-black' : 'bg-marvvn-gray-200'
+                }`} style={{ zIndex: 0 }} />
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
 import ReturnsTab from '@/components/ReturnsTab'
 import AddressesManager from '@/components/AddressesManager'
 
@@ -26,6 +66,7 @@ interface OrderStats {
 
 const statusColors: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-800',
+  confirmed: 'bg-blue-100 text-blue-800',
   processing: 'bg-blue-100 text-blue-800',
   shipped: 'bg-purple-100 text-purple-800',
   delivered: 'bg-green-100 text-green-800',
@@ -34,6 +75,7 @@ const statusColors: Record<string, string> = {
 
 const statusIcons: Record<string, any> = {
   pending: Clock,
+  confirmed: CheckCircle,
   processing: Package,
   shipped: Truck,
   delivered: CheckCircle,
@@ -400,23 +442,26 @@ export default function AccountPage() {
                     {stats.recentOrders.map((order: any) => {
                       const StatusIcon = statusIcons[order.status] || Clock
                       return (
-                        <div key={order.id} className="border border-marvvn-gray-200 p-5">
-                          <div className="flex items-start justify-between mb-3">
-                            <div>
-                              <p className="font-medium">Order #{order.id.slice(0, 8).toUpperCase()}</p>
-                              <p className="text-xs text-marvvn-gray-500 mt-1">
-                                {new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
-                              </p>
+                        <div key={order.id} className="border border-marvvn-gray-200">
+                          <div className="p-5">
+                            <div className="flex items-start justify-between mb-3">
+                              <div>
+                                <p className="font-medium">Order #{order.id.slice(0, 8).toUpperCase()}</p>
+                                <p className="text-xs text-marvvn-gray-500 mt-1">
+                                  {new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                </p>
+                              </div>
+                              <span className={`flex items-center gap-1.5 text-xs px-3 py-1 ${statusColors[order.status] || 'bg-gray-100 text-gray-800'}`}>
+                                <StatusIcon className="w-3 h-3" />
+                                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                              </span>
                             </div>
-                            <span className={`flex items-center gap-1.5 text-xs px-3 py-1 ${statusColors[order.status] || 'bg-gray-100 text-gray-800'}`}>
-                              <StatusIcon className="w-3 h-3" />
-                              {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                            </span>
+                            <div className="flex items-center justify-between pt-3 border-t border-marvvn-gray-100">
+                              <p className="text-sm text-marvvn-gray-500">Payment: {order.payment_status || 'Pending'}</p>
+                              <p className="font-medium">{format(order.total || 0)}</p>
+                            </div>
                           </div>
-                          <div className="flex items-center justify-between pt-3 border-t border-marvvn-gray-100">
-                            <p className="text-sm text-marvvn-gray-500">Payment: {order.payment_status || 'Pending'}</p>
-                            <p className="font-medium">{format(order.total || 0)}</p>
-                          </div>
+                          <OrderProgress status={order.status} />
                         </div>
                       )
                     })}
