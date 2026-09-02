@@ -104,6 +104,7 @@ export default function AccountPage() {
   const [saving, setSaving] = useState(false)
   const [saveMsg, setSaveMsg] = useState('')
   const [notifications, setNotifications] = useState({ email: true, whatsapp: false })
+  const [expandedOrders, setExpandedOrders] = useState<string | null>(null)
   const [authChecked, setAuthChecked] = useState(false)
 
   useEffect(() => {
@@ -411,32 +412,97 @@ export default function AccountPage() {
                       <h2 className="font-medium text-lg">Recent Orders</h2>
                       <button
                         type="button"
-                        onClick={() => setActiveTab('orders')}
+                        onClick={() => setExpandedOrders(expandedOrders === 'all' ? null : 'all')}
                         className="text-sm text-marvvn-gray-500 hover:text-marvvn-black flex items-center gap-1"
                       >
-                        View All <ArrowRight className="w-3 h-3" />
+                        {expandedOrders === 'all' ? 'Show Less' : 'View All'} <ArrowRight className={`w-3 h-3 transition-transform ${expandedOrders === 'all' ? 'rotate-90' : ''}`} />
                       </button>
                     </div>
                     <div className="space-y-3">
                       {stats.recentOrders.map((order: any) => {
+                        const isExpanded = expandedOrders === 'all' || expandedOrders === order.id
                         const StatusIcon = statusIcons[order.status] || Clock
                         return (
-                          <div key={order.id} className="flex items-center justify-between p-3 border border-marvvn-gray-100 hover:bg-marvvn-gray-50">
-                            <div className="flex items-center gap-3">
-                              <StatusIcon className="w-4 h-4 text-marvvn-gray-400" />
-                              <div>
-                                <p className="text-sm font-medium">#{order.id.slice(0, 8).toUpperCase()}</p>
-                                <p className="text-xs text-marvvn-gray-500">
-                                  {new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                                </p>
+                          <div key={order.id} className="border border-marvvn-gray-100">
+                            <div
+                              className="flex items-center justify-between p-3 hover:bg-marvvn-gray-50 cursor-pointer"
+                              onClick={() => setExpandedOrders(isExpanded && expandedOrders !== 'all' ? null : order.id)}
+                            >
+                              <div className="flex items-center gap-3">
+                                <StatusIcon className="w-4 h-4 text-marvvn-gray-400" />
+                                <div>
+                                  <p className="text-sm font-medium">#{order.id.slice(0, 8).toUpperCase()}</p>
+                                  <p className="text-xs text-marvvn-gray-500">
+                                    {new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                  </p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm font-medium">{format(order.total || 0)}</p>
+                                <span className={`text-xs px-2 py-0.5 ${statusColors[order.status] || 'bg-gray-100 text-gray-800'}`}>
+                                  {order.status}
+                                </span>
                               </div>
                             </div>
-                            <div className="text-right">
-                              <p className="text-sm font-medium">{format(order.total || 0)}</p>
-                              <span className={`text-xs px-2 py-0.5 ${statusColors[order.status] || 'bg-gray-100 text-gray-800'}`}>
-                                {order.status}
-                              </span>
-                            </div>
+                            {isExpanded && (
+                              <div className="border-t border-marvvn-gray-100">
+                                <OrderProgress status={order.status} />
+                                {order.order_items && order.order_items.length > 0 && (
+                                  <div className="divide-y divide-marvvn-gray-100">
+                                    {order.order_items.map((item: any) => (
+                                      <div key={item.id} className="px-4 py-3 flex items-center gap-3">
+                                        <div className="w-14 h-16 bg-marvvn-gray-50 relative flex-shrink-0 overflow-hidden">
+                                          {item.products?.images?.[0] ? (
+                                            <Image
+                                              src={item.products.images[0]}
+                                              alt={item.products?.title || ''}
+                                              fill
+                                              sizes="56px"
+                                              className="object-cover"
+                                            />
+                                          ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-marvvn-gray-300">
+                                              <Package className="w-5 h-5" />
+                                            </div>
+                                          )}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                          <p className="text-sm font-medium truncate">{item.products?.title || 'Product'}</p>
+                                          <p className="text-xs text-marvvn-gray-400">
+                                            {item.size && `Size: ${item.size}`}
+                                            {item.size && item.color && ' · '}
+                                            {item.color && `Color: ${item.color}`}
+                                            {item.quantity > 1 && ` · Qty: ${item.quantity}`}
+                                          </p>
+                                        </div>
+                                        <span className="text-sm font-medium">{formatPrice(item.price * item.quantity)}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                <div className="px-4 py-3 bg-marvvn-gray-50 flex items-center justify-between text-xs">
+                                  <span className="text-marvvn-gray-500">
+                                    {order.order_items?.length || 0} item{(order.order_items?.length || 0) > 1 ? 's' : ''}
+                                    {order.payment_method === 'cod' ? ' · Cash on Delivery' : ''}
+                                  </span>
+                                  <div className="flex items-center gap-3">
+                                    {order.payment_status && (
+                                      <span className={`text-[11px] font-medium ${order.payment_status === 'paid' ? 'text-green-600' : 'text-yellow-600'}`}>
+                                        {order.payment_status === 'paid' ? 'Paid' : 'Payment pending'}
+                                      </span>
+                                    )}
+                                    <span className="font-semibold">Total: {formatPrice(order.total)}</span>
+                                  </div>
+                                </div>
+                                {order.tracking_number && (
+                                  <div className="px-4 py-2 bg-marvvn-gray-50 border-t border-marvvn-gray-100 flex items-center gap-2">
+                                    <Truck className="w-3.5 h-3.5 text-marvvn-gray-400" />
+                                    <span className="text-xs text-marvvn-gray-500">Tracking:</span>
+                                    <span className="text-xs font-mono font-medium">{order.tracking_number}</span>
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </div>
                         )
                       })}
