@@ -8,7 +8,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useAuthStore } from '@/lib/auth-store'
 import { formatPrice } from '@/lib/utils'
-import { ChevronRight, Package, Loader2, CreditCard, Eye, FileText, RotateCcw } from 'lucide-react'
+import { ChevronRight, Package, Loader2, CreditCard, Eye, FileText, RotateCcw, CheckCircle, Truck, MapPin, Clock } from 'lucide-react'
 import InvoiceButton from '@/components/InvoiceButton'
 
 interface OrderItem {
@@ -30,6 +30,7 @@ interface Order {
   created_at: string
   shipping_address: any
   order_items: OrderItem[]
+  tracking_number?: string
 }
 
 const statusColors: Record<string, string> = {
@@ -38,6 +39,57 @@ const statusColors: Record<string, string> = {
   shipped: 'bg-purple-100 text-purple-800',
   delivered: 'bg-green-100 text-green-800',
   cancelled: 'bg-red-100 text-red-800',
+}
+
+const statusSteps = [
+  { key: 'pending', label: 'Order Placed', icon: Clock, description: 'Your order has been placed' },
+  { key: 'confirmed', label: 'Confirmed', icon: CheckCircle, description: 'Order confirmed by team' },
+  { key: 'shipped', label: 'Shipped', icon: Truck, description: 'Your order is on the way' },
+  { key: 'delivered', label: 'Delivered', icon: MapPin, description: 'Order delivered to you' },
+]
+
+function OrderProgress({ status }: { status: string }) {
+  const isCancelled = status === 'cancelled'
+  const currentStepIndex = statusSteps.findIndex(s => s.key === status)
+
+  return (
+    <div className="px-4 py-4 border-b border-marvvn-gray-100">
+      <div className="flex items-start justify-between">
+        {statusSteps.map((step, i) => {
+          const isCompleted = currentStepIndex >= i && !isCancelled
+          const isCurrent = currentStepIndex === i
+          return (
+            <div key={step.key} className="flex-1 flex flex-col items-center text-center relative">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center mb-1.5 transition-colors ${
+                isCancelled ? 'bg-marvvn-gray-100 text-marvvn-gray-400' :
+                isCompleted ? 'bg-marvvn-black text-white' :
+                'bg-marvvn-gray-100 text-marvvn-gray-400'
+              }`}>
+                <step.icon className="w-4 h-4" />
+              </div>
+              <p className={`text-[11px] font-medium ${isCompleted && !isCancelled ? 'text-marvvn-black' : 'text-marvvn-gray-400'}`}>
+                {step.label}
+              </p>
+              <p className="text-[9px] text-marvvn-gray-400 mt-0.5 hidden sm:block">{step.description}</p>
+              {i < statusSteps.length - 1 && (
+                <div className={`absolute top-4 left-1/2 w-full h-0.5 ${
+                  isCompleted && !isCancelled ? 'bg-marvvn-black' : 'bg-marvvn-gray-200'
+                }`} style={{ zIndex: 0 }} />
+              )}
+            </div>
+          )
+        })}
+        {isCancelled && (
+          <div className="flex-1 flex flex-col items-center text-center">
+            <div className="w-8 h-8 rounded-full bg-red-100 text-red-500 flex items-center justify-center mb-1.5">
+              <span className="text-sm font-bold">✕</span>
+            </div>
+            <p className="text-[11px] font-medium text-red-600">Cancelled</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
 }
 
 export default function OrdersPage() {
@@ -210,6 +262,9 @@ export default function OrdersPage() {
                     )}
                   </div>
                 </div>
+
+                {/* Order Progress */}
+                <OrderProgress status={order.status} />
 
                 {/* Order Items */}
                 <div className="divide-y divide-marvvn-gray-100">
