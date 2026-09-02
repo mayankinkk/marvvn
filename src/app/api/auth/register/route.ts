@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { sendWelcomeEmail } from '@/lib/email'
 
 export async function POST(request: Request) {
@@ -37,10 +38,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'An account with this email already exists' }, { status: 400 })
     }
 
-    await supabase.from('profiles').upsert(
+    const admin = createAdminClient()
+    const { error: profileError } = await admin.from('profiles').upsert(
       { id: data.user.id, name, email },
       { onConflict: 'id' }
-    ).then(({ error: e }) => { if (e) console.error('Profile upsert error:', e) })
+    )
+    if (profileError) console.error('Profile upsert error:', profileError)
 
     sendWelcomeEmail(email, name).catch(console.error)
   }

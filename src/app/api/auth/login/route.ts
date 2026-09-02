@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(request: Request) {
   const supabase = createClient()
@@ -11,7 +12,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 401 })
   }
 
-  // Ensure profile exists
+  // Ensure profile exists (use admin client to bypass RLS)
   const { data: profile } = await supabase
     .from('profiles')
     .select('id')
@@ -19,7 +20,8 @@ export async function POST(request: Request) {
     .single()
 
   if (!profile) {
-    await supabase.from('profiles').upsert({
+    const admin = createAdminClient()
+    await admin.from('profiles').upsert({
       id: data.user.id,
       name: data.user.user_metadata?.name || '',
       email: data.user.email,
