@@ -59,6 +59,15 @@ export default function OrdersPage() {
         .then((res) => res.json())
         .then((data) => { setOrders(data.orders || []); setLoadingOrders(false) })
         .catch(() => setLoadingOrders(false))
+
+      const interval = setInterval(() => {
+        fetch('/api/orders')
+          .then((res) => res.json())
+          .then((data) => { setOrders(data.orders || []) })
+          .catch(() => {})
+      }, 30000)
+
+      return () => clearInterval(interval)
     }
   }, [isAuthenticated])
 
