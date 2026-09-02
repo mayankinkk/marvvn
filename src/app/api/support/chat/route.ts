@@ -208,6 +208,7 @@ function buildOrderResponse(order: any) {
     pending: '⏳',
     confirmed: '✅',
     shipped: '🚚',
+    out_for_delivery: '🛵',
     delivered: '📦',
     cancelled: '❌',
   }
@@ -216,6 +217,7 @@ function buildOrderResponse(order: any) {
     pending: 'Your order has been placed and is awaiting confirmation.',
     confirmed: 'Great news! Your order has been confirmed and is being prepared.',
     shipped: 'Your order is on its way! It should arrive within 2-4 business days.',
+    out_for_delivery: 'Your order is out for delivery and will arrive today!',
     delivered: 'Your order has been delivered. We hope you love it!',
     cancelled: 'This order has been cancelled.',
   }

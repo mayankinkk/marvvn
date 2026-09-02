@@ -11,6 +11,7 @@ const statusSteps = [
   { key: 'pending', label: 'Order Placed', icon: Clock, description: 'Your order has been received' },
   { key: 'confirmed', label: 'Confirmed', icon: CheckCircle, description: 'Your order has been confirmed' },
   { key: 'shipped', label: 'Shipped', icon: Truck, description: 'Your order is on the way' },
+  { key: 'out_for_delivery', label: 'Out for Delivery', icon: MapPin, description: 'Out for delivery to you' },
   { key: 'delivered', label: 'Delivered', icon: MapPin, description: 'Your order has been delivered' },
 ]
 
@@ -18,6 +19,7 @@ const statusColors: Record<string, string> = {
   pending: 'text-amber-600 bg-amber-50 border-amber-200',
   confirmed: 'text-blue-600 bg-blue-50 border-blue-200',
   shipped: 'text-purple-600 bg-purple-50 border-purple-200',
+  out_for_delivery: 'text-orange-600 bg-orange-50 border-orange-200',
   delivered: 'text-emerald-600 bg-emerald-50 border-emerald-200',
   cancelled: 'text-red-600 bg-red-50 border-red-200',
 }

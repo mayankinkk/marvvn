@@ -45,6 +45,7 @@ const statusSteps = [
   { key: 'pending', label: 'Order Placed', icon: Clock, description: 'Your order has been placed' },
   { key: 'confirmed', label: 'Confirmed', icon: CheckCircle, description: 'Order confirmed by team' },
   { key: 'shipped', label: 'Shipped', icon: Truck, description: 'Your order is on the way' },
+  { key: 'out_for_delivery', label: 'Out for Delivery', icon: MapPin, description: 'Out for delivery to you' },
   { key: 'delivered', label: 'Delivered', icon: MapPin, description: 'Order delivered to you' },
 ]
 

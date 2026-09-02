@@ -13,7 +13,7 @@ interface Stats {
   totalUsers: number
   recentOrders: any[]
   dailyRevenue: { date: string; label: string; revenue: number; orders: number }[]
-  statusBreakdown: { pending: number; confirmed: number; shipped: number; delivered: number; cancelled: number }
+  statusBreakdown: { pending: number; confirmed: number; shipped: number; out_for_delivery: number; delivered: number; cancelled: number }
   topProducts: { title: string; handle: string; quantity: number; revenue: number }[]
   promoUsage: { code: string; count: number; totalDiscount: number }[]
   paymentMethods: { cod: number; upi: number; card: number }
@@ -59,6 +59,7 @@ export default function AdminDashboard() {
     pending: { color: 'text-amber-700 bg-amber-50', dot: 'bg-amber-400' },
     confirmed: { color: 'text-blue-700 bg-blue-50', dot: 'bg-blue-400' },
     shipped: { color: 'text-purple-700 bg-purple-50', dot: 'bg-purple-400' },
+    out_for_delivery: { color: 'text-orange-700 bg-orange-50', dot: 'bg-orange-400' },
     delivered: { color: 'text-emerald-700 bg-emerald-50', dot: 'bg-emerald-400' },
     cancelled: { color: 'text-red-700 bg-red-50', dot: 'bg-red-400' },
   }

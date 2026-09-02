@@ -56,6 +56,7 @@ export async function GET() {
     pending: allOrders.filter((o: any) => o.status === 'pending').length,
     confirmed: allOrders.filter((o: any) => o.status === 'confirmed').length,
     shipped: allOrders.filter((o: any) => o.status === 'shipped').length,
+    out_for_delivery: allOrders.filter((o: any) => o.status === 'out_for_delivery').length,
     delivered: allOrders.filter((o: any) => o.status === 'delivered').length,
     cancelled: allOrders.filter((o: any) => o.status === 'cancelled').length,
   }

@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Order is already cancelled' }, { status: 400 })
   }
 
-  if (order.status === 'shipped' || order.status === 'delivered') {
+  if (order.status === 'shipped' || order.status === 'out_for_delivery' || order.status === 'delivered') {
     return NextResponse.json({ error: 'Order has already been shipped/delivered and cannot be cancelled' }, { status: 400 })
   }
 
