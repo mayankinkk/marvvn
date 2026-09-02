@@ -52,10 +52,11 @@ export default function LazyImage({ src, alt, className = '', sizes, fill, style
       <>
         <img
           ref={imgRef}
-          data-src={src}
+          src={src}
           alt={alt}
           sizes={sizes}
-          className={`lazyload absolute inset-0 w-full h-full object-cover ${className}`}
+          loading="lazy"
+          className={`absolute inset-0 w-full h-full object-cover ${className}`}
           style={style}
         />
         <noscript>
@@ -75,10 +76,11 @@ export default function LazyImage({ src, alt, className = '', sizes, fill, style
     <>
       <img
         ref={imgRef}
-        data-src={src}
+        src={src}
         alt={alt}
         sizes={sizes}
-        className={`lazyload ${className}`}
+        loading="lazy"
+        className={className}
         style={style}
       />
       <noscript>
