@@ -24,6 +24,14 @@ export default function QuickViewModal({ product, isOpen, onClose }: QuickViewMo
   const discount = product.compareAtPrice ? calculateDiscount(product.compareAtPrice, product.price) : 0
   const inWishlist = isInWishlist(product.id)
 
+  // Check if a specific size is available (has stock) for the active color
+  const hasVariants = product.variants && product.variants.length > 0
+  const isSizeAvailable = (size: string) => {
+    if (!hasVariants) return true
+    const variant = product.variants!.find(v => v.size === size && v.color === selectedColor)
+    return variant ? variant.stock > 0 : false
+  }
+
   const handleAddToCart = useCallback(() => {
     addItem(product, selectedSize, selectedColor, quantity)
     toggleCart()
@@ -125,21 +133,28 @@ export default function QuickViewModal({ product, isOpen, onClose }: QuickViewMo
               <div>
                 <h3 className="text-sm font-medium uppercase tracking-wider mb-2">Size</h3>
                 <div className="flex flex-wrap gap-2">
-                  {product.sizes.map((size) => (
-                    <button
-                      key={size}
-                      type="button"
-                      onClick={() => setSelectedSize(size)}
-                      className={cn(
-                        'min-w-[48px] px-3 py-2 text-sm border transition-colors cursor-pointer',
-                        selectedSize === size
-                          ? 'border-marvvn-black bg-marvvn-black text-white'
-                          : 'border-marvvn-gray-300 hover:border-marvvn-black'
-                      )}
-                    >
-                      {size}
-                    </button>
-                  ))}
+                  {product.sizes.map((size) => {
+                    const available = isSizeAvailable(size)
+                    return (
+                      <button
+                        key={size}
+                        type="button"
+                        onClick={() => available && setSelectedSize(size)}
+                        disabled={!available}
+                        className={cn(
+                          'min-w-[48px] px-3 py-2 text-sm border transition-colors cursor-pointer relative',
+                          selectedSize === size
+                            ? 'border-marvvn-black bg-marvvn-black text-white'
+                            : available
+                              ? 'border-marvvn-gray-300 hover:border-marvvn-black'
+                              : 'border-marvvn-gray-200 text-marvvn-gray-300 cursor-not-allowed',
+                          !available && 'line-through decoration-marvvn-gray-400'
+                        )}
+                      >
+                        {size}
+                      </button>
+                    )
+                  })}
                 </div>
               </div>
             )}

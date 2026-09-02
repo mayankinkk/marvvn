@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Save, ArrowLeft, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 import MultiImageUpload from './MultiImageUpload'
+import { cn } from '@/lib/utils'
 
 interface ProductFormProps {
   productId?: string
@@ -300,12 +301,89 @@ export default function ProductForm({ productId }: ProductFormProps) {
           </div>
         </div>
 
+        {/* Size Availability — quick toggle */}
+        {parsedSizes.length > 0 && (
+          <div className="border-t pt-6 space-y-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-medium text-sm mb-1">Size Availability</h3>
+                <p className="text-xs text-marvvn-gray-500">Uncheck sizes that are unavailable. Customers will see a strikethrough on unavailable sizes.</p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const updated = { ...variantStock }
+                    parsedSizes.forEach(size => {
+                      parsedColors.forEach(color => {
+                        const key = `${size}|${color}`
+                        if (!updated[key] || updated[key] === 0) updated[key] = 10
+                      })
+                    })
+                    setVariantStock(updated)
+                  }}
+                  className="text-xs text-marvvn-black underline hover:no-underline cursor-pointer"
+                >
+                  Mark all available
+                </button>
+                <span className="text-marvvn-gray-300">|</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const updated = { ...variantStock }
+                    parsedSizes.forEach(size => {
+                      parsedColors.forEach(color => {
+                        updated[`${size}|${color}`] = 0
+                      })
+                    })
+                    setVariantStock(updated)
+                  }}
+                  className="text-xs text-marvvn-gray-500 underline hover:no-underline cursor-pointer"
+                >
+                  Mark all unavailable
+                </button>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              {parsedSizes.map((size) => {
+                const isAvailable = parsedColors.some(color => (variantStock[`${size}|${color}`] ?? 0) > 0)
+                return (
+                  <label
+                    key={size}
+                    className={cn(
+                      'flex items-center gap-2 px-4 py-2.5 border text-sm cursor-pointer transition-colors',
+                      isAvailable
+                        ? 'border-marvvn-black bg-marvvn-black text-white'
+                        : 'border-marvvn-gray-300 text-marvvn-gray-400 line-through'
+                    )}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isAvailable}
+                      onChange={(e) => {
+                        const updated = { ...variantStock }
+                        const stock = e.target.checked ? 10 : 0
+                        parsedColors.forEach(color => {
+                          updated[`${size}|${color}`] = stock
+                        })
+                        setVariantStock(updated)
+                      }}
+                      className="sr-only"
+                    />
+                    {size}
+                  </label>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Per-variant stock grid */}
         {parsedSizes.length > 0 && parsedColors.length > 0 && (
           <div className="border-t pt-6 space-y-3">
             <div>
               <h3 className="font-medium text-sm mb-1">Stock by Size & Color</h3>
-              <p className="text-xs text-marvvn-gray-500">Set inventory for each size/color combination. Leave at 0 for out of stock.</p>
+              <p className="text-xs text-marvvn-gray-500">Set exact inventory for each size/color combination. Sizes with stock = 0 show as unavailable to customers.</p>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -318,28 +396,34 @@ export default function ProductForm({ productId }: ProductFormProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  {parsedSizes.map((size) => (
-                    <tr key={size} className="border-t border-marvvn-gray-100">
-                      <td className="py-2 px-3 font-medium">{size}</td>
-                      {parsedColors.map((color) => {
-                        const key = `${size}|${color}`
-                        return (
-                          <td key={color} className="py-2 px-3">
-                            <input
-                              type="number"
-                              min="0"
-                              value={variantStock[key] ?? 0}
-                              onChange={(e) => setVariantStock({
-                                ...variantStock,
-                                [key]: Math.max(0, parseInt(e.target.value) || 0),
-                              })}
-                              className="w-full text-center input-field py-1 text-xs"
-                            />
-                          </td>
-                        )
-                      })}
-                    </tr>
-                  ))}
+                  {parsedSizes.map((size) => {
+                    const isAvailable = parsedColors.some(color => (variantStock[`${size}|${color}`] ?? 0) > 0)
+                    return (
+                      <tr key={size} className={cn('border-t border-marvvn-gray-100', !isAvailable && 'bg-marvvn-gray-50')}>
+                        <td className={cn('py-2 px-3 font-medium', !isAvailable && 'text-marvvn-gray-400 line-through')}>{size}</td>
+                        {parsedColors.map((color) => {
+                          const key = `${size}|${color}`
+                          return (
+                            <td key={color} className="py-2 px-3">
+                              <input
+                                type="number"
+                                min="0"
+                                value={variantStock[key] ?? 0}
+                                onChange={(e) => setVariantStock({
+                                  ...variantStock,
+                                  [key]: Math.max(0, parseInt(e.target.value) || 0),
+                                })}
+                                className={cn(
+                                  'w-full text-center input-field py-1 text-xs',
+                                  (variantStock[key] ?? 0) === 0 && 'text-marvvn-gray-300'
+                                )}
+                              />
+                            </td>
+                          )
+                        })}
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             </div>

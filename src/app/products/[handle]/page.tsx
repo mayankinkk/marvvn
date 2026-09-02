@@ -195,6 +195,13 @@ export default function ProductPage() {
   const isOutOfStock = effectiveStock !== undefined && effectiveStock <= 0
   const lowStock = !isOutOfStock && typeof effectiveStock === 'number' && effectiveStock > 0 && effectiveStock <= 5
 
+  // Check if a specific size is available (has stock) for the active color
+  const isSizeAvailable = (size: string) => {
+    if (!hasVariants) return true
+    const variant = product.variants!.find(v => v.size === size && v.color === activeColor)
+    return variant ? variant.stock > 0 : false
+  }
+
   const handleAddToCart = () => {
     const size = selectedSize || product.sizes[0]
     const color = selectedColor || product.colors[0]
@@ -413,21 +420,28 @@ export default function ProductPage() {
               </div>
               <SizeRecommendations category={product.category} currentSize={selectedSize} />
               <div className="flex flex-wrap gap-2">
-                {product.sizes.map((size) => (
-                  <button
-                    key={size}
-                    type="button"
-                    onClick={() => setSelectedSize(size)}
-                    className={cn(
-                      'min-w-[48px] px-3 py-2 text-sm border transition-colors cursor-pointer',
-                      selectedSize === size
-                        ? 'border-marvvn-black bg-marvvn-black text-white'
-                        : 'border-marvvn-gray-300 hover:border-marvvn-black'
-                    )}
-                  >
-                    {size}
-                  </button>
-                ))}
+                {product.sizes.map((size) => {
+                  const available = isSizeAvailable(size)
+                  return (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => available && setSelectedSize(size)}
+                      disabled={!available}
+                      className={cn(
+                        'min-w-[48px] px-3 py-2 text-sm border transition-colors cursor-pointer relative',
+                        selectedSize === size
+                          ? 'border-marvvn-black bg-marvvn-black text-white'
+                          : available
+                            ? 'border-marvvn-gray-300 hover:border-marvvn-black'
+                            : 'border-marvvn-gray-200 text-marvvn-gray-300 cursor-not-allowed',
+                        !available && 'line-through decoration-marvvn-gray-400'
+                      )}
+                    >
+                      {size}
+                    </button>
+                  )
+                })}
               </div>
             </div>
 
