@@ -133,6 +133,9 @@ export default function AccountPage() {
       return () => clearInterval(interval)
     }
   }, [isAuthenticated])
+
+  useEffect(() => {
+    if (isAuthenticated) {
       fetch('/api/account/profile', { method: 'GET' })
         .then(r => r.json())
         .then(data => {
