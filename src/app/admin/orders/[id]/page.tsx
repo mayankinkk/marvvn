@@ -90,8 +90,8 @@ export default function AdminOrderDetailPage() {
     )
   }
 
-  const currentStepIndex = statusSteps.findIndex(s => s.key === order.status)
-  const isCancelled = order.status === 'cancelled'
+  const currentStepIndex = statusSteps.findIndex(s => s.key === status)
+  const isCancelled = status === 'cancelled'
 
   return (
     <div>
@@ -103,9 +103,9 @@ export default function AdminOrderDetailPage() {
           <h1 className="text-[22px] font-semibold text-gray-900 tracking-tight">Order #{order.id.slice(0, 8).toUpperCase()}</h1>
           <p className="text-sm text-gray-400">Placed on {new Date(order.created_at).toLocaleString()}</p>
         </div>
-        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full ${statusColors[order.status]?.bg} ${statusColors[order.status]?.text}`}>
-          <span className={`w-2 h-2 rounded-full ${statusColors[order.status]?.dot}`} />
-          {order.status}
+        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-full ${statusColors[status]?.bg} ${statusColors[status]?.text}`}>
+          <span className={`w-2 h-2 rounded-full ${statusColors[status]?.dot}`} />
+          {status}
         </span>
       </div>
 
