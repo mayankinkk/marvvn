@@ -100,6 +100,20 @@ export default function ProductForm({ productId }: ProductFormProps) {
   const parsedSizes = form.sizes.split(',').map(s => s.trim()).filter(Boolean)
   const parsedColors = form.colors.split(',').map(s => s.trim()).filter(Boolean)
 
+  // Clean up stale variant entries when sizes or colors change
+  useEffect(() => {
+    setVariantStock((prev) => {
+      const cleaned: Record<string, number> = {}
+      for (const size of parsedSizes) {
+        for (const color of parsedColors) {
+          const key = `${size}|${color}`
+          if (key in prev) cleaned[key] = prev[key]
+        }
+      }
+      return cleaned
+    })
+  }, [parsedSizes.join(','), parsedColors.join(',')])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
@@ -421,7 +435,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
               </table>
             </div>
             <p className="text-xs text-marvvn-gray-400">
-              Total stock: {Object.values(variantStock).reduce((a, b) => a + b, 0)} units across {parsedSizes.length * parsedColors.length} variants
+              Total stock: {parsedSizes.reduce((total, size) => total + parsedColors.reduce((sum, color) => sum + (variantStock[`${size}|${color}`] ?? 0), 0), 0)} units across {parsedSizes.length * parsedColors.length} variants
             </p>
           </div>
         )}
