@@ -42,6 +42,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
   })
 
   const [variantStock, setVariantStock] = useState<Record<string, number>>({})
+  const [unavailableSizes, setUnavailableSizes] = useState<Set<string>>(new Set())
 
   useEffect(() => {
     if (isEdit) {
@@ -76,10 +77,20 @@ export default function ProductForm({ productId }: ProductFormProps) {
             // Load existing variants
             if (p.variants && Array.isArray(p.variants)) {
               const stockMap: Record<string, number> = {}
+              const unavail = new Set<string>()
+              const sizeStockMap: Record<string, number> = {}
               for (const v of p.variants) {
                 stockMap[`${v.size}|${v.color}`] = v.stock
+                sizeStockMap[v.size] = (sizeStockMap[v.size] || 0) + v.stock
+              }
+              // Mark sizes with total stock = 0 as unavailable
+              for (const size of (p.sizes || [])) {
+                if ((sizeStockMap[size] || 0) === 0) {
+                  unavail.add(size)
+                }
               }
               setVariantStock(stockMap)
+              setUnavailableSizes(unavail)
             }
           }
         })
@@ -127,7 +138,8 @@ export default function ProductForm({ productId }: ProductFormProps) {
         .map(([key, stock]) => {
           const [size, color] = key.split('|')
           return { size, color, stock }
-        }),
+        })
+        .filter((v) => !unavailableSizes.has(v.size)),
     }
 
     try {
@@ -307,21 +319,12 @@ export default function ProductForm({ productId }: ProductFormProps) {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-medium text-sm mb-1">Size Availability</h3>
-                <p className="text-xs text-marvvn-gray-500">Uncheck sizes that are unavailable. Customers will see a strikethrough on unavailable sizes.</p>
+                <p className="text-xs text-marvvn-gray-500">Click to toggle. Customers will see a strikethrough on unavailable sizes.</p>
               </div>
               <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() => {
-                    const updated = { ...variantStock }
-                    parsedSizes.forEach(size => {
-                      parsedColors.forEach(color => {
-                        const key = `${size}|${color}`
-                        if (!updated[key] || updated[key] === 0) updated[key] = 10
-                      })
-                    })
-                    setVariantStock(updated)
-                  }}
+                  onClick={() => setUnavailableSizes(new Set())}
                   className="text-xs text-marvvn-black underline hover:no-underline cursor-pointer"
                 >
                   Mark all available
@@ -329,15 +332,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
                 <span className="text-marvvn-gray-300">|</span>
                 <button
                   type="button"
-                  onClick={() => {
-                    const updated = { ...variantStock }
-                    parsedSizes.forEach(size => {
-                      parsedColors.forEach(color => {
-                        updated[`${size}|${color}`] = 0
-                      })
-                    })
-                    setVariantStock(updated)
-                  }}
+                  onClick={() => setUnavailableSizes(new Set(parsedSizes))}
                   className="text-xs text-marvvn-gray-500 underline hover:no-underline cursor-pointer"
                 >
                   Mark all unavailable
@@ -346,32 +341,29 @@ export default function ProductForm({ productId }: ProductFormProps) {
             </div>
             <div className="flex flex-wrap gap-3">
               {parsedSizes.map((size) => {
-                const isAvailable = parsedColors.some(color => (variantStock[`${size}|${color}`] ?? 0) > 0)
+                const isAvailable = !unavailableSizes.has(size)
                 return (
-                  <label
+                  <button
                     key={size}
+                    type="button"
+                    onClick={() => {
+                      const updated = new Set(unavailableSizes)
+                      if (updated.has(size)) {
+                        updated.delete(size)
+                      } else {
+                        updated.add(size)
+                      }
+                      setUnavailableSizes(updated)
+                    }}
                     className={cn(
-                      'flex items-center gap-2 px-4 py-2.5 border text-sm cursor-pointer transition-colors',
+                      'px-4 py-2.5 border text-sm cursor-pointer transition-colors',
                       isAvailable
                         ? 'border-marvvn-black bg-marvvn-black text-white'
                         : 'border-marvvn-gray-300 text-marvvn-gray-400 line-through'
                     )}
                   >
-                    <input
-                      type="checkbox"
-                      checked={isAvailable}
-                      onChange={(e) => {
-                        const updated = { ...variantStock }
-                        const stock = e.target.checked ? 10 : 0
-                        parsedColors.forEach(color => {
-                          updated[`${size}|${color}`] = stock
-                        })
-                        setVariantStock(updated)
-                      }}
-                      className="sr-only"
-                    />
                     {size}
-                  </label>
+                  </button>
                 )
               })}
             </div>
@@ -397,7 +389,7 @@ export default function ProductForm({ productId }: ProductFormProps) {
                 </thead>
                 <tbody>
                   {parsedSizes.map((size) => {
-                    const isAvailable = parsedColors.some(color => (variantStock[`${size}|${color}`] ?? 0) > 0)
+                    const isAvailable = !unavailableSizes.has(size)
                     return (
                       <tr key={size} className={cn('border-t border-marvvn-gray-100', !isAvailable && 'bg-marvvn-gray-50')}>
                         <td className={cn('py-2 px-3 font-medium', !isAvailable && 'text-marvvn-gray-400 line-through')}>{size}</td>
@@ -413,9 +405,10 @@ export default function ProductForm({ productId }: ProductFormProps) {
                                   ...variantStock,
                                   [key]: Math.max(0, parseInt(e.target.value) || 0),
                                 })}
+                                disabled={!isAvailable}
                                 className={cn(
                                   'w-full text-center input-field py-1 text-xs',
-                                  (variantStock[key] ?? 0) === 0 && 'text-marvvn-gray-300'
+                                  !isAvailable && 'text-marvvn-gray-300 bg-marvvn-gray-50'
                                 )}
                               />
                             </td>
