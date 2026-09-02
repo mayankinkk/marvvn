@@ -150,9 +150,10 @@ export async function POST(request: Request) {
     orderData.user_id = user.id
   }
 
-  // Optional fields - only add if they have values (column may not exist)
-  if (orderNotes) orderData.order_notes = orderNotes
-  if (giftMessage) orderData.gift_message = giftMessage
+  // Optional fields - only add if they have values
+  // NOTE: order_notes and gift_message columns don't exist in the orders table
+  // if (orderNotes) orderData.order_notes = orderNotes
+  // if (giftMessage) orderData.gift_message = giftMessage
 
   const { data: order, error: orderError } = await admin
     .from('orders')

@@ -20,7 +20,7 @@ export async function GET() {
   const { data, error } = await admin
     .from('orders')
     .select(`
-      id, user_id, total, discount, promo_code, status, payment_method, payment_status, shipping_address, order_notes, gift_message, created_at,
+      id, user_id, total, discount, promo_code, status, payment_method, payment_status, shipping_address, created_at,
       order_items(quantity, size, color, price, products(title, handle, images))
     `)
     .order('created_at', { ascending: false })

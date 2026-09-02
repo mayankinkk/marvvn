@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: Request) {
   try {
     const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
-    const rl = rateLimit(`chat:${ip}`, 20, 60000)
+    const rl = await rateLimit(`chat:${ip}`, 20, 60000)
     if (!rl.success) {
       return NextResponse.json({ error: 'Too many messages. Please slow down.' }, { status: 429 })
     }
@@ -135,11 +135,9 @@ HOW TO RESPOND:
 
     return NextResponse.json({ reply: response })
   } catch (error: any) {
-    const detail = error?.message || error?.status || JSON.stringify(error)
-    console.error('Chat API error:', detail)
+    console.error('Chat API error:', error?.message || error?.status || 'unknown')
     return NextResponse.json({
       reply: `Sorry, I'm having trouble right now. Please try again or reach us on WhatsApp at +91 7578017237 📱`,
-      _debug: detail,
     })
   }
 }

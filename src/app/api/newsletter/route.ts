@@ -6,7 +6,7 @@ import { withErrorHandling, ApiError } from '@/lib/api-handler'
 export async function POST(request: Request) {
   return withErrorHandling(async () => {
     const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
-    const rl = rateLimit(`newsletter:${ip}`, 3, 60000)
+    const rl = await rateLimit(`newsletter:${ip}`, 3, 60000)
     if (!rl.success) {
       throw new ApiError(429, 'Too many requests. Please try again later.')
     }

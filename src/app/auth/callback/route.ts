@@ -1,11 +1,19 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 
+function sanitizeRedirect(redirect: string | null): string {
+  const path = redirect || '/account'
+  if (!path.startsWith('/') || path.startsWith('//') || path.includes('://') || path.includes('\n') || path.includes('\r')) {
+    return '/account'
+  }
+  return path
+}
+
 export async function GET(request: Request) {
   const supabase = createClient()
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
-  const redirect = searchParams.get('redirect') || '/account'
+  const redirect = sanitizeRedirect(searchParams.get('redirect'))
 
   if (code) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)

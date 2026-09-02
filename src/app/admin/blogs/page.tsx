@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { sanitizeHtml } from '@/lib/sanitize'
 import { Plus, Trash2, ToggleLeft, ToggleRight, X, Pencil, Upload, Loader2, Bold, Italic, Heading1, List, Link2, ImageIcon, Quote, Code, Eye, Edit3 } from 'lucide-react'
 
 interface Blog {
@@ -309,7 +310,7 @@ export default function AdminBlogsPage() {
               {editorMode === 'preview' && (
                 <div
                   className="border border-marvvn-gray-200 rounded p-4 min-h-[250px] bg-white prose prose-sm max-w-none"
-                  dangerouslySetInnerHTML={{ __html: renderMarkdownPreview(form.content) }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(renderMarkdownPreview(form.content)) }}
                 />
               )}
             </div>

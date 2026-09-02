@@ -1,34 +1,35 @@
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
+import { createAdminClient } from '@/lib/supabase/admin'
 
-export function rateLimit(
+export async function rateLimit(
   key: string,
   maxRequests: number = 10,
   windowMs: number = 60000
-): { success: boolean; remaining: number; resetAt: number } {
+): Promise<{ success: boolean; remaining: number; resetAt: number }> {
   const now = Date.now()
-  const entry = rateLimitMap.get(key)
+  const windowStart = new Date(now - windowMs).toISOString()
 
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(key, { count: 1, resetAt: now + windowMs })
+  try {
+    const supabase = createAdminClient()
+
+    const { count } = await supabase
+      .from('rate_limits')
+      .select('*', { count: 'exact', head: true })
+      .eq('key', key)
+      .gte('created_at', windowStart)
+
+    const currentCount = count || 0
+
+    if (currentCount >= maxRequests) {
+      const resetAt = now + windowMs
+      return { success: false, remaining: 0, resetAt }
+    }
+
+    await supabase.from('rate_limits').insert({ key, created_at: new Date(now).toISOString() })
+
+    const remaining = maxRequests - currentCount - 1
+    const resetAt = now + windowMs
+    return { success: true, remaining, resetAt }
+  } catch {
     return { success: true, remaining: maxRequests - 1, resetAt: now + windowMs }
   }
-
-  if (entry.count >= maxRequests) {
-    return { success: false, remaining: 0, resetAt: entry.resetAt }
-  }
-
-  entry.count++
-  return { success: true, remaining: maxRequests - entry.count, resetAt: entry.resetAt }
-}
-
-// Clean up expired entries every 5 minutes
-if (typeof setInterval !== 'undefined') {
-  setInterval(() => {
-    const now = Date.now()
-    for (const [key, entry] of rateLimitMap.entries()) {
-      if (now > entry.resetAt) {
-        rateLimitMap.delete(key)
-      }
-    }
-  }, 5 * 60 * 1000)
 }

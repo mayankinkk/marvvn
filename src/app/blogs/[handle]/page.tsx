@@ -7,6 +7,7 @@ import { useParams } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { blogPosts as defaultBlogPosts } from '@/lib/data'
+import { sanitizeHtml } from '@/lib/sanitize'
 import { ChevronRight, Share2, MessageCircle, Twitter, Link2, Check } from 'lucide-react'
 
 interface BlogPost {
@@ -146,7 +147,7 @@ export default function BlogPostPage() {
             {post.content ? (
               <div
                 className="text-marvvn-gray-600 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: renderMarkdown(post.content) }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(renderMarkdown(post.content)) }}
               />
             ) : (
               <>
