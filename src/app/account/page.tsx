@@ -2,16 +2,19 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useAuthStore } from '@/lib/auth-store'
 import { useCurrency } from '@/lib/hooks/useCurrency'
+import { formatPrice } from '@/lib/utils'
 import {
   ChevronRight, User, Package, Heart, LogOut, Settings,
   Copy, Check, Edit3, Save, X, Lock, Eye, EyeOff, Bell, Mail, MessageCircle,
   Truck, Clock, CheckCircle, ArrowRight, Home, MapPin, Headphones, RotateCcw
 } from 'lucide-react'
+import InvoiceButton from '@/components/InvoiceButton'
 
 const statusSteps = [
   { key: 'pending', label: 'Order Placed', icon: Clock },
@@ -449,39 +452,85 @@ export default function AccountPage() {
                 <h2 className="font-medium text-lg mb-6">My Orders</h2>
                 {stats && stats.recentOrders.length > 0 ? (
                   <div className="space-y-4">
-                    {stats.recentOrders.map((order: any) => {
-                      const StatusIcon = statusIcons[order.status] || Clock
-                      return (
-                        <div key={order.id} className="border border-marvvn-gray-200">
-                          <div className="p-5">
-                            <div className="flex items-start justify-between mb-3">
-                              <div>
-                                <p className="font-medium">Order #{order.id.slice(0, 8).toUpperCase()}</p>
-                                <p className="text-xs text-marvvn-gray-500 mt-1">
-                                  {new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
-                                </p>
-                              </div>
-                              <span className={`flex items-center gap-1.5 text-xs px-3 py-1 ${statusColors[order.status] || 'bg-gray-100 text-gray-800'}`}>
-                                <StatusIcon className="w-3 h-3" />
-                                {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between pt-3 border-t border-marvvn-gray-100">
-                              <p className="text-sm text-marvvn-gray-500">Payment: {order.payment_status || 'Pending'}</p>
-                              <p className="font-medium">{format(order.total || 0)}</p>
-                            </div>
-                            {order.tracking_number && (
-                              <div className="mt-2 pt-2 border-t border-marvvn-gray-100 flex items-center gap-2">
-                                <Truck className="w-3.5 h-3.5 text-marvvn-gray-400" />
-                                <span className="text-xs text-marvvn-gray-500">Tracking:</span>
-                                <span className="text-xs font-mono font-medium">{order.tracking_number}</span>
-                              </div>
-                            )}
+                    {stats.recentOrders.map((order: any) => (
+                      <div key={order.id} className="border border-marvvn-gray-200">
+                        <div className="px-4 py-3 bg-marvvn-gray-50 border-b border-marvvn-gray-100 flex flex-wrap items-center justify-between gap-2 text-xs">
+                          <div className="flex flex-wrap items-center gap-3">
+                            <span className="text-marvvn-gray-500">
+                              Order <span className="font-mono text-marvvn-black">{order.id.slice(0, 8)}...</span>
+                            </span>
+                            <span className="text-marvvn-gray-400">
+                              {new Date(order.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            </span>
                           </div>
-                          <OrderProgress status={order.status} />
+                          <div className="flex items-center gap-2">
+                            <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${statusColors[order.status] || 'bg-gray-100 text-gray-800'}`}>
+                              {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                            </span>
+                          </div>
                         </div>
-                      )
-                    })}
+                        <OrderProgress status={order.status} />
+                        {order.order_items && order.order_items.length > 0 && (
+                          <div className="divide-y divide-marvvn-gray-100">
+                            {order.order_items.map((item: any) => (
+                              <div key={item.id} className="px-4 py-3 flex items-center gap-3">
+                                <div className="w-14 h-16 bg-marvvn-gray-50 relative flex-shrink-0 overflow-hidden">
+                                  {item.products?.images?.[0] ? (
+                                    <Image
+                                      src={item.products.images[0]}
+                                      alt={item.products?.title || ''}
+                                      fill
+                                      sizes="56px"
+                                      className="object-cover"
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-marvvn-gray-300">
+                                      <Package className="w-5 h-5" />
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium truncate">{item.products?.title || 'Product'}</p>
+                                  <p className="text-xs text-marvvn-gray-400">
+                                    {item.size && `Size: ${item.size}`}
+                                    {item.size && item.color && ' · '}
+                                    {item.color && `Color: ${item.color}`}
+                                    {item.quantity > 1 && ` · Qty: ${item.quantity}`}
+                                  </p>
+                                </div>
+                                <span className="text-sm font-medium">{formatPrice(item.price * item.quantity)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <div className="px-4 py-3 bg-marvvn-gray-50 border-t border-marvvn-gray-100">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-marvvn-gray-500">
+                              {order.order_items?.length || 0} item{(order.order_items?.length || 0) > 1 ? 's' : ''}
+                              {order.payment_method === 'cod' ? ' · Cash on Delivery' : ''}
+                            </span>
+                            <div className="flex items-center gap-3">
+                              {order.payment_status && (
+                                <span className={`text-[11px] font-medium ${order.payment_status === 'paid' ? 'text-green-600' : 'text-yellow-600'}`}>
+                                  {order.payment_status === 'paid' ? 'Paid' : 'Payment pending'}
+                                </span>
+                              )}
+                              <span className="font-semibold">Total: {formatPrice(order.total)}</span>
+                            </div>
+                          </div>
+                          {order.tracking_number && (
+                            <div className="flex items-center gap-2 mt-2 pt-2 border-t border-marvvn-gray-100">
+                              <Truck className="w-3.5 h-3.5 text-marvvn-gray-400" />
+                              <span className="text-xs text-marvvn-gray-500">Tracking:</span>
+                              <span className="text-xs font-mono font-medium">{order.tracking_number}</span>
+                            </div>
+                          )}
+                          <div className="flex items-center gap-3 mt-2 pt-2 border-t border-marvvn-gray-100">
+                            <InvoiceButton orderId={order.id} />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 ) : (
                   <div className="text-center py-16">
