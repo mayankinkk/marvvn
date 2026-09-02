@@ -52,18 +52,22 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   if (notes !== undefined) updateData.notes = notes
   if (tracking_number !== undefined) updateData.tracking_number = tracking_number
 
-  const { data: currentOrder } = await admin
-    .from('orders')
-    .select('status_history')
-    .eq('id', id)
-    .single()
+  try {
+    const { data: currentOrder } = await admin
+      .from('orders')
+      .select('status_history')
+      .eq('id', id)
+      .single()
 
-  if (status) {
-    const history = currentOrder?.status_history || []
-    updateData.status_history = [
-      ...history,
-      { status, timestamp: new Date().toISOString() }
-    ]
+    if (status) {
+      const history = currentOrder?.status_history || []
+      updateData.status_history = [
+        ...history,
+        { status, timestamp: new Date().toISOString() }
+      ]
+    }
+  } catch {
+    // status_history column may not exist yet
   }
 
   const { data, error } = await admin

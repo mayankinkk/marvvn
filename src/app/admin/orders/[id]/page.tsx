@@ -37,6 +37,7 @@ export default function AdminOrderDetailPage() {
   const [notes, setNotes] = useState('')
   const [trackingNumber, setTrackingNumber] = useState('')
   const [saved, setSaved] = useState(false)
+  const [saveError, setSaveError] = useState('')
 
   useEffect(() => {
     fetch(`/api/admin/orders/${id}`)
@@ -57,19 +58,28 @@ export default function AdminOrderDetailPage() {
   const handleUpdate = async () => {
     setSaving(true)
     setSaved(false)
+    setSaveError('')
     try {
       const res = await fetch(`/api/admin/orders/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status, payment_status: paymentStatus, notes, tracking_number: trackingNumber }),
       })
-      if (res.ok) {
-        const data = await res.json()
+      const data = await res.json()
+      if (res.ok && data.order) {
         setOrder(data.order)
+        setStatus(data.order.status)
+        setPaymentStatus(data.order.payment_status)
+        setTrackingNumber(data.order.tracking_number || '')
+        setNotes(data.order.notes || '')
         setSaved(true)
         setTimeout(() => setSaved(false), 3000)
+      } else {
+        setSaveError(data.error || 'Failed to update order')
       }
-    } catch {}
+    } catch (e: any) {
+      setSaveError(e.message || 'Network error')
+    }
     setSaving(false)
   }
 
@@ -244,6 +254,9 @@ export default function AdminOrderDetailPage() {
               </button>
               {saved && (
                 <p className="text-xs text-emerald-600 text-center font-medium">Order updated. Customer notified via email + WhatsApp.</p>
+              )}
+              {saveError && (
+                <p className="text-xs text-red-600 text-center font-medium">Error: {saveError}</p>
               )}
             </div>
           </div>

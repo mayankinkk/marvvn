@@ -108,13 +108,13 @@ export default function OrdersPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetch('/api/orders')
+      fetch('/api/orders', { cache: 'no-store' })
         .then((res) => res.json())
         .then((data) => { setOrders(data.orders || []); setLoadingOrders(false) })
         .catch(() => setLoadingOrders(false))
 
       const interval = setInterval(() => {
-        fetch('/api/orders')
+        fetch('/api/orders', { cache: 'no-store' })
           .then((res) => res.json())
           .then((data) => { setOrders(data.orders || []) })
           .catch(() => {})
