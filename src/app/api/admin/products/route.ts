@@ -106,8 +106,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Failed to create product' }, { status: 500 })
   }
 
-  // Insert variants if provided
+  // Insert variants if provided (use admin client to bypass RLS)
   if (variants && Array.isArray(variants) && variants.length > 0) {
+    const admin = createAdminClient()
     const variantRows = variants.map((v: any) => ({
       product_id: data.id,
       size: v.size,
@@ -115,7 +116,7 @@ export async function POST(request: Request) {
       stock: v.stock || 0,
       sku: v.sku || null,
     }))
-    await supabase.from('product_variants').insert(variantRows)
+    await admin.from('product_variants').insert(variantRows)
   }
 
   return NextResponse.json({ product: data }, { status: 201 })

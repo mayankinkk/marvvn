@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 async function isAdmin(supabase: any) {
   const { data: { user } } = await supabase.auth.getUser()
@@ -22,8 +23,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: 'Product not found' }, { status: 404 })
   }
 
-  // Fetch variants
-  const { data: variants } = await supabase
+  // Fetch variants using admin client to bypass RLS
+  const admin = createAdminClient()
+  const { data: variants } = await admin
     .from('product_variants')
     .select('*')
     .eq('product_id', id)
@@ -88,10 +90,11 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: 'Failed to update product' }, { status: 500 })
   }
 
-  // Sync variants if provided
+  // Sync variants if provided (use admin client to bypass RLS)
   if (variants && Array.isArray(variants)) {
+    const admin = createAdminClient()
     // Delete existing variants and re-insert
-    await supabase.from('product_variants').delete().eq('product_id', id)
+    await admin.from('product_variants').delete().eq('product_id', id)
     if (variants.length > 0) {
       const variantRows = variants.map((v: any) => ({
         product_id: id,
@@ -100,7 +103,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         stock: v.stock || 0,
         sku: v.sku || null,
       }))
-      await supabase.from('product_variants').insert(variantRows)
+      await admin.from('product_variants').insert(variantRows)
     }
   }
 

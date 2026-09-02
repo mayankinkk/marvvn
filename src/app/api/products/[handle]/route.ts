@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET(
   request: Request,
@@ -17,8 +18,9 @@ export async function GET(
     return NextResponse.json({ error: 'Product not found' }, { status: 404 })
   }
 
-  // Fetch variants for this product
-  const { data: variants } = await supabase
+  // Fetch variants using admin client to bypass RLS
+  const admin = createAdminClient()
+  const { data: variants } = await admin
     .from('product_variants')
     .select('id, size, color, stock, sku')
     .eq('product_id', data.id)
