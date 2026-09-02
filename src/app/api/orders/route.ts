@@ -132,6 +132,10 @@ export async function POST(request: Request) {
 
   const finalTotal = Math.max(0, serverTotal - discount)
 
+  // Use admin client for insert to bypass RLS (guest orders have no user_id)
+  const admin = createAdminClient()
+
+  // Build order data - only include fields that likely exist
   const orderData: any = {
     total: finalTotal,
     discount,
@@ -139,17 +143,17 @@ export async function POST(request: Request) {
     shipping_address: { ...shippingAddress, email: shippingAddress.email || user?.email },
     payment_method: paymentMethod,
     status: 'pending',
-    payment_status: paymentMethod === 'cod' ? 'pending' : 'pending',
-    order_notes: orderNotes || null,
-    gift_message: giftMessage || null,
+    payment_status: 'pending',
   }
 
   if (user) {
     orderData.user_id = user.id
   }
 
-  // Use admin client for insert to bypass RLS (guest orders have no user_id)
-  const admin = createAdminClient()
+  // Optional fields - only add if they have values (column may not exist)
+  if (orderNotes) orderData.order_notes = orderNotes
+  if (giftMessage) orderData.gift_message = giftMessage
+
   const { data: order, error: orderError } = await admin
     .from('orders')
     .insert(orderData)
@@ -157,7 +161,8 @@ export async function POST(request: Request) {
     .single()
 
   if (orderError) {
-    return NextResponse.json({ error: 'Failed to create order' }, { status: 500 })
+    console.error('Order insert error:', JSON.stringify(orderError))
+    return NextResponse.json({ error: 'Failed to create order', details: orderError.message }, { status: 500 })
   }
 
   const itemsWithOrderId = orderItems.map((item: any) => ({
