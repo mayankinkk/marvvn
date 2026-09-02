@@ -122,11 +122,17 @@ export default function AccountPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetch('/api/account/stats')
-        .then(r => r.json())
-        .then(setStats)
-        .catch(() => {})
-      // Load notification preferences from profile
+      const fetchStats = () => {
+        fetch('/api/account/stats')
+          .then(r => r.json())
+          .then(setStats)
+          .catch(() => {})
+      }
+      fetchStats()
+      const interval = setInterval(fetchStats, 15000)
+      return () => clearInterval(interval)
+    }
+  }, [isAuthenticated])
       fetch('/api/account/profile', { method: 'GET' })
         .then(r => r.json())
         .then(data => {

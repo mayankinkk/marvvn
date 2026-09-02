@@ -23,5 +23,7 @@ export async function GET() {
   const totalSpent = orders?.reduce((sum: number, o: any) => sum + (o.total || 0), 0) || 0
   const pendingOrders = orders?.filter((o: any) => o.status === 'pending' || o.status === 'processing' || o.status === 'shipped').length || 0
 
-  return NextResponse.json({ totalOrders, totalSpent, pendingOrders, recentOrders: orders?.slice(0, 5) || [] })
+  return NextResponse.json({ totalOrders, totalSpent, pendingOrders, recentOrders: orders?.slice(0, 5) || [] }, {
+    headers: { 'Cache-Control': 'no-store, must-revalidate' },
+  })
 }

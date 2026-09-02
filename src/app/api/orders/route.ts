@@ -23,7 +23,9 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  return NextResponse.json({ orders })
+  return NextResponse.json({ orders }, {
+    headers: { 'Cache-Control': 'no-store, must-revalidate' },
+  })
 }
 
 export async function POST(request: Request) {

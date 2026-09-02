@@ -118,7 +118,7 @@ export default function OrdersPage() {
           .then((res) => res.json())
           .then((data) => { setOrders(data.orders || []) })
           .catch(() => {})
-      }, 30000)
+      }, 15000)
 
       return () => clearInterval(interval)
     }
