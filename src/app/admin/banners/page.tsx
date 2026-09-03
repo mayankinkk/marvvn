@@ -13,6 +13,10 @@ interface BannerSlot {
   titleKey?: string
   subtitleKey?: string
   linkKey?: string
+  headingKey?: string
+  textKey?: string
+  textPlaceholder?: string
+  valueKeys?: { iconKey: string; labelKey: string }[]
   aspectHint: string
 }
 
@@ -77,9 +81,18 @@ const bannerSlots: BannerSlot[] = [
   },
   {
     id: 'brand-story',
-    label: 'Brand Story Banner',
-    description: 'Left-side image in the About / Brand Story section on the homepage',
+    label: 'Brand Story Section',
+    description: 'Brand story section on the homepage — image, heading, story text, and value icons',
     imageKey: 'brand_story_image',
+    headingKey: 'brand_story_heading',
+    textKey: 'brand_story_text',
+    textPlaceholder: 'MARVVN isn\'t just a brand — it\'s a culture. Rooted in streetwear and individuality, we craft clothing that blends quality with affordability.',
+    valueKeys: [
+      { iconKey: 'brand_value_1_icon', labelKey: 'brand_value_1_label' },
+      { iconKey: 'brand_value_2_icon', labelKey: 'brand_value_2_label' },
+      { iconKey: 'brand_value_3_icon', labelKey: 'brand_value_3_label' },
+      { iconKey: 'brand_value_4_icon', labelKey: 'brand_value_4_label' },
+    ],
     aspectHint: 'Landscape: 3:2 or 16:9 recommended',
   },
 ]
@@ -232,6 +245,7 @@ function BannerCard({
   onUpdate: (key: string, value: string) => void
 }) {
   const hasText = !!(slot.titleKey || slot.subtitleKey || slot.linkKey)
+  const hasBrandStory = !!(slot.headingKey || slot.textKey || slot.valueKeys)
 
   return (
     <div className="bg-white border border-gray-200 overflow-hidden">
@@ -314,6 +328,61 @@ function BannerCard({
                   className="w-full px-3 py-2 text-sm border border-gray-200 focus:outline-none focus:border-gray-900 transition-colors"
                   placeholder="/collections/new-arrivals"
                 />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Brand Story extra fields */}
+        {hasBrandStory && (
+          <div className="mt-4 space-y-3 pt-4 border-t border-gray-100">
+            {slot.headingKey && (
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Section Heading</label>
+                <input
+                  type="text"
+                  value={banners[slot.headingKey] || ''}
+                  onChange={(e) => onUpdate(slot.headingKey!, e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-gray-200 focus:outline-none focus:border-gray-900 transition-colors"
+                  placeholder="e.g. OUR STORY"
+                />
+              </div>
+            )}
+            {slot.textKey && (
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Story Text</label>
+                <textarea
+                  value={banners[slot.textKey] || ''}
+                  onChange={(e) => onUpdate(slot.textKey!, e.target.value)}
+                  rows={3}
+                  className="w-full px-3 py-2 text-sm border border-gray-200 focus:outline-none focus:border-gray-900 transition-colors resize-none"
+                  placeholder={slot.textPlaceholder}
+                />
+              </div>
+            )}
+            {slot.valueKeys && (
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Brand Values (4 icons)</label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {slot.valueKeys.map((vk, i) => (
+                    <div key={i} className="space-y-1.5">
+                      <input
+                        type="text"
+                        value={banners[vk.iconKey] || ''}
+                        onChange={(e) => onUpdate(vk.iconKey, e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 focus:outline-none focus:border-gray-900 transition-colors"
+                        placeholder="Icon: sparkles / heart / award / leaf"
+                      />
+                      <input
+                        type="text"
+                        value={banners[vk.labelKey] || ''}
+                        onChange={(e) => onUpdate(vk.labelKey, e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-200 focus:outline-none focus:border-gray-900 transition-colors"
+                        placeholder={`Value ${i + 1} label`}
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>

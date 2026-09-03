@@ -19,7 +19,11 @@ const BANNER_KEYS = [
   'promo_5_image', 'promo_5_mobile_image',
   'promo_5_title', 'promo_5_subtitle', 'promo_5_link',
   'shop_mens_image', 'shop_womens_image',
-  'brand_story_image',
+  'brand_story_image', 'brand_story_heading', 'brand_story_text',
+  'brand_value_1_icon', 'brand_value_1_label',
+  'brand_value_2_icon', 'brand_value_2_label',
+  'brand_value_3_icon', 'brand_value_3_label',
+  'brand_value_4_icon', 'brand_value_4_label',
 ]
 
 export async function GET() {
