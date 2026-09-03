@@ -86,6 +86,13 @@ const statusIcons: Record<string, any> = {
   cancelled: X,
 }
 
+const returnStatusConfig: Record<string, { label: string; color: string }> = {
+  pending: { label: 'Return Pending', color: 'bg-yellow-100 text-yellow-800' },
+  approved: { label: 'Return Approved', color: 'bg-blue-100 text-blue-800' },
+  rejected: { label: 'Return Rejected', color: 'bg-red-100 text-red-800' },
+  completed: { label: 'Refunded', color: 'bg-green-100 text-green-800' },
+}
+
 export default function AccountPage() {
   const { user, isAuthenticated, loading, logout, fetchUser } = useAuthStore()
   const { format } = useCurrency()
@@ -108,6 +115,7 @@ export default function AccountPage() {
   const [actionOrderId, setActionOrderId] = useState<string | null>(null)
   const [returnReason, setReturnReason] = useState('')
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null)
+  const [returnMap, setReturnMap] = useState<Record<string, { status: string; admin_notes: string }>>({})
   const [authChecked, setAuthChecked] = useState(false)
 
   useEffect(() => {
@@ -151,6 +159,26 @@ export default function AccountPage() {
           }
         })
         .catch(() => {})
+    }
+  }, [isAuthenticated])
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const fetchReturns = () => {
+        fetch('/api/returns')
+          .then(r => r.json())
+          .then(data => {
+            const map: Record<string, { status: string; admin_notes: string }> = {}
+            for (const ret of data.returns || []) {
+              map[ret.order_id] = { status: ret.status, admin_notes: ret.admin_notes || '' }
+            }
+            setReturnMap(map)
+          })
+          .catch(() => {})
+      }
+      fetchReturns()
+      const interval = setInterval(fetchReturns, 15000)
+      return () => clearInterval(interval)
     }
   }, [isAuthenticated])
 
@@ -265,6 +293,12 @@ export default function AccountPage() {
         setSaveMsg('Return request submitted')
         setActionOrderId(null)
         setReturnReason('')
+        // refresh return map
+        fetch('/api/returns').then(r => r.json()).then(d => {
+          const map: Record<string, { status: string; admin_notes: string }> = {}
+          for (const ret of d.returns || []) map[ret.order_id] = { status: ret.status, admin_notes: ret.admin_notes || '' }
+          setReturnMap(map)
+        }).catch(() => {})
       } else {
         setSaveMsg(data.error || 'Failed to submit return')
       }
@@ -554,9 +588,24 @@ export default function AccountPage() {
                                     <span className="text-xs font-mono font-medium">{order.tracking_number}</span>
                                   </div>
                                 )}
+                                {returnMap[order.id] && (
+                                  <div className="px-4 py-3 bg-marvvn-gray-50 border-t border-marvvn-gray-100">
+                                    <div className="flex items-center gap-2">
+                                      <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${returnStatusConfig[returnMap[order.id].status]?.color || 'bg-gray-100 text-gray-800'}`}>
+                                        {returnStatusConfig[returnMap[order.id].status]?.label || returnMap[order.id].status}
+                                      </span>
+                                      <span className="text-xs text-marvvn-gray-500">Return request {returnMap[order.id].status}</span>
+                                    </div>
+                                    {returnMap[order.id].admin_notes && (
+                                      <p className="text-xs bg-white border p-2 rounded mt-2">
+                                        <span className="font-medium">Admin note:</span> {returnMap[order.id].admin_notes}
+                                      </p>
+                                    )}
+                                  </div>
+                                )}
                                 <div className="px-4 py-3 bg-marvvn-gray-50 border-t border-marvvn-gray-100 flex flex-wrap items-center gap-3">
                                   <InvoiceButton orderId={order.id} />
-                                  {(order.status === 'pending' || order.status === 'confirmed') && (
+                                  {(order.status === 'pending' || order.status === 'confirmed') && !returnMap[order.id] && (
                                     <button
                                       type="button"
                                       onClick={(e) => {
@@ -569,7 +618,7 @@ export default function AccountPage() {
                                       Cancel Order
                                     </button>
                                   )}
-                                  {order.status === 'delivered' && (
+                                  {order.status === 'delivered' && (!returnMap[order.id] || returnMap[order.id].status === 'rejected') && (
                                     <button
                                       type="button"
                                       onClick={(e) => {
@@ -714,9 +763,24 @@ export default function AccountPage() {
                               <span className="text-xs font-mono font-medium">{order.tracking_number}</span>
                             </div>
                           )}
+                          {returnMap[order.id] && (
+                            <div className="mt-2 pt-2 border-t border-marvvn-gray-100">
+                              <div className="flex items-center gap-2">
+                                <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${returnStatusConfig[returnMap[order.id].status]?.color || 'bg-gray-100 text-gray-800'}`}>
+                                  {returnStatusConfig[returnMap[order.id].status]?.label || returnMap[order.id].status}
+                                </span>
+                                <span className="text-xs text-marvvn-gray-500">Return request {returnMap[order.id].status}</span>
+                              </div>
+                              {returnMap[order.id].admin_notes && (
+                                <p className="text-xs bg-white border p-2 rounded mt-2">
+                                  <span className="font-medium">Admin note:</span> {returnMap[order.id].admin_notes}
+                                </p>
+                              )}
+                            </div>
+                          )}
                           <div className="flex flex-wrap items-center gap-3 mt-2 pt-2 border-t border-marvvn-gray-100">
                             <InvoiceButton orderId={order.id} />
-                            {(order.status === 'pending' || order.status === 'confirmed') && (
+                            {(order.status === 'pending' || order.status === 'confirmed') && !returnMap[order.id] && (
                               <button
                                 type="button"
                                 onClick={() => setActionOrderId(actionOrderId === `cancel-${order.id}` ? null : `cancel-${order.id}`)}
@@ -726,7 +790,7 @@ export default function AccountPage() {
                                 Cancel Order
                               </button>
                             )}
-                            {order.status === 'delivered' && (
+                            {order.status === 'delivered' && (!returnMap[order.id] || returnMap[order.id].status === 'rejected') && (
                               <button
                                 type="button"
                                 onClick={() => setActionOrderId(actionOrderId === `return-${order.id}` ? null : `return-${order.id}`)}
