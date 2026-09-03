@@ -6,6 +6,37 @@ import { Save, ArrowLeft, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 import MultiImageUpload from './MultiImageUpload'
 import { cn } from '@/lib/utils'
+import { menMegaMenu, womenMegaMenu, accessoriesMegaMenu } from '@/lib/mega-menu-data'
+
+const COLLECTION_GROUPS: { title: string; handles: { label: string; handle: string }[] }[] = [
+  {
+    title: 'Men — Categories',
+    handles: menMegaMenu.columns[0].links.map(l => ({ label: l.label, handle: l.href.replace('/collections/', '') })),
+  },
+  {
+    title: 'Men — Collections',
+    handles: menMegaMenu.columns[1].links.map(l => ({ label: l.label, handle: l.href.replace('/collections/', '') })),
+  },
+  {
+    title: 'Women — Categories',
+    handles: womenMegaMenu.columns[0].links.map(l => ({ label: l.label, handle: l.href.replace('/collections/', '') })),
+  },
+  {
+    title: 'Women — Collections',
+    handles: womenMegaMenu.columns[1].links.map(l => ({ label: l.label, handle: l.href.replace('/collections/', '') })),
+  },
+  {
+    title: 'Accessories',
+    handles: accessoriesMegaMenu.columns[0].links.map(l => ({ label: l.label, handle: l.href.replace('/collections/', '') })),
+  },
+  {
+    title: 'General',
+    handles: [
+      { label: 'New Arrivals (legacy)', handle: 'new-arrivals' },
+      { label: 'Best Sellers (legacy)', handle: 'best-sellers' },
+    ],
+  },
+]
 
 interface ProductFormProps {
   productId?: string
@@ -279,27 +310,57 @@ export default function ProductForm({ productId }: ProductFormProps) {
           />
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        {/* Collections — explicit assignment to mega-menu handles */}
+        <div className="border rounded p-4 space-y-4 bg-gray-50/50">
           <div>
-            <label className="block text-sm font-medium mb-1">Collections (comma-separated)</label>
-            <input
-              type="text"
-              value={form.collection}
-              onChange={(e) => setForm({ ...form, collection: e.target.value })}
-              className="input-field"
-              placeholder="new-arrivals, oversized-t-shirts"
-            />
+            <h3 className="font-medium text-sm">Collections * — where this product appears</h3>
+            <p className="text-xs text-marvvn-gray-500 mt-1">Check exactly where this product should show. Each checkbox = one page like <code>/collections/mens-new-arrivals</code> or <code>/collections/oversized-t-shirt-men</code>. If you check both “New Arrivals” and “Oversized T-Shirts”, it will show in both.</p>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Tags (comma-separated)</label>
-            <input
-              type="text"
-              value={form.tags}
-              onChange={(e) => setForm({ ...form, tags: e.target.value })}
-              className="input-field"
-              placeholder="oversized, cotton"
-            />
+          {COLLECTION_GROUPS.map((group) => {
+            const selected = new Set(form.collection.split(',').map(s => s.trim()).filter(Boolean))
+            return (
+              <div key={group.title} className="">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-marvvn-gray-600 mb-2">{group.title}</h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {group.handles.map(({ label, handle }) => {
+                    const checked = selected.has(handle)
+                    return (
+                      <label key={handle} className={cn('flex items-center gap-2 px-3 py-2 border rounded cursor-pointer text-sm transition-colors', checked ? 'bg-black text-white border-black' : 'bg-white border-gray-200 hover:border-black')}>
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={(e) => {
+                            const set = new Set(form.collection.split(',').map(s => s.trim()).filter(Boolean))
+                            if (e.target.checked) set.add(handle)
+                            else set.delete(handle)
+                            setForm({ ...form, collection: Array.from(set).join(', ') })
+                          }}
+                          className="accent-black w-3.5 h-3.5"
+                        />
+                        <span className="truncate">{label}</span>
+                        <span className="text-[10px] opacity-60 truncate">/{handle}</span>
+                      </label>
+                    )
+                  })}
+                </div>
+              </div>
+            )
+          })}
+          <div className="text-xs text-marvvn-gray-500">
+            Selected: <code className="bg-white px-2 py-1 border rounded">{form.collection || '(none — product will be hidden from collections)'}</code>
           </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Tags (comma-separated) — for search only</label>
+          <input
+            type="text"
+            value={form.tags}
+            onChange={(e) => setForm({ ...form, tags: e.target.value })}
+            className="input-field"
+            placeholder="cotton, streetwear, brown"
+          />
+          <p className="text-xs text-marvvn-gray-500 mt-1">Tags are now only for search. They do <b>not</b> decide which collection page the product appears on.</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">

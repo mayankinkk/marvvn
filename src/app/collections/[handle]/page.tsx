@@ -14,7 +14,10 @@ import { useProducts } from '@/lib/hooks/useProducts'
 import { cn } from '@/lib/utils'
 import { trackViewItemList } from '@/components/Analytics'
 
-const COLLECTION_FILTERS: Record<string, (p: any) => boolean> = {
+// LEGACY filters — kept for backwards compatibility until all products are migrated to explicit collections.
+// New source of truth: product.collection includes handle (set via ProductForm checkboxes).
+// If a product has collection: ["mens-new-arrivals", "oversized-t-shirt-men"], it will show in BOTH pages. Uncheck to hide.
+const LEGACY_COLLECTION_FILTERS: Record<string, (p: any) => boolean> = {
   'new-arrivals': (p) => p.collection?.includes('new-arrivals'),
   'best-sellers': (p) => p.collection?.includes('best-sellers'),
   'women': (p) => p.category === 'women',
@@ -22,22 +25,23 @@ const COLLECTION_FILTERS: Record<string, (p: any) => boolean> = {
   'accessories': (p) => p.category === 'accessories',
   'womens-new-arrivals': (p) => p.category === 'women' && p.collection?.includes('new-arrivals'),
   'mens-new-arrivals': (p) => p.category === 'men' && p.collection?.includes('new-arrivals'),
-  'oversized-t-shirts': (p) => p.tags?.some((t: string) => t.includes('oversized')),
-  'oversized-t-shirt-men': (p) => p.category === 'men' && p.tags?.some((t: string) => t.includes('oversized')),
-  'bottoms': (p) => ['pants', 'joggers', 'sweatpants', 'jeans'].some((t) => p.tags?.includes(t)),
-  'womens-bottoms': (p) => p.category === 'women' && ['pants', 'joggers', 'sweatpants'].some((t) => p.tags?.includes(t)),
-  'mens-bottoms': (p) => p.category === 'men' && ['pants', 'joggers', 'jeans'].some((t) => p.tags?.includes(t)),
-  'jackets': (p) => p.tags?.some((t: string) => t.includes('jacket') || t.includes('denim')),
-  'caps': (p) => p.tags?.some((t: string) => t.includes('cap')),
+  'oversized-t-shirts': (p) => p.tags?.some((t: string) => String(t).toLowerCase().includes('oversized')),
+  'oversized-t-shirt-men': (p) => p.category === 'men' && p.tags?.some((t: string) => String(t).toLowerCase().includes('oversized')),
+  'oversized-t-shirt-women': (p) => p.category === 'women' && p.tags?.some((t: string) => String(t).toLowerCase().includes('oversized')),
+  'bottoms': (p) => ['pants', 'joggers', 'sweatpants', 'jeans'].some((t) => p.tags?.map((x:string)=>String(x).toLowerCase()).includes(t)),
+  'womens-bottoms': (p) => p.category === 'women' && ['pants', 'joggers', 'sweatpants'].some((t) => p.tags?.map((x:string)=>String(x).toLowerCase()).includes(t)),
+  'mens-bottoms': (p) => p.category === 'men' && ['pants', 'joggers', 'jeans'].some((t) => p.tags?.map((x:string)=>String(x).toLowerCase()).includes(t)),
+  'jackets': (p) => p.tags?.some((t: string) => String(t).toLowerCase().includes('jacket') || String(t).toLowerCase().includes('denim')),
+  'caps': (p) => p.tags?.some((t: string) => String(t).toLowerCase().includes('cap')),
   'spiderman-women': (p) => p.category === 'women',
   'red-bull-collection': () => true,
   'special-prices': (p) => !!p.compare_at_price || !!p.compareAtPrice,
   'signature-collection-app': (p) => p.collection?.includes('new-arrivals'),
   'acosta-collection-app': (p) => p.collection?.includes('best-sellers'),
-  'sweatshirts-hoodies': (p) => p.tags?.some((t: string) => t.includes('sweatshirt') || t.includes('hoodie')),
+  'sweatshirts-hoodies': (p) => p.tags?.some((t: string) => String(t).toLowerCase().includes('sweatshirt') || String(t).toLowerCase().includes('hoodie')),
   'premium': (p) => p.price >= 1999,
-  'jeans': (p) => p.tags?.some((t: string) => t.includes('jeans')),
-  'joggers': (p) => p.tags?.some((t: string) => t.includes('joggers')),
+  'jeans': (p) => p.tags?.some((t: string) => String(t).toLowerCase().includes('jeans')),
+  'joggers': (p) => p.tags?.some((t: string) => String(t).toLowerCase().includes('joggers')),
 }
 
 export default function CollectionPage() {
@@ -55,9 +59,17 @@ export default function CollectionPage() {
   const filteredProducts = useMemo(() => {
     let result = products
 
-    const filterFn = COLLECTION_FILTERS[handle]
-    if (filterFn) {
-      result = result.filter(filterFn)
+    const legacyFn = LEGACY_COLLECTION_FILTERS[handle]
+    if (legacyFn) {
+      // New: explicit collection match takes priority. Legacy fallback keeps old products working until migration.
+      result = result.filter((p: any) => p.collection?.includes(handle) || legacyFn(p))
+    } else {
+      // No legacy rule — check explicit collections (and category for top-level pages)
+      if (['women', 'men', 'accessories', 'unisex'].includes(handle)) {
+        result = result.filter((p: any) => p.category === handle || p.collection?.includes(handle))
+      } else {
+        result = result.filter((p: any) => p.collection?.includes(handle))
+      }
     }
 
     if (selectedSizes.length > 0) {
