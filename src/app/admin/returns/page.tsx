@@ -26,6 +26,8 @@ export default function AdminReturnsPage() {
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState<ReturnRequest | null>(null)
   const [adminNotes, setAdminNotes] = useState('')
+  const [editStatus, setEditStatus] = useState('')
+  const [saving, setSaving] = useState(false)
 
   useEffect(() => {
     fetch('/api/returns')
@@ -35,14 +37,16 @@ export default function AdminReturnsPage() {
   }, [])
 
   const handleStatus = async (id: string, status: string) => {
+    setSaving(true)
     await fetch('/api/returns', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, status, admin_notes: adminNotes }),
     })
     setReturns(prev => prev.map(r => r.id === id ? { ...r, status, admin_notes: adminNotes } : r))
-    setSelected(null)
-    setAdminNotes('')
+    setSelected(prev => prev ? { ...prev, status, admin_notes: adminNotes } : prev)
+    setEditStatus(status)
+    setSaving(false)
   }
 
   if (loading) {
@@ -69,7 +73,7 @@ export default function AdminReturnsPage() {
               returns.map(ret => (
                 <div
                   key={ret.id}
-                  onClick={() => { setSelected(ret); setAdminNotes(ret.admin_notes || '') }}
+                  onClick={() => { setSelected(ret); setAdminNotes(ret.admin_notes || ''); setEditStatus(ret.status) }}
                   className={`px-6 py-4 border-b last:border-0 cursor-pointer transition-colors ${
                     selected?.id === ret.id ? 'bg-marvvn-gray-50' : 'hover:bg-marvvn-gray-50'
                   }`}
@@ -129,13 +133,15 @@ export default function AdminReturnsPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleStatus(selected.id, 'approved')}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700 cursor-pointer"
+                    disabled={saving}
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-green-600 text-white text-sm font-medium rounded hover:bg-green-700 cursor-pointer disabled:opacity-50"
                   >
                     <CheckCircle className="w-4 h-4" /> Approve
                   </button>
                   <button
                     onClick={() => handleStatus(selected.id, 'rejected')}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700 cursor-pointer"
+                    disabled={saving}
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-red-600 text-white text-sm font-medium rounded hover:bg-red-700 cursor-pointer disabled:opacity-50"
                   >
                     <XCircle className="w-4 h-4" /> Reject
                   </button>
@@ -145,11 +151,36 @@ export default function AdminReturnsPage() {
               {selected.status === 'approved' && (
                 <button
                   onClick={() => handleStatus(selected.id, 'completed')}
-                  className="w-full py-2.5 bg-marvvn-black text-white text-sm font-medium rounded hover:bg-marvvn-gray-900 cursor-pointer"
+                  disabled={saving}
+                  className="w-full py-2.5 bg-marvvn-black text-white text-sm font-medium rounded hover:bg-marvvn-gray-900 cursor-pointer disabled:opacity-50"
                 >
-                  Mark as Completed (Refund Processed)
+                  {saving ? 'Saving...' : 'Mark as Completed (Refund Processed)'}
                 </button>
               )}
+
+              {/* Edit option — visible for any status, lets admin update notes/status after approval */}
+              <div className="mt-4 pt-4 border-t">
+                <p className="text-xs font-medium text-marvvn-gray-500 mb-2">Edit</p>
+                <label className="block text-xs text-marvvn-gray-400 mb-1">Status</label>
+                <select
+                  value={editStatus}
+                  onChange={e => setEditStatus(e.target.value)}
+                  className="w-full border border-marvvn-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-marvvn-black mb-3"
+                >
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                  <option value="completed">Completed (Refunded)</option>
+                </select>
+                <button
+                  onClick={() => handleStatus(selected.id, editStatus)}
+                  disabled={saving}
+                  className="w-full py-2 border border-marvvn-gray-300 text-sm font-medium hover:bg-marvvn-gray-50 cursor-pointer disabled:opacity-50"
+                >
+                  {saving ? 'Saving...' : 'Save Changes'}
+                </button>
+                <p className="text-[11px] text-marvvn-gray-400 mt-1">Updates the return status & notes — customer sees it instantly on their order card and Returns tab.</p>
+              </div>
             </div>
           ) : (
             <div className="flex items-center justify-center h-64 text-marvvn-gray-400">
