@@ -182,19 +182,28 @@ export default function OrdersPage() {
   const [returningId, setReturningId] = useState<string | null>(null)
   const [returnReason, setReturnReason] = useState('')
   const [showReturnForm, setShowReturnForm] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
 
   async function handleReturnRequest(orderId: string) {
     if (!returnReason.trim()) return
     setReturningId(orderId)
+    setActionError(null)
     try {
-      await fetch('/api/returns', {
+      const res = await fetch('/api/returns', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderId, reason: returnReason }),
       })
-      setShowReturnForm(null)
-      setReturnReason('')
-    } catch {}
+      const data = await res.json().catch(() => ({}))
+      if (res.ok) {
+        setShowReturnForm(null)
+        setReturnReason('')
+      } else {
+        setActionError(data.error || 'Failed to submit return')
+      }
+    } catch {
+      setActionError('Failed to submit return')
+    }
     setReturningId(null)
   }
 
@@ -349,21 +358,28 @@ export default function OrdersPage() {
                       {(order.status === 'pending' || order.status === 'confirmed') ? (
                         <>
                           <p className="text-xs text-marvvn-gray-500">Are you sure you want to cancel this order? This action cannot be undone.</p>
+                          {actionError && <p className="text-xs text-red-600">{actionError}</p>}
                           <div className="flex gap-2">
                             <button
                               onClick={async () => {
                                 setReturningId(order.id)
+                                setActionError(null)
                                 try {
                                   const res = await fetch('/api/cancel-order', {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({ orderId: order.id, email: user?.email }),
                                   })
+                                  const data = await res.json().catch(() => ({}))
                                   if (res.ok) {
                                     setOrders(prev => prev.map(o => o.id === order.id ? { ...o, status: 'cancelled' } : o))
+                                    setShowReturnForm(null)
+                                  } else {
+                                    setActionError(data.error || 'Failed to cancel order')
                                   }
-                                } catch {}
-                                setShowReturnForm(null)
+                                } catch {
+                                  setActionError('Failed to cancel order')
+                                }
                                 setReturningId(null)
                               }}
                               disabled={returningId === order.id}
@@ -372,7 +388,7 @@ export default function OrdersPage() {
                               {returningId === order.id ? 'Cancelling...' : 'Yes, Cancel'}
                             </button>
                             <button
-                              onClick={() => setShowReturnForm(null)}
+                              onClick={() => { setShowReturnForm(null); setActionError(null) }}
                               className="px-3 py-1.5 text-xs border border-marvvn-gray-300 rounded hover:bg-marvvn-gray-50 cursor-pointer"
                             >
                               Keep Order
@@ -388,6 +404,7 @@ export default function OrdersPage() {
                             className="w-full px-3 py-2 text-xs border border-marvvn-gray-200 rounded focus:outline-none focus:border-marvvn-black"
                             rows={2}
                           />
+                          {actionError && <p className="text-xs text-red-600">{actionError}</p>}
                           <button
                             onClick={() => handleReturnRequest(order.id)}
                             disabled={returningId === order.id || !returnReason.trim()}

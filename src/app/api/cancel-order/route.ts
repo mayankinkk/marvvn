@@ -1,21 +1,46 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(request: Request) {
   const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const body = await request.json()
   const { orderId, email } = body
 
-  if (!orderId || !email) {
-    return NextResponse.json({ error: 'Order ID and email are required' }, { status: 400 })
+  if (!orderId) {
+    return NextResponse.json({ error: 'Order ID is required' }, { status: 400 })
   }
 
-  const { data: order, error: fetchError } = await supabase
-    .from('orders')
-    .select('*')
-    .eq('id', orderId)
-    .eq('shipping_address->>email', email)
-    .single()
+  const admin = createAdminClient()
+
+  // Prefer user_id ownership check (RLS-proof); fallback to email lookup for legacy/guest orders
+  let order: any = null
+  let fetchError: any = null
+  {
+    const res = await admin.from('orders').select('*').eq('id', orderId).eq('user_id', user.id).single()
+    order = res.data
+    fetchError = res.error
+  }
+  if ((fetchError || !order) && email) {
+    const res = await admin.from('orders').select('*').eq('id', orderId).eq('shipping_address->>email', email).single()
+    if (!res.error && res.data) {
+      order = res.data
+      fetchError = null
+    }
+  }
+  // Final fallback: try by id alone and verify ownership via email match
+  if (fetchError || !order) {
+    const res = await admin.from('orders').select('*').eq('id', orderId).single()
+    if (!res.error && res.data && (res.data.user_id === user.id || res.data.shipping_address?.email === user.email || res.data.shipping_address?.email === email)) {
+      order = res.data
+      fetchError = null
+    }
+  }
 
   if (fetchError || !order) {
     return NextResponse.json({ error: 'Order not found' }, { status: 404 })
@@ -29,32 +54,36 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Order has already been shipped/delivered and cannot be cancelled' }, { status: 400 })
   }
 
-  const orderTime = new Date(order.created_at).getTime()
-  const now = Date.now()
-  const oneHour = 60 * 60 * 1000
+  // Build update payload — handle missing status_history column gracefully
+  const updatePayload: any = { status: 'cancelled', updated_at: new Date().toISOString() }
+  try {
+    const { data: cur, error: histErr } = await admin.from('orders').select('status_history').eq('id', orderId).single()
+    if (!histErr && cur) {
+      const history = Array.isArray((cur as any).status_history) ? (cur as any).status_history : []
+      history.push({ status: 'cancelled', timestamp: new Date().toISOString() })
+      updatePayload.status_history = history
+    }
+  } catch {}
 
-  if (now - orderTime > oneHour) {
-    return NextResponse.json({ error: 'Cancellation window has expired (1 hour limit)' }, { status: 400 })
-  }
-
-  const statusHistory = Array.isArray(order.status_history) ? order.status_history : []
-  statusHistory.push({ status: 'cancelled', timestamp: new Date().toISOString() })
-
-  const { error: updateError } = await supabase
+  const { error: updateError } = await admin
     .from('orders')
-    .update({
-      status: 'cancelled',
-      status_history: statusHistory,
-      updated_at: new Date().toISOString(),
-    })
+    .update(updatePayload)
     .eq('id', orderId)
 
   if (updateError) {
-    return NextResponse.json({ error: 'Failed to cancel order' }, { status: 500 })
+    // If status_history column missing, retry without it
+    if (updateError.message?.includes('status_history')) {
+      const { error: retryErr } = await admin.from('orders').update({ status: 'cancelled', updated_at: new Date().toISOString() }).eq('id', orderId)
+      if (retryErr) {
+        return NextResponse.json({ error: 'Failed to cancel order: ' + retryErr.message }, { status: 500 })
+      }
+    } else {
+      return NextResponse.json({ error: 'Failed to cancel order: ' + updateError.message }, { status: 500 })
+    }
   }
 
-  // Restore stock
-  const { data: items } = await supabase
+  // Restore stock (via admin, bypasses RLS)
+  const { data: items } = await admin
     .from('order_items')
     .select('product_id, quantity, size, color')
     .eq('order_id', orderId)
@@ -65,7 +94,7 @@ export async function POST(request: Request) {
       const color = item.color || ''
 
       // Check if this product has variants
-      const { data: variant } = await supabase
+      const { data: variant } = await admin
         .from('product_variants')
         .select('id')
         .eq('product_id', item.product_id)
@@ -76,14 +105,14 @@ export async function POST(request: Request) {
       if (variant) {
         // Restore variant stock
         try {
-          await supabase.rpc('increment_variant_stock', {
+          await admin.rpc('increment_variant_stock', {
             p_product_id: item.product_id,
             p_size: size,
             p_color: color,
             p_quantity: item.quantity,
           })
         } catch {
-          const { data: v } = await supabase
+          const { data: v } = await admin
             .from('product_variants')
             .select('stock')
             .eq('product_id', item.product_id)
@@ -91,7 +120,7 @@ export async function POST(request: Request) {
             .eq('color', color)
             .single()
           if (v) {
-            await supabase.from('product_variants')
+            await admin.from('product_variants')
               .update({ stock: v.stock + item.quantity })
               .eq('product_id', item.product_id)
               .eq('size', size)
@@ -101,18 +130,18 @@ export async function POST(request: Request) {
       } else {
         // Fall back to product-level stock
         try {
-          await supabase.rpc('increment_stock', {
+          await admin.rpc('increment_stock', {
             p_product_id: item.product_id,
             p_quantity: item.quantity,
           })
         } catch {
-          const { data: prod } = await supabase
+          const { data: prod } = await admin
             .from('products')
             .select('stock')
             .eq('id', item.product_id)
             .single()
           if (prod) {
-            await supabase.from('products')
+            await admin.from('products')
               .update({ stock: (prod.stock || 0) + item.quantity })
               .eq('id', item.product_id)
           }

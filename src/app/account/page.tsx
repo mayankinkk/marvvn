@@ -226,19 +226,26 @@ export default function AccountPage() {
 
   const handleCancelOrder = async (orderId: string) => {
     setActionLoadingId(orderId)
+    setSaveMsg('')
     try {
       const res = await fetch('/api/cancel-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderId, email: user?.email }),
       })
+      const data = await res.json().catch(() => ({}))
       if (res.ok) {
         setStats((prev) => prev ? {
           ...prev,
           recentOrders: prev.recentOrders.map((o: any) => o.id === orderId ? { ...o, status: 'cancelled' } : o),
         } : prev)
+        setSaveMsg('Order cancelled successfully')
+      } else {
+        setSaveMsg(data.error || 'Failed to cancel order')
       }
-    } catch {}
+    } catch {
+      setSaveMsg('Failed to cancel order')
+    }
     setActionOrderId(null)
     setActionLoadingId(null)
   }
@@ -246,15 +253,24 @@ export default function AccountPage() {
   const handleReturnRequest = async (orderId: string) => {
     if (!returnReason.trim()) return
     setActionLoadingId(orderId)
+    setSaveMsg('')
     try {
-      await fetch('/api/returns', {
+      const res = await fetch('/api/returns', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderId, reason: returnReason }),
       })
-      setActionOrderId(null)
-      setReturnReason('')
-    } catch {}
+      const data = await res.json().catch(() => ({}))
+      if (res.ok) {
+        setSaveMsg('Return request submitted')
+        setActionOrderId(null)
+        setReturnReason('')
+      } else {
+        setSaveMsg(data.error || 'Failed to submit return')
+      }
+    } catch {
+      setSaveMsg('Failed to submit return')
+    }
     setActionLoadingId(null)
   }
 
