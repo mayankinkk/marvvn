@@ -93,12 +93,20 @@ function OrderProgress({ status }: { status: string }) {
   )
 }
 
+const returnStatusConfig: Record<string, { label: string; color: string }> = {
+  pending: { label: 'Return Pending', color: 'bg-yellow-100 text-yellow-800' },
+  approved: { label: 'Return Approved', color: 'bg-blue-100 text-blue-800' },
+  rejected: { label: 'Return Rejected', color: 'bg-red-100 text-red-800' },
+  completed: { label: 'Refunded', color: 'bg-green-100 text-green-800' },
+}
+
 export default function OrdersPage() {
   const { user, isAuthenticated, loading } = useAuthStore()
   const router = useRouter()
   const [orders, setOrders] = useState<Order[]>([])
   const [loadingOrders, setLoadingOrders] = useState(true)
   const [retryingId, setRetryingId] = useState<string | null>(null)
+  const [returnMap, setReturnMap] = useState<Record<string, { status: string; admin_notes: string }>>({})
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
@@ -108,6 +116,14 @@ export default function OrdersPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
+      const fetchReturns = () => fetch('/api/returns').then(r => r.json()).then(d => {
+        const m: Record<string, { status: string; admin_notes: string }> = {}
+        for (const ret of d.returns || []) m[ret.order_id] = { status: ret.status, admin_notes: ret.admin_notes || '' }
+        setReturnMap(m)
+      }).catch(() => {})
+      fetchReturns()
+      const rInterval = setInterval(fetchReturns, 15000)
+
       fetch('/api/orders', { cache: 'no-store' })
         .then((res) => res.json())
         .then((data) => { setOrders(data.orders || []); setLoadingOrders(false) })
@@ -120,7 +136,7 @@ export default function OrdersPage() {
           .catch(() => {})
       }, 15000)
 
-      return () => clearInterval(interval)
+      return () => { clearInterval(interval); clearInterval(rInterval) }
     }
   }, [isAuthenticated])
 
@@ -332,9 +348,22 @@ export default function OrdersPage() {
                       <span className="text-xs font-mono font-medium">{order.tracking_number}</span>
                     </div>
                   )}
+                  {returnMap[order.id] && (
+                    <div className="px-4 py-3 bg-marvvn-gray-50 border-t border-marvvn-gray-100">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium ${returnStatusConfig[returnMap[order.id].status]?.color || 'bg-gray-100 text-gray-800'}`}>
+                          {returnStatusConfig[returnMap[order.id].status]?.label || returnMap[order.id].status}
+                        </span>
+                        <span className="text-xs text-marvvn-gray-500">Return request {returnMap[order.id].status}</span>
+                      </div>
+                      {returnMap[order.id].admin_notes && (
+                        <p className="text-xs bg-white border p-2 rounded mt-2"><span className="font-medium">Admin note:</span> {returnMap[order.id].admin_notes}</p>
+                      )}
+                    </div>
+                  )}
                   <div className="flex items-center gap-3 mt-2 pt-2 border-t border-marvvn-gray-100">
                     <InvoiceButton orderId={order.id} />
-                    {(order.status === 'pending' || order.status === 'confirmed') && (
+                    {(order.status === 'pending' || order.status === 'confirmed') && !returnMap[order.id] && (
                       <button
                         onClick={() => setShowReturnForm(showReturnForm === order.id ? null : order.id)}
                         className="flex items-center gap-1.5 text-xs font-medium text-red-500 hover:text-red-700 transition-colors cursor-pointer"
@@ -343,7 +372,7 @@ export default function OrdersPage() {
                         Cancel Order
                       </button>
                     )}
-                    {order.status === 'delivered' && (
+                    {order.status === 'delivered' && (!returnMap[order.id] || returnMap[order.id].status === 'rejected') && (
                       <button
                         onClick={() => setShowReturnForm(showReturnForm === order.id ? null : order.id)}
                         className="flex items-center gap-1.5 text-xs font-medium text-marvvn-gray-500 hover:text-marvvn-black transition-colors cursor-pointer"
