@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function AboutSection() {
   const [email, setEmail] = useState('')
@@ -30,13 +31,15 @@ export default function AboutSection() {
   return (
     <section className="relative">
       <div className="grid lg:grid-cols-2 min-h-[500px]">
-        <div className="relative bg-marvvn-gray-100">
-          <div className="hidden lg:flex w-full h-full items-center justify-center">
-            <span className="text-marvvn-gray-400 text-lg font-display">Our Story</span>
-          </div>
-          <div className="lg:hidden w-full aspect-[4/5] flex items-center justify-center bg-marvvn-gray-100">
-            <span className="text-marvvn-gray-400 text-lg font-display">Our Story</span>
-          </div>
+        <div className="relative bg-marvvn-gray-100 overflow-hidden">
+          <Image
+            src="/images/brand-story.jpg"
+            alt="MARVVN brand story"
+            fill
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            className="object-cover"
+            priority
+          />
         </div>
         <div className="bg-marvvn-black text-white flex items-center justify-center p-8 lg:p-16">
           <div className="max-w-md text-center lg:text-left">
