@@ -25,30 +25,62 @@ export async function GET() {
     return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 })
   }
 
-  // Fetch all variants to compute total stock per product (use admin client to bypass RLS)
+  // Fetch all variants to compute total stock and available sizes per product (use admin client to bypass RLS)
   const productIds = (data || []).map(p => p.id)
   let variantMap = new Map<string, number>()
+  let availableSizesMap = new Map<string, { size: string; stock: number }[]>()
+  let allVariantsMap = new Map<string, any[]>()
 
   try {
     const admin = createAdminClient()
     const { data: variants } = await admin
       .from('product_variants')
-      .select('product_id, stock')
+      .select('id, product_id, size, color, stock')
       .in('product_id', productIds)
 
     for (const v of variants || []) {
       const current = variantMap.get(v.product_id) || 0
       variantMap.set(v.product_id, current + (v.stock || 0))
+
+      const varList = allVariantsMap.get(v.product_id) || []
+      varList.push(v)
+      allVariantsMap.set(v.product_id, varList)
+
+      if (v.stock > 0 && v.size) {
+        const list = availableSizesMap.get(v.product_id) || []
+        const existing = list.find(item => item.size === v.size)
+        if (existing) {
+          existing.stock += v.stock
+        } else {
+          list.push({ size: v.size, stock: v.stock })
+        }
+        availableSizesMap.set(v.product_id, list)
+      }
     }
   } catch {
     // product_variants table may not exist yet
   }
 
-  // Attach total stock to each product
-  const productsWithStock = (data || []).map(p => ({
-    ...p,
-    stock: variantMap.has(p.id) ? variantMap.get(p.id) : (p.stock || 0),
-  }))
+  // Attach total stock, variants, and available sizes to each product
+  const productsWithStock = (data || []).map(p => {
+    const hasVariantEntries = variantMap.has(p.id)
+    const stock = hasVariantEntries ? variantMap.get(p.id) : (p.stock || 0)
+
+    let availableSizes: { size: string; stock: number }[] = []
+    if (availableSizesMap.has(p.id)) {
+      availableSizes = availableSizesMap.get(p.id) || []
+    } else if (!hasVariantEntries && stock > 0 && Array.isArray(p.sizes)) {
+      availableSizes = p.sizes.map((s: string) => ({ size: s, stock }))
+    }
+
+    return {
+      ...p,
+      stock,
+      variants: allVariantsMap.get(p.id) || [],
+      available_sizes: availableSizes,
+      availableSizes: availableSizes,
+    }
+  })
 
   return NextResponse.json({ products: productsWithStock })
 }

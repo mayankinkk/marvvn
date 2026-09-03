@@ -28,6 +28,8 @@ export interface Product {
   stock?: number
   low_stock_threshold?: number
   variants?: ProductVariant[]
+  available_sizes?: { size: string; stock: number }[]
+  availableSizes?: { size: string; stock: number }[]
   flash_sale?: boolean
   flash_sale_price?: number
   flash_sale_ends_at?: string

@@ -46,7 +46,10 @@ export default function AdminProductsPage() {
 
   const filtered = products.filter((p) =>
     p.title.toLowerCase().includes(search.toLowerCase()) ||
-    p.handle.toLowerCase().includes(search.toLowerCase())
+    p.handle.toLowerCase().includes(search.toLowerCase()) ||
+    p.category?.toLowerCase().includes(search.toLowerCase()) ||
+    p.available_sizes?.some(s => s.size.toLowerCase().includes(search.toLowerCase())) ||
+    p.sizes?.some(s => s.toLowerCase().includes(search.toLowerCase()))
   )
 
   const toggleSelectAll = () => {
@@ -274,6 +277,7 @@ export default function AdminProductsPage() {
                 <th className="px-4 py-3 font-medium">Product</th>
                 <th className="px-4 py-3 font-medium">Category</th>
                 <th className="px-4 py-3 font-medium">Price</th>
+                <th className="px-4 py-3 font-medium">Sizes</th>
                 <th className="px-4 py-3 font-medium">Stock</th>
                 <th className="px-4 py-3 font-medium">Badge</th>
                 <th className="px-4 py-3 font-medium text-right">Actions</th>
@@ -309,6 +313,24 @@ export default function AdminProductsPage() {
                       <span className="text-marvvn-gray-400 line-through ml-1 text-xs">
                         {formatPrice(product.compareAtPrice)}
                       </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {product.available_sizes && product.available_sizes.length > 0 ? (
+                      <div className="flex flex-wrap gap-1.5 items-center max-w-[200px]">
+                        {product.available_sizes.map((s) => (
+                          <span
+                            key={s.size}
+                            title={`${s.size}: ${s.stock} available`}
+                            className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-marvvn-gray-100 text-marvvn-black border border-marvvn-gray-200 rounded"
+                          >
+                            <span>{s.size}</span>
+                            <span className="text-[10px] text-marvvn-gray-500 font-normal">({s.stock})</span>
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <span className="text-xs text-red-500 font-medium">None</span>
                     )}
                   </td>
                   <td className="px-4 py-3">
