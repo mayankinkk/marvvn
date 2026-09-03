@@ -111,7 +111,7 @@ export async function POST(request: Request) {
       .from('coupons')
       .select('discount_value, discount_type, min_cart, max_uses, used_count, expires_at')
       .eq('code', promoCode.toUpperCase())
-      .eq('is_active', true)
+      .eq('active', true)
       .single()
 
     if (coupon) {

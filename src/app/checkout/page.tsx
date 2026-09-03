@@ -73,63 +73,59 @@ export default function CheckoutPage() {
         setRazorpayReady(true)
         return resolve(true)
       }
+
       const existing = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]') as HTMLScriptElement | null
-      if (!existing) {
-        const script = document.createElement('script')
-        script.src = 'https://checkout.razorpay.com/v1/checkout.js'
-        script.async = true
-        script.onload = () => {
-          script.setAttribute('data-loaded', 'true')
-          setRazorpayReady(true)
-          resolve(true)
-        }
-        script.onerror = () => reject(new Error('Failed to load Razorpay. Please check your connection.'))
-        document.body.appendChild(script)
-        // Fallback poll in case onload doesn't fire
-        let attempts = 0
-        const poll = setInterval(() => {
-          if ((window as any).Razorpay && typeof (window as any).Razorpay === 'function') {
-            clearInterval(poll)
+      if (existing && !(window as any).Razorpay) {
+        existing.remove()
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+      script.async = true
+
+      let resolved = false
+      let poll: any = null
+
+      const cleanup = () => {
+        if (poll) clearInterval(poll)
+      }
+
+      script.onload = () => {
+        if (resolved) return
+        script.setAttribute('data-loaded', 'true')
+        setRazorpayReady(true)
+        resolved = true
+        cleanup()
+        resolve(true)
+      }
+
+      script.onerror = () => {
+        if (resolved) return
+        resolved = true
+        cleanup()
+        reject(new Error('Failed to load Razorpay. Please disable Brave Shields / ad blockers and refresh.'))
+      }
+
+      document.body.appendChild(script)
+
+      let attempts = 0
+      poll = setInterval(() => {
+        if ((window as any).Razorpay && typeof (window as any).Razorpay === 'function') {
+          if (!resolved) {
+            resolved = true
+            cleanup()
+            script.setAttribute('data-loaded', 'true')
             setRazorpayReady(true)
             resolve(true)
-          } else if (attempts++ > 50) {
-            clearInterval(poll)
-            reject(new Error('Razorpay failed to load (timeout). Please refresh and try again.'))
           }
-        }, 100)
-        return
-      }
-      // Script already in DOM — poll for Razorpay global
-      if ((window as any).Razorpay && typeof (window as any).Razorpay === 'function') {
-        setRazorpayReady(true)
-        return resolve(true)
-      }
-      if (existing.getAttribute('data-loaded') === 'true') {
-        setRazorpayReady(true)
-        return resolve(true)
-      }
-      let attempts = 0
-      const poll = setInterval(() => {
-        if ((window as any).Razorpay && typeof (window as any).Razorpay === 'function') {
-          clearInterval(poll)
-          existing.setAttribute('data-loaded', 'true')
-          setRazorpayReady(true)
-          resolve(true)
-        } else if (attempts++ > 50) {
-          clearInterval(poll)
-          reject(new Error('Razorpay failed to load (timeout). Please refresh and try again.'))
+        } else if (++attempts > 40) {
+          if (!resolved) {
+            resolved = true
+            cleanup()
+            reject(new Error('Razorpay failed to load (timeout). Please disable Brave Shields / ad blockers and refresh.'))
+          }
         }
       }, 100)
-      existing.addEventListener('load', () => {
-        clearInterval(poll)
-        existing.setAttribute('data-loaded', 'true')
-        setRazorpayReady(true)
-        resolve(true)
-      }, { once: true })
-      existing.addEventListener('error', () => {
-        clearInterval(poll)
-        reject(new Error('Failed to load Razorpay'))
-      }, { once: true })
     })
   }
 
@@ -351,7 +347,8 @@ export default function CheckoutPage() {
           prefill: {
             name: `${shipping.firstName} ${shipping.lastName}`,
             email: contact.email,
-            contact: contact.phone,
+            contact: contact.phone || shippingPhone,
+            method: payment.method === 'upi' ? 'upi' : payment.method === 'card' ? 'card' : undefined,
           },
           theme: { color: '#000000' },
           modal: {
@@ -369,6 +366,7 @@ export default function CheckoutPage() {
           setOrderError('Payment failed. Please try again.')
         })
         razorpay.open()
+        setIsPlacing(false)
         return
       }
 

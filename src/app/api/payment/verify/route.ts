@@ -1,14 +1,7 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(request: Request) {
-  const supabase = createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature, orderId } = await request.json()
 
   if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !orderId) {
@@ -25,7 +18,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid payment signature' }, { status: 400 })
   }
 
-  const { error } = await supabase
+  const admin = createAdminClient()
+  const { error } = await admin
     .from('orders')
     .update({
       payment_status: 'paid',
@@ -33,7 +27,6 @@ export async function POST(request: Request) {
       status: 'confirmed',
     })
     .eq('id', orderId)
-    .eq('user_id', user.id)
 
   if (error) {
     return NextResponse.json({ error: 'Failed to update order' }, { status: 500 })
