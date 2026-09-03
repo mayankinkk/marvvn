@@ -8,7 +8,7 @@ import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { useAuthStore } from '@/lib/auth-store'
 import { formatPrice } from '@/lib/utils'
-import { ChevronRight, Package, Loader2, CreditCard, Eye, FileText, RotateCcw, CheckCircle, Truck, MapPin, Clock } from 'lucide-react'
+import { ChevronRight, Package, Loader2, CreditCard, Eye, FileText, RotateCcw, CheckCircle, Truck, MapPin, Clock, X } from 'lucide-react'
 import InvoiceButton from '@/components/InvoiceButton'
 
 interface OrderItem {
@@ -94,7 +94,7 @@ function OrderProgress({ status }: { status: string }) {
 }
 
 export default function OrdersPage() {
-  const { isAuthenticated, loading } = useAuthStore()
+  const { user, isAuthenticated, loading } = useAuthStore()
   const router = useRouter()
   const [orders, setOrders] = useState<Order[]>([])
   const [loadingOrders, setLoadingOrders] = useState(true)
@@ -325,6 +325,15 @@ export default function OrdersPage() {
                   )}
                   <div className="flex items-center gap-3 mt-2 pt-2 border-t border-marvvn-gray-100">
                     <InvoiceButton orderId={order.id} />
+                    {(order.status === 'pending' || order.status === 'confirmed') && (
+                      <button
+                        onClick={() => setShowReturnForm(showReturnForm === order.id ? null : order.id)}
+                        className="flex items-center gap-1.5 text-xs font-medium text-red-500 hover:text-red-700 transition-colors cursor-pointer"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                        Cancel Order
+                      </button>
+                    )}
                     {order.status === 'delivered' && (
                       <button
                         onClick={() => setShowReturnForm(showReturnForm === order.id ? null : order.id)}
@@ -337,20 +346,57 @@ export default function OrdersPage() {
                   </div>
                   {showReturnForm === order.id && (
                     <div className="mt-2 pt-2 border-t border-marvvn-gray-100 space-y-2">
-                      <textarea
-                        value={returnReason}
-                        onChange={e => setReturnReason(e.target.value)}
-                        placeholder="Reason for return..."
-                        className="w-full px-3 py-2 text-xs border border-marvvn-gray-200 rounded focus:outline-none focus:border-marvvn-black"
-                        rows={2}
-                      />
-                      <button
-                        onClick={() => handleReturnRequest(order.id)}
-                        disabled={returningId === order.id || !returnReason.trim()}
-                        className="px-3 py-1.5 text-xs bg-marvvn-black text-white rounded hover:bg-marvvn-gray-900 cursor-pointer disabled:opacity-50"
-                      >
-                        {returningId === order.id ? 'Submitting...' : 'Submit Return Request'}
-                      </button>
+                      {(order.status === 'pending' || order.status === 'confirmed') ? (
+                        <>
+                          <p className="text-xs text-marvvn-gray-500">Are you sure you want to cancel this order? This action cannot be undone.</p>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={async () => {
+                                setReturningId(order.id)
+                                try {
+                                  const res = await fetch('/api/cancel-order', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ orderId: order.id, email: user?.email }),
+                                  })
+                                  if (res.ok) {
+                                    setOrders(prev => prev.map(o => o.id === order.id ? { ...o, status: 'cancelled' } : o))
+                                  }
+                                } catch {}
+                                setShowReturnForm(null)
+                                setReturningId(null)
+                              }}
+                              disabled={returningId === order.id}
+                              className="px-3 py-1.5 text-xs bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer disabled:opacity-50"
+                            >
+                              {returningId === order.id ? 'Cancelling...' : 'Yes, Cancel'}
+                            </button>
+                            <button
+                              onClick={() => setShowReturnForm(null)}
+                              className="px-3 py-1.5 text-xs border border-marvvn-gray-300 rounded hover:bg-marvvn-gray-50 cursor-pointer"
+                            >
+                              Keep Order
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <textarea
+                            value={returnReason}
+                            onChange={e => setReturnReason(e.target.value)}
+                            placeholder="Reason for return..."
+                            className="w-full px-3 py-2 text-xs border border-marvvn-gray-200 rounded focus:outline-none focus:border-marvvn-black"
+                            rows={2}
+                          />
+                          <button
+                            onClick={() => handleReturnRequest(order.id)}
+                            disabled={returningId === order.id || !returnReason.trim()}
+                            className="px-3 py-1.5 text-xs bg-marvvn-black text-white rounded hover:bg-marvvn-gray-900 cursor-pointer disabled:opacity-50"
+                          >
+                            {returningId === order.id ? 'Submitting...' : 'Submit Return Request'}
+                          </button>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
