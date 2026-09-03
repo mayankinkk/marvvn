@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import LazyImage from './LazyImage'
 import { ChevronRight } from 'lucide-react'
-import { blogPosts as defaultBlogPosts } from '@/lib/data'
 
 interface BlogPost {
   id: string
@@ -26,18 +25,14 @@ export default function BlogSection() {
     fetch('/api/blogs')
       .then((res) => res.json())
       .then((data) => {
-        if (data.blogs && data.blogs.length > 0) {
-          setPosts(data.blogs.map((b: any) => ({
-            ...b,
-            date: new Date(b.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-          })))
-        } else {
-          setPosts(defaultBlogPosts)
-        }
+        const blogs = (data.blogs || []).map((b: any) => ({
+          ...b,
+          date: new Date(b.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+        }))
+        setPosts(blogs)
         setLoading(false)
       })
       .catch(() => {
-        setPosts(defaultBlogPosts)
         setLoading(false)
       })
   }, [])
@@ -66,6 +61,8 @@ export default function BlogSection() {
       </section>
     )
   }
+
+  if (posts.length === 0) return null
 
   return (
     <section className="py-12 lg:py-20">

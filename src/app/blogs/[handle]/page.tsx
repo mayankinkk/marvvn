@@ -6,7 +6,6 @@ import Image from 'next/image'
 import { useParams } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import { blogPosts as defaultBlogPosts } from '@/lib/data'
 import { sanitizeHtml } from '@/lib/sanitize'
 import { ChevronRight, Share2, MessageCircle, Twitter, Link2, Check } from 'lucide-react'
 
@@ -75,21 +74,10 @@ export default function BlogPostPage() {
             })
             .slice(0, 3)
           setRelatedPosts(related)
-        } else {
-          const fallback = defaultBlogPosts.find((p) => p.handle === handle)
-          if (fallback) {
-            setPost(fallback)
-            setRelatedPosts(defaultBlogPosts.filter((p) => p.handle !== handle).slice(0, 3))
-          }
         }
         setLoading(false)
       })
       .catch(() => {
-        const fallback = defaultBlogPosts.find((p) => p.handle === handle)
-        if (fallback) {
-          setPost(fallback)
-          setRelatedPosts(defaultBlogPosts.filter((p) => p.handle !== handle).slice(0, 3))
-        }
         setLoading(false)
       })
   }, [handle])

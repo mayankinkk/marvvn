@@ -5,7 +5,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
-import { blogPosts as defaultBlogPosts } from '@/lib/data'
 import { ChevronRight, Clock, User, Search, X } from 'lucide-react'
 
 interface BlogPost {
@@ -50,11 +49,10 @@ export default function BlogsPage() {
           ...b,
           date: new Date(b.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
         }))
-        setPosts(allPosts.length > 0 ? allPosts : defaultBlogPosts)
+        setPosts(allPosts)
         setLoading(false)
       })
       .catch(() => {
-        setPosts(defaultBlogPosts)
         setLoading(false)
       })
 
