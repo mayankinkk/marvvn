@@ -449,40 +449,6 @@ export default function ProductPage() {
 
             <p className="text-marvvn-gray-600 text-sm">{product.description}</p>
 
-            {/* Check Delivery & Pickup */}
-            <div className="border rounded-xl p-4 min-w-0 overflow-hidden">
-              <p className="text-sm font-medium mb-3">Check Delivery and Pickup:</p>
-              <div className="flex gap-2 min-w-0">
-                <div className="flex-1 min-w-0 relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-marvvn-gray-400" />
-                  <input
-                    type="text"
-                    value={pincode}
-                    onChange={(e) => { setPincode(e.target.value.replace(/\D/g, '').slice(0, 6)); setDeliveryInfo(null); setDeliveryError('') }}
-                    placeholder="Enter pincode"
-                    className="w-full min-w-0 pl-10 pr-3 py-2.5 text-sm border border-marvvn-gray-300 focus:border-marvvn-black focus:outline-none"
-                    onKeyDown={(e) => e.key === 'Enter' && checkDelivery()}
-                  />
-                </div>
-                <button
-                  onClick={checkDelivery}
-                  disabled={pincode.length !== 6 || deliveryLoading}
-                  className="flex-shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 text-sm font-medium border border-marvvn-black hover:bg-marvvn-black hover:text-white transition-colors cursor-pointer disabled:opacity-50"
-                >
-                  {deliveryLoading ? 'Checking...' : deliveryInfo ? 'Change' : 'Check'}
-                </button>
-              </div>
-              {deliveryInfo && (
-                <div className="mt-3 flex items-center gap-2 text-sm text-green-700 bg-green-50 p-3 rounded">
-                  <Truck className="w-4 h-4 flex-shrink-0" />
-                  <span>{deliveryInfo.estimate}</span>
-                </div>
-              )}
-              {deliveryError && (
-                <p className="mt-2 text-sm text-red-600">{deliveryError}</p>
-              )}
-            </div>
-
             {/* Stock display */}
             {hasVariants && !isOutOfStock && typeof effectiveStock === 'number' && effectiveStock > 5 && (
               <div className="text-sm text-marvvn-gray-500">
@@ -629,6 +595,40 @@ export default function ProductPage() {
                 Buy It Now
               </button>
             )}
+
+            {/* Check Delivery & Pickup */}
+            <div className="border rounded-xl p-4 min-w-0 overflow-hidden">
+              <p className="text-sm font-medium mb-3">Check Delivery and Pickup:</p>
+              <div className="flex gap-2 min-w-0">
+                <div className="flex-1 min-w-0 relative">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-marvvn-gray-400" />
+                  <input
+                    type="text"
+                    value={pincode}
+                    onChange={(e) => { setPincode(e.target.value.replace(/\D/g, '').slice(0, 6)); setDeliveryInfo(null); setDeliveryError('') }}
+                    placeholder="Enter pincode"
+                    className="w-full min-w-0 pl-10 pr-3 py-2.5 text-sm border border-marvvn-gray-300 focus:border-marvvn-black focus:outline-none"
+                    onKeyDown={(e) => e.key === 'Enter' && checkDelivery()}
+                  />
+                </div>
+                <button
+                  onClick={checkDelivery}
+                  disabled={pincode.length !== 6 || deliveryLoading}
+                  className="flex-shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 text-sm font-medium border border-marvvn-black hover:bg-marvvn-black hover:text-white transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  {deliveryLoading ? 'Checking...' : deliveryInfo ? 'Change' : 'Check'}
+                </button>
+              </div>
+              {deliveryInfo && (
+                <div className="mt-3 flex items-center gap-2 text-sm text-green-700 bg-green-50 p-3 rounded">
+                  <Truck className="w-4 h-4 flex-shrink-0" />
+                  <span>{deliveryInfo.estimate}</span>
+                </div>
+              )}
+              {deliveryError && (
+                <p className="mt-2 text-sm text-red-600">{deliveryError}</p>
+              )}
+            </div>
 
             {/* What You Get */}
             <div className="border-t pt-6">
