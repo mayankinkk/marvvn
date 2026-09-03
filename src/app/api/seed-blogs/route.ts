@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 async function isAdmin(supabase: any) {
   const { data: { user } } = await supabase.auth.getUser()
@@ -12,6 +13,7 @@ export async function POST() {
   const supabase = createClient()
   if (!(await isAdmin(supabase))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
+  const admin = createAdminClient()
   const { blogPosts } = await import('@/lib/data')
 
   const seedData = blogPosts.map((p) => ({
@@ -25,7 +27,7 @@ export async function POST() {
     published: true,
   }))
 
-  const { data, error } = await supabase
+  const { data, error } = await admin
     .from('blogs')
     .upsert(seedData, { onConflict: 'handle' })
 
@@ -52,7 +54,7 @@ export async function POST() {
     },
   ]
 
-  await supabase.from('reviews').upsert(reviewSeedData, { onConflict: 'name' })
+  await admin.from('reviews').upsert(reviewSeedData, { onConflict: 'name' })
 
   return NextResponse.json({ success: true, blogs: seedData.length, reviews: reviewSeedData.length })
 }
