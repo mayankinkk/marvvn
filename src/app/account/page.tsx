@@ -105,6 +105,9 @@ export default function AccountPage() {
   const [saveMsg, setSaveMsg] = useState('')
   const [notifications, setNotifications] = useState({ email: true, whatsapp: false })
   const [expandedOrders, setExpandedOrders] = useState<string | null>(null)
+  const [actionOrderId, setActionOrderId] = useState<string | null>(null)
+  const [returnReason, setReturnReason] = useState('')
+  const [actionLoadingId, setActionLoadingId] = useState<string | null>(null)
   const [authChecked, setAuthChecked] = useState(false)
 
   useEffect(() => {
@@ -219,6 +222,40 @@ export default function AccountPage() {
     } catch {
       alert('Something went wrong. Please try again.')
     }
+  }
+
+  const handleCancelOrder = async (orderId: string) => {
+    setActionLoadingId(orderId)
+    try {
+      const res = await fetch('/api/cancel-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, email: user?.email }),
+      })
+      if (res.ok) {
+        setStats((prev) => prev ? {
+          ...prev,
+          recentOrders: prev.recentOrders.map((o: any) => o.id === orderId ? { ...o, status: 'cancelled' } : o),
+        } : prev)
+      }
+    } catch {}
+    setActionOrderId(null)
+    setActionLoadingId(null)
+  }
+
+  const handleReturnRequest = async (orderId: string) => {
+    if (!returnReason.trim()) return
+    setActionLoadingId(orderId)
+    try {
+      await fetch('/api/returns', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, reason: returnReason }),
+      })
+      setActionOrderId(null)
+      setReturnReason('')
+    } catch {}
+    setActionLoadingId(null)
   }
 
   if (!isAuthenticated) return null
@@ -501,6 +538,76 @@ export default function AccountPage() {
                                     <span className="text-xs font-mono font-medium">{order.tracking_number}</span>
                                   </div>
                                 )}
+                                <div className="px-4 py-3 bg-marvvn-gray-50 border-t border-marvvn-gray-100 flex flex-wrap items-center gap-3">
+                                  <InvoiceButton orderId={order.id} />
+                                  {(order.status === 'pending' || order.status === 'confirmed') && (
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        setActionOrderId(actionOrderId === `cancel-${order.id}` ? null : `cancel-${order.id}`)
+                                      }}
+                                      className="flex items-center gap-1.5 text-xs font-medium text-red-500 hover:text-red-700 cursor-pointer"
+                                    >
+                                      <X className="w-3.5 h-3.5" />
+                                      Cancel Order
+                                    </button>
+                                  )}
+                                  {order.status === 'delivered' && (
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation()
+                                        setActionOrderId(actionOrderId === `return-${order.id}` ? null : `return-${order.id}`)
+                                      }}
+                                      className="flex items-center gap-1.5 text-xs font-medium text-marvvn-gray-500 hover:text-marvvn-black cursor-pointer"
+                                    >
+                                      <RotateCcw className="w-3.5 h-3.5" />
+                                      Return
+                                    </button>
+                                  )}
+                                </div>
+                                {actionOrderId === `cancel-${order.id}` && (
+                                  <div className="px-4 py-3 bg-marvvn-gray-50 border-t border-marvvn-gray-100 space-y-2">
+                                    <p className="text-xs text-marvvn-gray-500">Are you sure you want to cancel this order? This action cannot be undone.</p>
+                                    <div className="flex gap-2">
+                                      <button
+                                        type="button"
+                                        onClick={() => handleCancelOrder(order.id)}
+                                        disabled={actionLoadingId === order.id}
+                                        className="px-3 py-1.5 text-xs bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer disabled:opacity-50"
+                                      >
+                                        {actionLoadingId === order.id ? 'Cancelling...' : 'Yes, Cancel'}
+                                      </button>
+                                      <button
+                                        type="button"
+                                        onClick={() => setActionOrderId(null)}
+                                        className="px-3 py-1.5 text-xs border border-marvvn-gray-300 rounded hover:bg-marvvn-gray-50 cursor-pointer"
+                                      >
+                                        Keep Order
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+                                {actionOrderId === `return-${order.id}` && (
+                                  <div className="px-4 py-3 bg-marvvn-gray-50 border-t border-marvvn-gray-100 space-y-2">
+                                    <textarea
+                                      value={returnReason}
+                                      onChange={(e) => setReturnReason(e.target.value)}
+                                      placeholder="Reason for return..."
+                                      className="w-full px-3 py-2 text-xs border border-marvvn-gray-200 rounded focus:outline-none focus:border-marvvn-black"
+                                      rows={2}
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => handleReturnRequest(order.id)}
+                                      disabled={actionLoadingId === order.id || !returnReason.trim()}
+                                      className="px-3 py-1.5 text-xs bg-marvvn-black text-white rounded hover:bg-marvvn-gray-900 cursor-pointer disabled:opacity-50"
+                                    >
+                                      {actionLoadingId === order.id ? 'Submitting...' : 'Submit Return Request'}
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                             )}
                           </div>
@@ -591,9 +698,70 @@ export default function AccountPage() {
                               <span className="text-xs font-mono font-medium">{order.tracking_number}</span>
                             </div>
                           )}
-                          <div className="flex items-center gap-3 mt-2 pt-2 border-t border-marvvn-gray-100">
+                          <div className="flex flex-wrap items-center gap-3 mt-2 pt-2 border-t border-marvvn-gray-100">
                             <InvoiceButton orderId={order.id} />
+                            {(order.status === 'pending' || order.status === 'confirmed') && (
+                              <button
+                                type="button"
+                                onClick={() => setActionOrderId(actionOrderId === `cancel-${order.id}` ? null : `cancel-${order.id}`)}
+                                className="flex items-center gap-1.5 text-xs font-medium text-red-500 hover:text-red-700 cursor-pointer"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                                Cancel Order
+                              </button>
+                            )}
+                            {order.status === 'delivered' && (
+                              <button
+                                type="button"
+                                onClick={() => setActionOrderId(actionOrderId === `return-${order.id}` ? null : `return-${order.id}`)}
+                                className="flex items-center gap-1.5 text-xs font-medium text-marvvn-gray-500 hover:text-marvvn-black cursor-pointer"
+                              >
+                                <RotateCcw className="w-3.5 h-3.5" />
+                                Return
+                              </button>
+                            )}
                           </div>
+                          {actionOrderId === `cancel-${order.id}` && (
+                            <div className="mt-2 pt-2 border-t border-marvvn-gray-100 space-y-2">
+                              <p className="text-xs text-marvvn-gray-500">Are you sure you want to cancel this order? This action cannot be undone.</p>
+                              <div className="flex gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => handleCancelOrder(order.id)}
+                                  disabled={actionLoadingId === order.id}
+                                  className="px-3 py-1.5 text-xs bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer disabled:opacity-50"
+                                >
+                                  {actionLoadingId === order.id ? 'Cancelling...' : 'Yes, Cancel'}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setActionOrderId(null)}
+                                  className="px-3 py-1.5 text-xs border border-marvvn-gray-300 rounded hover:bg-marvvn-gray-50 cursor-pointer"
+                                >
+                                  Keep Order
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                          {actionOrderId === `return-${order.id}` && (
+                            <div className="mt-2 pt-2 border-t border-marvvn-gray-100 space-y-2">
+                              <textarea
+                                value={returnReason}
+                                onChange={(e) => setReturnReason(e.target.value)}
+                                placeholder="Reason for return..."
+                                className="w-full px-3 py-2 text-xs border border-marvvn-gray-200 rounded focus:outline-none focus:border-marvvn-black"
+                                rows={2}
+                              />
+                              <button
+                                type="button"
+                                onClick={() => handleReturnRequest(order.id)}
+                                disabled={actionLoadingId === order.id || !returnReason.trim()}
+                                className="px-3 py-1.5 text-xs bg-marvvn-black text-white rounded hover:bg-marvvn-gray-900 cursor-pointer disabled:opacity-50"
+                              >
+                                {actionLoadingId === order.id ? 'Submitting...' : 'Submit Return Request'}
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
