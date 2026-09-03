@@ -74,33 +74,62 @@ export default function CheckoutPage() {
         return resolve(true)
       }
       const existing = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]') as HTMLScriptElement | null
-      if (existing) {
-        if ((window as any).Razorpay) {
-          setRazorpayReady(true)
-          return resolve(true)
-        }
-        existing.addEventListener('load', () => {
-          setRazorpayReady(true)
-          resolve(true)
-        })
-        existing.addEventListener('error', () => reject(new Error('Failed to load Razorpay')))
-        // If script already exists but hasn't loaded, poll
-        if (existing.getAttribute('data-loaded') === 'true') {
+      if (!existing) {
+        const script = document.createElement('script')
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+        script.async = true
+        script.onload = () => {
+          script.setAttribute('data-loaded', 'true')
           setRazorpayReady(true)
           resolve(true)
         }
+        script.onerror = () => reject(new Error('Failed to load Razorpay. Please check your connection.'))
+        document.body.appendChild(script)
+        // Fallback poll in case onload doesn't fire
+        let attempts = 0
+        const poll = setInterval(() => {
+          if ((window as any).Razorpay && typeof (window as any).Razorpay === 'function') {
+            clearInterval(poll)
+            setRazorpayReady(true)
+            resolve(true)
+          } else if (attempts++ > 50) {
+            clearInterval(poll)
+            reject(new Error('Razorpay failed to load (timeout). Please refresh and try again.'))
+          }
+        }, 100)
         return
       }
-      const script = document.createElement('script')
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js'
-      script.async = true
-      script.onload = () => {
-        script.setAttribute('data-loaded', 'true')
+      // Script already in DOM — poll for Razorpay global
+      if ((window as any).Razorpay && typeof (window as any).Razorpay === 'function') {
+        setRazorpayReady(true)
+        return resolve(true)
+      }
+      if (existing.getAttribute('data-loaded') === 'true') {
+        setRazorpayReady(true)
+        return resolve(true)
+      }
+      let attempts = 0
+      const poll = setInterval(() => {
+        if ((window as any).Razorpay && typeof (window as any).Razorpay === 'function') {
+          clearInterval(poll)
+          existing.setAttribute('data-loaded', 'true')
+          setRazorpayReady(true)
+          resolve(true)
+        } else if (attempts++ > 50) {
+          clearInterval(poll)
+          reject(new Error('Razorpay failed to load (timeout). Please refresh and try again.'))
+        }
+      }, 100)
+      existing.addEventListener('load', () => {
+        clearInterval(poll)
+        existing.setAttribute('data-loaded', 'true')
         setRazorpayReady(true)
         resolve(true)
-      }
-      script.onerror = () => reject(new Error('Failed to load Razorpay. Please check your connection.'))
-      document.body.appendChild(script)
+      }, { once: true })
+      existing.addEventListener('error', () => {
+        clearInterval(poll)
+        reject(new Error('Failed to load Razorpay'))
+      }, { once: true })
     })
   }
 
