@@ -171,33 +171,53 @@ export default function CheckoutPage() {
     if (items.length === 0) return
     const email = contact.email || user?.email
     if (!email) return
+    const phone = contact.phone || shippingPhone || (user as any)?.phone || ''
 
     const abandonmentData = {
       email,
+      phone,
       items: items.map(i => ({ title: i.product.title, quantity: i.quantity, price: i.product.price, handle: i.product.handle })),
       total: totalPrice(),
     }
 
     const sendAbandonment = () => {
-      fetch('/api/cart-abandonment', {
+      const payload = JSON.stringify(abandonmentData)
+      const url = '/api/cart-abandonment'
+      try {
+        if (navigator.sendBeacon) {
+          const blob = new Blob([payload], { type: 'application/json' })
+          if (navigator.sendBeacon(url, blob)) return
+        }
+      } catch {}
+      // Fallback: fetch with keepalive (works on pagehide/visibilitychange)
+      fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(abandonmentData),
+        body: payload,
+        keepalive: true,
       }).catch(() => {})
     }
 
-    // Fire on tab/window close
+    // Fire on tab/window close — beforeunload + pagehide + visibilitychange for mobile reliability
     const handleBeforeUnload = () => sendAbandonment()
+    const handlePageHide = () => sendAbandonment()
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') sendAbandonment()
+    }
     window.addEventListener('beforeunload', handleBeforeUnload)
+    window.addEventListener('pagehide', handlePageHide)
+    document.addEventListener('visibilitychange', handleVisibilityChange)
 
-    // Also fire after 15 minutes as a fallback
-    const timer = setTimeout(sendAbandonment, 15 * 60 * 1000)
+    // Also fire after 3 minutes as a fallback (shorter than 15 for faster recovery)
+    const timer = setTimeout(sendAbandonment, 3 * 60 * 1000)
 
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload)
+      window.removeEventListener('pagehide', handlePageHide)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
       clearTimeout(timer)
     }
-  }, [items, totalPrice, contact.email, user?.email])
+  }, [items, totalPrice, contact.email, contact.phone, shippingPhone, user?.email])
 
   const shippingCost = totalPrice() >= freeShippingThreshold ? 0 : shippingFee
   const total = finalPrice() + shippingCost
