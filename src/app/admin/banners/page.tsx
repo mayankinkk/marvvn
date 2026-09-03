@@ -75,6 +75,13 @@ const bannerSlots: BannerSlot[] = [
     linkKey: 'promo_4_link',
     aspectHint: 'Desktop: 21:9 cinematic · Mobile: 16:9',
   },
+  {
+    id: 'brand-story',
+    label: 'Brand Story Banner',
+    description: 'Left-side image in the About / Brand Story section on the homepage',
+    imageKey: 'brand_story_image',
+    aspectHint: 'Landscape: 3:2 or 16:9 recommended',
+  },
 ]
 
 export default function AdminBannersPage() {

@@ -3,8 +3,10 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { useSettings } from '@/components/SettingsProvider'
 
 export default function AboutSection() {
+  const settings = useSettings()
   const [email, setEmail] = useState('')
   const [subscribed, setSubscribed] = useState(false)
   const [subscribing, setSubscribing] = useState(false)
@@ -33,7 +35,7 @@ export default function AboutSection() {
       <div className="grid lg:grid-cols-2 min-h-[500px]">
         <div className="relative bg-marvvn-gray-100 overflow-hidden">
           <Image
-            src="/images/brand-story.jpg"
+            src={settings.brand_story_image || '/images/brand-story.jpg'}
             alt="MARVVN brand story"
             fill
             sizes="(max-width: 1024px) 100vw, 50vw"
