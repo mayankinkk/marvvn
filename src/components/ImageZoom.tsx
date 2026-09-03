@@ -11,7 +11,8 @@ interface ImageZoomProps {
 }
 
 export default function ImageZoom({ src, alt, className = '' }: ImageZoomProps) {
-  const [isZoomed, setIsZoomed] = useState(false)
+  const [isHovering, setIsHovering] = useState(false)
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false)
   const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 })
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -23,40 +24,41 @@ export default function ImageZoom({ src, alt, className = '' }: ImageZoomProps) 
     setZoomPos({ x, y })
   }, [])
 
-  const handleMouseEnter = () => setIsZoomed(true)
-  const handleMouseLeave = () => setIsZoomed(false)
+  const handleMouseEnter = () => setIsHovering(true)
+  const handleMouseLeave = () => setIsHovering(false)
 
   return (
     <>
       <div
         ref={containerRef}
-        className={`relative overflow-hidden cursor-crosshair group ${className}`}
+        className={`relative overflow-hidden cursor-zoom-in group ${className}`}
         onMouseMove={handleMouseMove}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        onClick={() => setIsLightboxOpen(true)}
       >
         <Image
           src={src}
           alt={alt}
           fill
           sizes="(max-width: 768px) 100vw, 50vw"
-          className={`object-cover transition-transform duration-200 ${isZoomed ? 'scale-150' : 'scale-100'}`}
-          style={isZoomed ? { transformOrigin: `${zoomPos.x}% ${zoomPos.y}%` } : undefined}
+          className={`object-cover transition-transform duration-200 ${isHovering ? 'scale-[1.8]' : 'scale-100'}`}
+          style={isHovering ? { transformOrigin: `${zoomPos.x}% ${zoomPos.y}%` } : undefined}
           unoptimized
         />
-        <div className="absolute bottom-3 right-3 bg-white/80 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+        <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
           <ZoomIn className="w-4 h-4 text-gray-700" />
         </div>
       </div>
 
       {/* Full-screen lightbox on click */}
-      {isZoomed && (
+      {isLightboxOpen && (
         <div
           className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center cursor-zoom-out"
-          onClick={() => setIsZoomed(false)}
+          onClick={() => setIsLightboxOpen(false)}
         >
           <button
-            onClick={() => setIsZoomed(false)}
+            onClick={() => setIsLightboxOpen(false)}
             className="absolute top-4 right-4 text-white/80 hover:text-white z-10 cursor-pointer"
           >
             <X className="w-8 h-8" />
