@@ -188,13 +188,19 @@ export default function BlogsPage() {
                   className="group border border-marvvn-gray-100 hover:shadow-lg transition-all duration-300"
                 >
                   <div className="aspect-[16/9] bg-marvvn-gray-50 overflow-hidden relative">
-                    <Image
-                      src={post.image}
-                      alt={post.title}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
+                    {post.image ? (
+                      <Image
+                        src={post.image}
+                        alt={post.title}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-marvvn-gray-200">
+                        <span className="text-marvvn-gray-400 text-sm">Blog Post</span>
+                      </div>
+                    )}
                     {post.category && (
                       <span className="absolute top-3 left-3 bg-white/90 backdrop-blur px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider">
                         {post.category.replace('-', ' ')}

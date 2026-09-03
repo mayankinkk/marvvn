@@ -84,13 +84,19 @@ export default function BlogSection() {
           {posts.slice(0, 3).map((post) => (
             <Link key={post.id} href={`/blogs/${post.handle}`} className="group">
               <div className="aspect-[16/9] bg-marvvn-gray-100 mb-4 overflow-hidden relative">
-                <LazyImage
-                  src={post.image}
-                  alt={post.title}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  className="group-hover:scale-105 transition-transform duration-500"
-                />
+                {post.image ? (
+                  <LazyImage
+                    src={post.image}
+                    alt={post.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="group-hover:scale-105 transition-transform duration-500"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-marvvn-gray-200">
+                    <span className="text-marvvn-gray-400 text-sm">Blog Post</span>
+                  </div>
+                )}
               </div>
               <p className="text-xs text-marvvn-gray-500 mb-2">{post.date}</p>
               <h3 className="text-base font-medium mb-2 group-hover:text-marvvn-gray-600 transition-colors line-clamp-2">

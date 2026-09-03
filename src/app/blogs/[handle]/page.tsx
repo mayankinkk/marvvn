@@ -115,13 +115,19 @@ export default function BlogPostPage() {
 
         <article className="max-w-3xl mx-auto">
           <div className="aspect-[16/9] bg-marvvn-gray-50 overflow-hidden mb-6 relative">
-            <Image
-              src={post.image}
-              alt={post.title}
-              fill
-              sizes="(max-width: 768px) 100vw, 768px"
-              className="object-cover"
-            />
+            {post.image ? (
+              <Image
+                src={post.image}
+                alt={post.title}
+                fill
+                sizes="(max-width: 768px) 100vw, 768px"
+                className="object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-marvvn-gray-200">
+                <span className="text-marvvn-gray-400">Blog Post</span>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center gap-4 text-xs text-marvvn-gray-400 mb-4">
