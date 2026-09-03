@@ -64,15 +64,56 @@ export default function CheckoutPage() {
   const [payment, setPayment] = useState({
     method: 'upi' as 'cod' | 'upi' | 'card',
   })
+  const [razorpayReady, setRazorpayReady] = useState(false)
 
-  useEffect(() => {
-    if (payment.method !== 'cod' && !(window as any).Razorpay) {
+  const loadRazorpayScript = () => {
+    return new Promise<boolean>((resolve, reject) => {
+      if (typeof window === 'undefined') return reject(new Error('Window not available'))
+      if ((window as any).Razorpay && typeof (window as any).Razorpay === 'function') {
+        setRazorpayReady(true)
+        return resolve(true)
+      }
+      const existing = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]') as HTMLScriptElement | null
+      if (existing) {
+        if ((window as any).Razorpay) {
+          setRazorpayReady(true)
+          return resolve(true)
+        }
+        existing.addEventListener('load', () => {
+          setRazorpayReady(true)
+          resolve(true)
+        })
+        existing.addEventListener('error', () => reject(new Error('Failed to load Razorpay')))
+        // If script already exists but hasn't loaded, poll
+        if (existing.getAttribute('data-loaded') === 'true') {
+          setRazorpayReady(true)
+          resolve(true)
+        }
+        return
+      }
       const script = document.createElement('script')
       script.src = 'https://checkout.razorpay.com/v1/checkout.js'
       script.async = true
+      script.onload = () => {
+        script.setAttribute('data-loaded', 'true')
+        setRazorpayReady(true)
+        resolve(true)
+      }
+      script.onerror = () => reject(new Error('Failed to load Razorpay. Please check your connection.'))
       document.body.appendChild(script)
+    })
+  }
+
+  useEffect(() => {
+    if (payment.method !== 'cod') {
+      loadRazorpayScript().catch(() => setRazorpayReady(false))
     }
   }, [payment.method])
+
+  // Preload Razorpay on mount so it's ready before user clicks Pay
+  useEffect(() => {
+    loadRazorpayScript().catch(() => {})
+  }, [])
 
   // Fetch saved addresses for logged-in users
   useEffect(() => {
@@ -244,6 +285,16 @@ export default function CheckoutPage() {
       const orderData = await orderRes.json()
 
       if (payment.method !== 'cod') {
+        // Ensure Razorpay is loaded before opening checkout
+        try {
+          await loadRazorpayScript()
+        } catch (e: any) {
+          throw new Error(e?.message || 'Razorpay failed to load. Please refresh and try again.')
+        }
+        if (typeof (window as any).Razorpay !== 'function') {
+          throw new Error('Razorpay is not available. Please refresh the page and try again.')
+        }
+
         const payRes = await fetch('/api/payment', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -282,7 +333,8 @@ export default function CheckoutPage() {
           },
         }
 
-        const razorpay = new (window as any).Razorpay(options)
+        const RazorpayCtor = (window as any).Razorpay
+        const razorpay = new RazorpayCtor(options)
         razorpay.on('payment.failed', () => {
           setIsPlacing(false)
           setOrderError('Payment failed. Please try again.')
