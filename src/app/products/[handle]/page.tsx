@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import ImageZoom from '@/components/ImageZoom'
 import { useCurrency } from '@/lib/hooks/useCurrency'
 import { useParams } from 'next/navigation'
-import { Heart, ShoppingBag, Minus, Plus, ChevronRight, Truck, RotateCcw, Shield, Bell, MapPin, Package, CreditCard, Zap, Star } from 'lucide-react'
+import { Heart, ShoppingBag, Minus, Plus, ChevronRight, ChevronLeft, Truck, RotateCcw, Shield, Bell, MapPin, Package, CreditCard, Zap, Star } from 'lucide-react'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import ProductCard from '@/components/ProductCard'
@@ -46,6 +46,11 @@ export default function ProductPage() {
   const [selectedColor, setSelectedColor] = useState('')
   const [quantity, setQuantity] = useState(1)
   const [activeImage, setActiveImage] = useState(0)
+  const touchStartX = useRef<number | null>(null)
+  const touchStartY = useRef<number | null>(null)
+  const isDragging = useRef(false)
+  const dragStartX = useRef(0)
+  const thumbsRef = useRef<HTMLDivElement>(null)
   const { addItem, toggleCart } = useCartStore()
   const { format, symbol } = useCurrency()
   const { toggleItem, isInWishlist } = useWishlistStore()
@@ -139,6 +144,77 @@ export default function ProductPage() {
     addItem(product, size, color, quantity)
     window.location.href = '/checkout'
   }
+
+  // Swipe handlers for product images — touch + mouse drag
+  const imageCount = product?.images?.length || 0
+
+  const goToNextImage = useCallback(() => {
+    if (!product?.images?.length) return
+    setActiveImage((prev) => (prev + 1) % product.images.length)
+  }, [product])
+
+  const goToPrevImage = useCallback(() => {
+    if (!product?.images?.length) return
+    setActiveImage((prev) => (prev - 1 + product.images.length) % product.images.length)
+  }, [product])
+
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX
+    touchStartY.current = e.touches[0].clientY
+  }, [])
+
+  const onTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (touchStartX.current == null || touchStartY.current == null) return
+    const dx = e.changedTouches[0].clientX - touchStartX.current
+    const dy = e.changedTouches[0].clientY - touchStartY.current
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+      if (dx < 0) goToNextImage()
+      else goToPrevImage()
+    }
+    touchStartX.current = null
+    touchStartY.current = null
+  }, [goToNextImage, goToPrevImage])
+
+  const onMouseDown = useCallback((e: React.MouseEvent) => {
+    isDragging.current = true
+    dragStartX.current = e.clientX
+    ;(e.currentTarget as HTMLElement).style.cursor = 'grabbing'
+  }, [])
+
+  const onMouseUp = useCallback((e: React.MouseEvent) => {
+    if (!isDragging.current) return
+    const dx = e.clientX - dragStartX.current
+    if (Math.abs(dx) > 50) {
+      if (dx < 0) goToNextImage()
+      else goToPrevImage()
+    }
+    isDragging.current = false
+    ;(e.currentTarget as HTMLElement).style.cursor = 'grab'
+  }, [goToNextImage, goToPrevImage])
+
+  const onMouseLeaveDrag = useCallback((e: React.MouseEvent) => {
+    if (isDragging.current) {
+      isDragging.current = false
+      ;(e.currentTarget as HTMLElement).style.cursor = 'grab'
+    }
+  }, [])
+
+  // Keep active thumbnail visible when swiping
+  useEffect(() => {
+    if (!thumbsRef.current) return
+    const el = thumbsRef.current.children[activeImage] as HTMLElement | undefined
+    el?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
+  }, [activeImage])
+
+  // Keyboard arrows (when product is loaded)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowLeft') goToPrevImage()
+      if (e.key === 'ArrowRight') goToNextImage()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [goToNextImage, goToPrevImage])
 
   if (loading) {
     return (
@@ -247,15 +323,60 @@ export default function ProductPage() {
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 min-w-0">
           {/* Left — Images */}
           <div className="space-y-4 min-w-0 overflow-hidden">
-            <div className="aspect-[3/4] bg-marvvn-gray-50 overflow-hidden relative w-full max-w-full">
+            <div
+              className="group aspect-[3/4] bg-marvvn-gray-50 overflow-hidden relative w-full max-w-full touch-pan-y select-none"
+              onTouchStart={onTouchStart}
+              onTouchEnd={onTouchEnd}
+              onMouseDown={onMouseDown}
+              onMouseUp={onMouseUp}
+              onMouseLeave={onMouseLeaveDrag}
+              style={{ cursor: imageCount > 1 ? 'grab' : 'default', touchAction: 'pan-y' }}
+            >
               <ImageZoom
                 src={product.images?.[activeImage] || '/placeholder.png'}
                 alt={product.title}
                 className="w-full h-full"
               />
+              {/* Swipe arrows — visible on hover / always on mobile */}
+              {imageCount > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); goToPrevImage() }}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 backdrop-blur rounded-full shadow flex items-center justify-center hover:bg-white transition-all opacity-90 lg:opacity-0 lg:group-hover:opacity-100 focus:opacity-100"
+                    aria-label="Previous image"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); goToNextImage() }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/90 backdrop-blur rounded-full shadow flex items-center justify-center hover:bg-white transition-all opacity-90 lg:opacity-0 lg:group-hover:opacity-100 focus:opacity-100"
+                    aria-label="Next image"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                  {/* Dots indicator + counter */}
+                  <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm rounded-full px-3 py-1.5">
+                    {product.images.map((_, i) => (
+                      <span
+                        key={i}
+                        className={`block rounded-full transition-all ${i === activeImage ? 'w-5 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-white/50'}`}
+                      />
+                    ))}
+                  </div>
+                  <span className="absolute top-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+                    {activeImage + 1} / {imageCount}
+                  </span>
+                  {/* Swipe hint — fades after first swipe */}
+                  <span className="absolute top-3 left-3 bg-white/90 text-black text-[10px] font-medium uppercase tracking-wider px-2 py-1 rounded-full shadow hidden sm:flex items-center gap-1 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
+                    Swipe ↔
+                  </span>
+                </>
+              )}
             </div>
             {product.images?.length > 1 && (
-              <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-1 -mx-1 px-1">
+              <div ref={thumbsRef} className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-1 -mx-1 px-1">
                 {product.images.map((image, index) => (
                   <button
                     key={index}
