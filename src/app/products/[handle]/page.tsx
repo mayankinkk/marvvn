@@ -412,10 +412,10 @@ export default function ProductPage() {
                 type="button"
                 onClick={() => toggleItem(product)}
                 className={cn(
-                  'flex-shrink-0 w-10 h-10 flex items-center justify-center border transition-all cursor-pointer mt-1',
+                  'flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center border transition-all cursor-pointer mt-1',
                   inWishlist
                     ? 'border-marvvn-red bg-red-50 text-marvvn-red'
-                    : 'border-marvvn-gray-300 hover:border-marvvn-black hover:bg-marvvn-gray-50'
+                    : 'border-marvvn-gray-200 bg-white hover:border-marvvn-black hover:bg-marvvn-gray-50'
                 )}
               >
                 <Heart className={cn('w-5 h-5', inWishlist && 'fill-current')} />
