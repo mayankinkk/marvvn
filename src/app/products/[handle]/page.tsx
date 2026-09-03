@@ -210,7 +210,7 @@ export default function ProductPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen max-w-full overflow-x-clip">
       <ProductJsonLd
         product={{
           title: product.title,
@@ -233,8 +233,8 @@ export default function ProductPage() {
       />
       <Header />
 
-      <main className="container py-4 lg:py-8">
-        <nav className="flex items-center gap-2 text-xs text-marvvn-gray-500 mb-6">
+      <main className="container py-4 lg:py-8 pb-24 lg:pb-8 overflow-hidden">
+        <nav className="flex items-center gap-2 text-xs text-marvvn-gray-500 mb-6 overflow-hidden min-w-0 flex-wrap">
           <Link href="/" className="hover:text-marvvn-black">Home</Link>
           <ChevronRight className="w-3 h-3" />
           <Link href={`/collections/${product.category}`} className="hover:text-marvvn-black capitalize">
@@ -244,10 +244,10 @@ export default function ProductPage() {
           <span className="text-marvvn-black truncate">{product.title}</span>
         </nav>
 
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 min-w-0">
           {/* Left — Images */}
-          <div className="space-y-4">
-            <div className="aspect-[3/4] bg-marvvn-gray-50 overflow-hidden relative">
+          <div className="space-y-4 min-w-0 overflow-hidden">
+            <div className="aspect-[3/4] bg-marvvn-gray-50 overflow-hidden relative w-full max-w-full">
               <ImageZoom
                 src={product.images?.[activeImage] || '/placeholder.png'}
                 alt={product.title}
@@ -255,14 +255,14 @@ export default function ProductPage() {
               />
             </div>
             {product.images?.length > 1 && (
-              <div className="flex gap-2">
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide snap-x snap-mandatory pb-1 -mx-1 px-1">
                 {product.images.map((image, index) => (
                   <button
                     key={index}
                     type="button"
                     onClick={() => setActiveImage(index)}
                     className={cn(
-                      'w-20 h-24 border-2 overflow-hidden relative cursor-pointer',
+                      'flex-shrink-0 snap-start w-16 h-20 sm:w-20 sm:h-24 border-2 overflow-hidden relative cursor-pointer',
                       activeImage === index ? 'border-marvvn-black' : 'border-transparent'
                     )}
                   >
@@ -274,7 +274,7 @@ export default function ProductPage() {
           </div>
 
           {/* Right — Product Info */}
-          <div className="space-y-5">
+          <div className="space-y-5 min-w-0 overflow-hidden">
             {/* Flash Sale Timer */}
             {product.flash_sale && product.flash_sale_ends_at && product.flash_sale_price && (
               <FlashSaleTimer
@@ -285,8 +285,8 @@ export default function ProductPage() {
             )}
 
             {/* Title + Wishlist */}
-            <div className="flex items-start justify-between gap-4">
-              <h1 className="text-2xl lg:text-3xl font-display font-medium leading-tight">{product.title}</h1>
+            <div className="flex items-start justify-between gap-4 min-w-0">
+              <h1 className="text-2xl lg:text-3xl font-display font-medium leading-tight break-words min-w-0 flex-1">{product.title}</h1>
               <button
                 type="button"
                 onClick={() => toggleItem(product)}
@@ -302,7 +302,7 @@ export default function ProductPage() {
             </div>
 
             {/* Price */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap min-w-0">
               {product.compareAtPrice && (
                 <span className="text-lg text-marvvn-gray-400 line-through">
                   {formatPrice(product.compareAtPrice)}
@@ -329,24 +329,24 @@ export default function ProductPage() {
             <p className="text-marvvn-gray-600 text-sm">{product.description}</p>
 
             {/* Check Delivery & Pickup */}
-            <div className="border rounded-xl p-4">
+            <div className="border rounded-xl p-4 min-w-0 overflow-hidden">
               <p className="text-sm font-medium mb-3">Check Delivery and Pickup:</p>
-              <div className="flex gap-2">
-                <div className="flex-1 relative">
+              <div className="flex gap-2 min-w-0">
+                <div className="flex-1 min-w-0 relative">
                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-marvvn-gray-400" />
                   <input
                     type="text"
                     value={pincode}
                     onChange={(e) => { setPincode(e.target.value.replace(/\D/g, '').slice(0, 6)); setDeliveryInfo(null); setDeliveryError('') }}
                     placeholder="Enter pincode"
-                    className="w-full pl-10 pr-3 py-2.5 text-sm border border-marvvn-gray-300 focus:border-marvvn-black focus:outline-none"
+                    className="w-full min-w-0 pl-10 pr-3 py-2.5 text-sm border border-marvvn-gray-300 focus:border-marvvn-black focus:outline-none"
                     onKeyDown={(e) => e.key === 'Enter' && checkDelivery()}
                   />
                 </div>
                 <button
                   onClick={checkDelivery}
                   disabled={pincode.length !== 6 || deliveryLoading}
-                  className="px-6 py-2.5 text-sm font-medium border border-marvvn-black hover:bg-marvvn-black hover:text-white transition-colors cursor-pointer disabled:opacity-50"
+                  className="flex-shrink-0 whitespace-nowrap px-4 sm:px-6 py-2.5 text-sm font-medium border border-marvvn-black hover:bg-marvvn-black hover:text-white transition-colors cursor-pointer disabled:opacity-50"
                 >
                   {deliveryLoading ? 'Checking...' : deliveryInfo ? 'Change' : 'Check'}
                 </button>
@@ -379,23 +379,23 @@ export default function ProductPage() {
 
             {/* Out of Stock Alert */}
             {isOutOfStock && (
-              <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+              <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg min-w-0 overflow-hidden">
                 {stockAlertSigned ? (
-                  <p className="text-sm text-amber-700 flex items-center gap-2">
-                    <Bell className="w-4 h-4" /> You&apos;ll be notified when this is back in stock!
+                  <p className="text-sm text-amber-700 flex items-center gap-2 break-words">
+                    <Bell className="w-4 h-4 flex-shrink-0" /> You&apos;ll be notified when this is back in stock!
                   </p>
                 ) : (
-                  <div className="space-y-2">
-                    <p className="text-sm text-amber-700 font-medium">This product is currently out of stock</p>
-                    <div className="flex gap-2">
+                  <div className="space-y-2 min-w-0">
+                    <p className="text-sm text-amber-700 font-medium break-words">This product is currently out of stock</p>
+                    <div className="flex gap-2 min-w-0">
                       <input
                         type="email"
                         placeholder="Your email"
                         value={stockAlertEmail}
                         onChange={(e) => setStockAlertEmail(e.target.value)}
-                        className="flex-1 px-3 py-2 text-sm border border-amber-300 rounded focus:outline-none focus:border-amber-500"
+                        className="flex-1 min-w-0 px-3 py-2 text-sm border border-amber-300 rounded focus:outline-none focus:border-amber-500"
                       />
-                      <button onClick={handleStockAlert} className="px-3 py-2 text-sm bg-amber-600 text-white rounded hover:bg-amber-700 cursor-pointer">
+                      <button onClick={handleStockAlert} className="flex-shrink-0 whitespace-nowrap px-3 py-2 text-sm bg-amber-600 text-white rounded hover:bg-amber-700 cursor-pointer">
                         Notify Me
                       </button>
                     </div>
@@ -405,9 +405,9 @@ export default function ProductPage() {
             )}
 
             {/* Size */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-3 text-sm">
+            <div className="min-w-0 overflow-hidden">
+              <div className="flex items-center justify-between gap-2 flex-wrap mb-3 min-w-0">
+                <div className="flex items-center gap-2 sm:gap-3 text-sm flex-wrap min-w-0">
                   <h3 className="font-medium uppercase tracking-wider">Size</h3>
                   {product.waist && (
                     <span className="text-marvvn-gray-500">| WAIST {product.waist.toUpperCase()}</span>
@@ -446,7 +446,7 @@ export default function ProductPage() {
             </div>
 
             {/* Color */}
-            <div>
+            <div className="min-w-0 overflow-hidden">
               <h3 className="text-sm font-medium uppercase tracking-wider mb-3">Color</h3>
               <div className="flex flex-wrap gap-2">
                 {product.colors.map((color) => (
@@ -468,8 +468,8 @@ export default function ProductPage() {
             </div>
 
             {/* Quantity + Add to Cart row */}
-            <div className="flex items-center gap-3">
-              <div className="flex items-center border border-marvvn-gray-300">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="flex items-center border border-marvvn-gray-300 flex-shrink-0">
                 <button
                   type="button"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -490,9 +490,9 @@ export default function ProductPage() {
                 type="button"
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
-                className="flex-1 h-12 btn-primary flex items-center justify-center gap-2 text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 min-w-0 h-12 btn-primary flex items-center justify-center gap-2 text-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
               >
-                <ShoppingBag className="w-4 h-4" />
+                <ShoppingBag className="w-4 h-4 flex-shrink-0" />
                 {isOutOfStock ? 'Out of Stock' : 'Add To Cart'}
               </button>
             </div>
@@ -511,9 +511,9 @@ export default function ProductPage() {
 
             {/* Special Offers */}
             {settings.product_special_offers_enabled !== 'false' && (
-              <div className="border rounded-xl p-4">
+              <div className="border rounded-xl p-4 min-w-0 overflow-hidden">
                 <h3 className="text-sm font-medium mb-3">{settings.product_special_offers_title || 'Special Offers'}</h3>
-                <div className="bg-marvvn-black text-white rounded-lg p-3 flex items-center gap-3">
+                <div className="bg-marvvn-black text-white rounded-lg p-3 flex items-center gap-3 min-w-0">
                   <div className="w-8 h-8 bg-white/20 rounded flex items-center justify-center flex-shrink-0">
                     <CreditCard className="w-4 h-4" />
                   </div>
@@ -552,8 +552,8 @@ export default function ProductPage() {
         </div>
 
         {/* Tabs Section */}
-        <div className="mt-12 lg:mt-16 border-t pt-8">
-          <div className="flex gap-2 flex-wrap mb-8">
+        <div className="mt-12 lg:mt-16 border-t pt-8 min-w-0 overflow-hidden">
+          <div className="flex gap-2 flex-wrap mb-8 min-w-0">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -572,7 +572,7 @@ export default function ProductPage() {
           </div>
 
           {/* Tab Content */}
-          <div className="max-w-3xl">
+          <div className="max-w-3xl min-w-0 overflow-hidden">
             {activeTab === 'size-fit' && (
               <div className="space-y-6">
                 {/* Per-product Size & Fit text */}

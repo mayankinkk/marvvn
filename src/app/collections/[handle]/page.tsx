@@ -122,7 +122,7 @@ export default function CollectionPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen max-w-full overflow-x-clip">
       <CollectionJsonLd
         collection={{
           title: collection?.title || handle.replace(/-/g, ' '),
@@ -144,8 +144,8 @@ export default function CollectionPage() {
       />
       <Header />
 
-      <main className="container py-4 lg:py-8">
-        <nav className="flex items-center gap-2 text-xs text-marvvn-gray-500 mb-6">
+      <main className="container py-4 lg:py-8 max-w-full overflow-hidden">
+        <nav className="flex items-center gap-2 text-xs text-marvvn-gray-500 mb-6 flex-wrap min-w-0 overflow-hidden">
           <Link href="/" className="hover:text-marvvn-black">Home</Link>
           <ChevronRight className="w-3 h-3" />
           <span className="text-marvvn-black capitalize">
@@ -153,17 +153,17 @@ export default function CollectionPage() {
           </span>
         </nav>
 
-        <div className="flex items-center justify-between mb-6 lg:mb-8">
-          <div>
-            <h1 className="text-2xl lg:text-3xl font-display font-medium capitalize">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 lg:mb-8 min-w-0">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl lg:text-3xl font-display font-medium capitalize break-words">
               {collection?.title || handle.replace(/-/g, ' ')}
             </h1>
             {collection?.description && (
-              <p className="text-sm text-marvvn-gray-500 mt-1">{collection.description}</p>
+              <p className="text-sm text-marvvn-gray-500 mt-1 break-words">{collection.description}</p>
             )}
             <p className="text-sm text-marvvn-gray-400 mt-1">{filteredProducts.length} products</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-shrink-0 flex-wrap">
             <button
               type="button"
               onClick={() => setShowFilters(!showFilters)}
@@ -186,9 +186,9 @@ export default function CollectionPage() {
           </div>
         </div>
 
-        <div className="flex gap-8">
+        <div className="flex flex-col lg:flex-row gap-8 min-w-0">
           <aside className={cn(
-            'w-64 flex-shrink-0 space-y-6',
+            'w-full lg:w-64 flex-shrink-0 space-y-6 min-w-0',
             showFilters ? 'block' : 'hidden lg:block'
           )}>
             <div>
@@ -292,7 +292,7 @@ export default function CollectionPage() {
             )}
           </aside>
 
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             {filteredProducts.length > 0 ? (
               <InfiniteScroll
                 items={filteredProducts}

@@ -27,10 +27,10 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen max-w-full overflow-x-clip">
       <Header />
 
-      <main className="container py-8 lg:py-12">
+      <main className="container py-8 lg:py-12 max-w-full overflow-hidden">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-xs text-marvvn-gray-500 mb-6">
           <Link href="/" className="hover:text-marvvn-black">Home</Link>
@@ -102,9 +102,9 @@ export default function CartPage() {
             )}
           </div>
         ) : (
-          <div className="grid lg:grid-cols-3 gap-8">
+          <div className="grid lg:grid-cols-3 gap-8 min-w-0">
             {/* Items */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2 min-w-0 overflow-hidden">
               <div className="border-b pb-2 mb-4 hidden md:grid grid-cols-12 gap-4 text-xs font-medium uppercase tracking-wider text-marvvn-gray-500">
                 <div className="col-span-6">Product</div>
                 <div className="col-span-2 text-center">Price</div>
@@ -114,8 +114,8 @@ export default function CartPage() {
 
               <div className="divide-y">
                 {items.map((item) => (
-                  <div key={`${item.product.id}-${item.size}-${item.color}`} className="py-6 grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-                    <div className="md:col-span-6 flex gap-4">
+                  <div key={`${item.product.id}-${item.size}-${item.color}`} className="py-6 grid grid-cols-1 md:grid-cols-12 gap-4 items-center min-w-0">
+                    <div className="md:col-span-6 flex gap-4 min-w-0 overflow-hidden">
                       <div className="w-20 h-24 bg-marvvn-gray-50 flex-shrink-0 relative overflow-hidden">
                         <Image
                           src={item.product.images?.[0] || '/placeholder.png'}
@@ -275,15 +275,15 @@ export default function CartPage() {
                         </button>
                       </div>
                     ) : (
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 min-w-0">
                         <input
                           type="text"
                           placeholder="Promo code"
                           value={promoInput}
                           onChange={(e) => { setPromoInput(e.target.value); setPromoError('') }}
-                          className="flex-1 px-3 py-2 text-sm border border-marvvn-gray-300 focus:outline-none focus:border-marvvn-black"
+                          className="flex-1 min-w-0 px-3 py-2 text-sm border border-marvvn-gray-300 focus:outline-none focus:border-marvvn-black"
                         />
-                        <button type="button" onClick={handleApplyPromo} className="px-3 py-2 text-sm font-medium border border-marvvn-gray-300 hover:border-marvvn-black transition-colors">
+                        <button type="button" onClick={handleApplyPromo} className="flex-shrink-0 whitespace-nowrap px-3 py-2 text-sm font-medium border border-marvvn-gray-300 hover:border-marvvn-black transition-colors">
                           Apply
                         </button>
                       </div>

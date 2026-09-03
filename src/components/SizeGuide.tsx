@@ -56,7 +56,8 @@ export default function SizeGuide({ category }: SizeGuideProps) {
               <button onClick={() => setOpen(false)} className="cursor-pointer"><X className="w-5 h-5" /></button>
             </div>
             <p className="text-sm text-marvvn-gray-500 mb-4">Measurements are in inches. Our oversized tees run large — size down for a regular fit.</p>
-            <table className="w-full text-sm border">
+            <div className="overflow-x-auto -mx-1">
+            <table className="w-full text-sm border min-w-[320px]">
               <thead>
                 <tr className="bg-marvvn-gray-50">
                   {chart.headers.map(h => (
@@ -74,6 +75,7 @@ export default function SizeGuide({ category }: SizeGuideProps) {
                 ))}
               </tbody>
             </table>
+            </div>
             <div className="mt-4 p-3 bg-marvvn-gray-50 text-sm text-marvvn-gray-600">
               <strong>Tip:</strong> If you&apos;re between sizes, we recommend sizing down for a regular fit or staying true to size for an oversized look.
             </div>
