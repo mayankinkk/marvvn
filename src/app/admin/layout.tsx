@@ -116,9 +116,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         {/* Brand */}
         <div className="px-5 pt-6 pb-5">
           <Link href="/admin" className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-white rounded-lg flex items-center justify-center">
-              <span className="text-[#111318] font-display font-bold text-sm tracking-tight">M</span>
-            </div>
+            <img src="/icons/main-logo.png" alt="MARVVN" className="w-9 h-9 object-contain" />
             <div>
               <span className="text-[15px] font-semibold tracking-wide">MARVVN</span>
               <span className="block text-[11px] text-white/40 font-medium tracking-wider uppercase">Admin Panel</span>
