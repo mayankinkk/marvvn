@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 async function isAdmin(supabase: any) {
   const { data: { user } } = await supabase.auth.getUser()
@@ -12,7 +13,8 @@ export async function GET(request: Request) {
   const supabase = createClient()
   if (!(await isAdmin(supabase))) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
-  const { data, error } = await supabase
+  const admin = createAdminClient()
+  const { data, error } = await admin
     .from('blogs')
     .select('*')
     .order('created_at', { ascending: false })
@@ -32,7 +34,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Handle, title, excerpt, and image are required' }, { status: 400 })
   }
 
-  const { data, error } = await supabase
+  const admin = createAdminClient()
+  const { data, error } = await admin
     .from('blogs')
     .insert({
       handle: handle.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
@@ -77,7 +80,8 @@ export async function PUT(request: Request) {
   if (published !== undefined) updates.published = published
   if (category !== undefined) updates.category = category || null
 
-  const { data, error } = await supabase
+  const admin = createAdminClient()
+  const { data, error } = await admin
     .from('blogs')
     .update(updates)
     .eq('id', id)
@@ -96,7 +100,8 @@ export async function DELETE(request: Request) {
   const id = searchParams.get('id')
   if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
 
-  const { error } = await supabase.from('blogs').delete().eq('id', id)
+  const admin = createAdminClient()
+  const { error } = await admin.from('blogs').delete().eq('id', id)
   if (error) return NextResponse.json({ error: 'Failed to delete blog' }, { status: 500 })
   return NextResponse.json({ success: true })
 }
