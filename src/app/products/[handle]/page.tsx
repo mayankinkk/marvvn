@@ -507,7 +507,7 @@ export default function ProductPage() {
                   </p>
                 ) : (
                   <div className="space-y-2 min-w-0">
-                    <p className="text-sm text-amber-700 font-medium break-words">This product is currently out of stock</p>
+                    <p className="text-sm text-amber-700 font-medium break-words">This size is currently out of stock</p>
                     <div className="flex gap-2 min-w-0">
                       <input
                         type="email"
