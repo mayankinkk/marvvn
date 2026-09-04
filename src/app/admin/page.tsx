@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Package, ShoppingCart, Users, IndianRupee, Clock, ArrowUpRight, TrendingUp, Tag, CreditCard, RefreshCw } from 'lucide-react'
+import { Package, ShoppingCart, Users, IndianRupee, Clock, ArrowUpRight, TrendingUp, Tag, CreditCard, RefreshCw, Trash2, AlertTriangle, X } from 'lucide-react'
 import { formatPrice } from '@/lib/utils'
 
 interface Stats {
@@ -23,6 +23,10 @@ interface Stats {
 export default function AdminDashboard() {
   const [stats, setStats] = useState<Stats | null>(null)
   const [loading, setLoading] = useState(true)
+  const [showResetModal, setShowResetModal] = useState(false)
+  const [resetConfirm, setResetConfirm] = useState('')
+  const [resetting, setResetting] = useState(false)
+  const [resetError, setResetError] = useState('')
 
   const fetchStats = () => {
     setLoading(true)
@@ -33,6 +37,28 @@ export default function AdminDashboard() {
   }
 
   useEffect(() => { fetchStats() }, [])
+
+  const handleReset = async () => {
+    if (resetConfirm !== 'RESET') return
+    setResetting(true)
+    setResetError('')
+    try {
+      const res = await fetch('/api/admin/reset-stats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ confirm: 'RESET', scope: 'orders' }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Reset failed')
+      setShowResetModal(false)
+      setResetConfirm('')
+      fetchStats()
+    } catch (err: any) {
+      setResetError(err.message || 'Failed to reset stats')
+    } finally {
+      setResetting(false)
+    }
+  }
 
   if (loading && !stats) {
     return (
@@ -74,15 +100,25 @@ export default function AdminDashboard() {
           <h1 className="text-[22px] font-semibold text-gray-900 tracking-tight">Dashboard</h1>
           <p className="text-sm text-gray-400 mt-0.5">Welcome back. Here is your store overview.</p>
         </div>
-        <button
-          type="button"
-          onClick={fetchStats}
-          disabled={loading}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-500 hover:text-gray-700 border border-gray-200 rounded-lg hover:bg-white transition-all disabled:opacity-50 cursor-pointer"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowResetModal(true)}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm text-red-600 hover:text-red-700 border border-red-200 rounded-lg hover:bg-red-50 transition-all cursor-pointer"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            Reset Stats
+          </button>
+          <button
+            type="button"
+            onClick={fetchStats}
+            disabled={loading}
+            className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-500 hover:text-gray-700 border border-gray-200 rounded-lg hover:bg-white transition-all disabled:opacity-50 cursor-pointer"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Stat Cards */}
@@ -303,6 +339,83 @@ export default function AdminDashboard() {
           </table>
         </div>
       </div>
+
+      {/* Reset Stats Modal */}
+      {showResetModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => !resetting && setShowResetModal(false)} />
+          <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+            <div className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-red-600" />
+                </div>
+                <button
+                  onClick={() => !resetting && setShowResetModal(false)}
+                  className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
+                >
+                  <X className="w-4 h-4 text-gray-500" />
+                </button>
+              </div>
+
+              <h3 className="text-lg font-semibold text-gray-900">Reset dashboard stats?</h3>
+              <p className="text-sm text-gray-500 mt-2 leading-relaxed">
+                This will <span className="font-semibold text-red-600">permanently delete all orders</span> and reset revenue, avg order,
+                pending, order status, daily revenue, top products, payment methods and promo usage to zero.
+              </p>
+              <div className="mt-3 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2.5">
+                <p className="text-xs font-medium text-amber-800">Products (28) and Users (11) will be kept.</p>
+                <p className="text-xs text-amber-700 mt-0.5">Only orders & revenue will be cleared. This cannot be undone.</p>
+              </div>
+
+              <div className="mt-5">
+                <label className="text-xs font-medium text-gray-700">
+                  Type <span className="font-mono font-bold text-gray-900">RESET</span> to confirm
+                </label>
+                <input
+                  type="text"
+                  value={resetConfirm}
+                  onChange={(e) => setResetConfirm(e.target.value)}
+                  placeholder="RESET"
+                  autoFocus
+                  className="mt-1.5 w-full px-3 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 font-mono"
+                />
+              </div>
+
+              {resetError && (
+                <p className="mt-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{resetError}</p>
+              )}
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => setShowResetModal(false)}
+                  disabled={resetting}
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleReset}
+                  disabled={resetConfirm !== 'RESET' || resetting}
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+                >
+                  {resetting ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Resetting...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4" />
+                      Reset to Zero
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
