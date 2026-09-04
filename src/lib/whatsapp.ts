@@ -160,7 +160,7 @@ ${itemsList}
 *Delivery Address:*
 ${addressText}
 
-*Estimated Delivery:* 3-5 business days
+*Estimated Delivery:* 7-10 business days
 
 Track your order: https://marvvn.online/account/orders
 

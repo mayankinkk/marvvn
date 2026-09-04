@@ -22,10 +22,13 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { toggleItem, isInWishlist } = useWishlistStore()
   const discount = product.compareAtPrice ? calculateDiscount(product.compareAtPrice, product.price) : 0
   const inWishlist = isInWishlist(product.id)
+  const isOutOfStock = typeof product.stock === 'number' && product.stock <= 0
+  const isLowStock = typeof product.stock === 'number' && product.stock > 0 && product.stock <= 5
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+    if (isOutOfStock) return
     addItem(product, selectedSize, product.colors?.[0] || '')
     toggleCart()
   }
@@ -70,7 +73,12 @@ export default function ProductCard({ product }: ProductCardProps) {
           {product.badge === 'bestseller' && (
             <span className="product-badge bg-marvvn-gold">Bestseller</span>
           )}
-          {typeof product.stock === 'number' && product.stock > 0 && product.stock <= 5 && (
+          {isOutOfStock && (
+            <span className="absolute top-3 left-3 text-[10px] font-bold uppercase tracking-wider px-2 py-1 bg-gray-800 text-white rounded-sm">
+              Out of Stock
+            </span>
+          )}
+          {isLowStock && (
             <span className="absolute top-3 left-3 text-[10px] font-bold uppercase tracking-wider px-2 py-1 bg-red-600 text-white rounded-sm animate-pulse">
               Only {product.stock} left!
             </span>
@@ -93,10 +101,11 @@ export default function ProductCard({ product }: ProductCardProps) {
               <button
                 type="button"
                 onClick={handleAddToCart}
-                className="flex-1 btn-primary flex items-center justify-center gap-2 py-2.5 cursor-pointer text-xs"
+                disabled={isOutOfStock}
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 cursor-pointer text-xs ${isOutOfStock ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'btn-primary'}`}
               >
                 <ShoppingBag className="w-4 h-4" />
-                Add To Cart
+                {isOutOfStock ? 'Out of Stock' : 'Add To Cart'}
               </button>
             </div>
           </div>

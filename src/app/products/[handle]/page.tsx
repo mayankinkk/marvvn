@@ -70,17 +70,26 @@ export default function ProductPage() {
 
   // Parse settings-driven content — per-product overrides global
   const whatYouGetFeatures: { icon: string; title: string; subtitle: string }[] = (() => {
+    let features: { icon: string; title: string; subtitle: string }[] = []
     if (product?.what_you_get && Array.isArray(product.what_you_get) && product.what_you_get.length > 0) {
-      return product.what_you_get
+      features = product.what_you_get
+    } else {
+      try { features = JSON.parse(settings.product_what_you_get || '[]') } catch { features = [] }
     }
-    try { return JSON.parse(settings.product_what_you_get || '[]') } catch { return [] }
+    // Normalize legacy delivery timing (4-7 / 3-5 / 5-7 -> 7-10)
+    return features.map(f => ({
+      ...f,
+      subtitle: f.subtitle?.replace(/\b(?:3-5|4-7|5-7) (business|working) days\b/g, '7-10 $1 days') || f.subtitle,
+    }))
   })()
 
   const fabricCareLines = (settings.product_fabric_care || '').split('\n').filter(Boolean).map((l: string) => l.trim())
   const fabricNotesLines = (settings.product_fabric_notes || '').split('\n').filter(Boolean).map((l: string) => l.trim())
-  const shippingLines = (settings.product_shipping_text || 'We currently offer 5% discount on all pre-paid orders.\nFree shipping on orders above {threshold}.\nStandard shipping fee of {shipping_fee} applies on orders below {threshold}.\nShips within 48 hours. Delivery in 4-7 business days across India.')
+  const shippingLines = (settings.product_shipping_text || 'We currently offer 5% discount on all pre-paid orders.\nFree shipping on orders above {threshold}.\nStandard shipping fee of {shipping_fee} applies on orders below {threshold}.\nShips within 48 hours. Delivery in 7-10 business days across India.')
     .replace(/(?:[₹£€$]\s*)?\{threshold\}/g, `₹${settings.free_shipping_threshold || '999'}`)
     .replace(/(?:[₹£€$]\s*)?\{shipping_fee\}/g, `₹${settings.shipping_fee || '65'}`)
+    .replace(/\b(?:3-5|4-7|5-7) business days\b/g, '7-10 business days')
+    .replace(/\b(?:3-5|4-7|5-7) working days\b/g, '7-10 working days')
     .split('\n').filter(Boolean).map((l: string) => l.trim())
   const returnsLines = (settings.product_returns_text || 'Returns accepted within 3 days of delivery only.\nProduct must be unused, unworn, unwashed, with original tags and packaging.\nNo exchanges — refund only.\nDelivery charges are non-refundable.\nApplicable shipping charges will be deducted from refunds for returned free-shipping orders.\nDamaged or used items will not be accepted.\nIf you received a damaged item, contact us within 24 hours with photos/videos.')
     .split('\n').filter(Boolean).map((l: string) => l.trim())

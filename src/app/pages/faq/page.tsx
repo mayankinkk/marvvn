@@ -13,7 +13,7 @@ const faqCategories = [
   {
     category: 'Orders & Shipping',
     items: [
-      { q: 'How long does shipping take?', a: 'Standard shipping takes 3-5 business days within India. Express shipping (available at checkout) delivers within 1-2 business days. Delivery times may vary depending on your location.' },
+      { q: 'How long does shipping take?', a: 'Standard shipping takes 7-10 business days within India. Express shipping (available at checkout) delivers within 1-2 business days. Delivery times may vary depending on your location.' },
       { q: 'How can I track my order?', a: 'Once your order is shipped, you\'ll receive a tracking link via email and WhatsApp. You can also track your order from your account dashboard under "Orders".' },
       { q: 'What are the shipping charges?', a: 'We offer free shipping on orders above ₹999. For orders below ₹999, a flat shipping fee of ₹65 applies. Shipping charges are non-refundable.' },
       { q: 'Do you ship internationally?', a: 'Currently, we only ship within India. We\'re working on expanding to international shipping soon.' },

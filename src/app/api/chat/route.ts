@@ -65,7 +65,7 @@ SHIPPING:
 - Free shipping on orders above ₹999
 - ₹65 shipping fee for orders below ₹999
 - Ships within 48 hours
-- Delivery in 5-7 business days across India
+ - Delivery in 7-10 business days across India
 
 RETURN POLICY (important — be clear about this):
 - Returns accepted within 3 DAYS of delivery ONLY — not 7 days, not 5 days, exactly 3 days

@@ -123,7 +123,7 @@ const DEFAULTS: Record<string, string> = {
   product_what_you_get: JSON.stringify([
     { icon: 'package', title: 'Premium Quality Fabric', subtitle: 'Dense feel with lasting comfort' },
     { icon: 'credit-card', title: 'Flexible Payment Options', subtitle: 'COD available + prepaid savings' },
-    { icon: 'zap', title: 'Fast Delivery', subtitle: 'Delivered within 4-7 working days' },
+    { icon: 'zap', title: 'Fast Delivery', subtitle: 'Delivered within 7-10 working days' },
     { icon: 'rotate-ccw', title: '3-Day Easy Returns', subtitle: 'Easy returns within 3 days of delivery. Shipping charges deducted from refund on free-shipping orders.' },
   ]),
   product_size_fit_men: 'The model (Height 5\'10") is wearing size M',
@@ -131,7 +131,7 @@ const DEFAULTS: Record<string, string> = {
   product_size_fit_advice: 'Fits true to size. Do you need size advice? Please refer to our size chart.',
   product_fabric_care: 'Machine wash cold with similar colors\nTumble dry low\nDo not bleach or iron on print\nTurn inside out before washing to preserve the design',
   product_fabric_notes: 'Colors may slightly vary depending on your screen brightness.\nActual product specifications may vary +/-5%\nAll products have different sizes \u2014 refer to the size chart',
-  product_shipping_text: 'We currently offer 5% discount on all pre-paid orders.\nFree shipping on orders above {threshold}.\nStandard shipping fee of {shipping_fee} applies on orders below {threshold}.\nShips within 48 hours. Delivery in 4-7 business days across India.',
+  product_shipping_text: 'We currently offer 5% discount on all pre-paid orders.\nFree shipping on orders above {threshold}.\nStandard shipping fee of {shipping_fee} applies on orders below {threshold}.\nShips within 48 hours. Delivery in 7-10 business days across India.',
   product_returns_text: 'Returns accepted within 3 days of delivery only.\nProduct must be unused, unworn, unwashed, with original tags and packaging.\nNo exchanges \u2014 refund only.\nDelivery charges are non-refundable.\nApplicable shipping charges will be deducted from refunds for returned free-shipping orders.\nDamaged or used items will not be accepted.\nIf you received a damaged item, contact us within 24 hours with photos/videos.',
   product_returns_refund: 'After we receive and inspect the returned item, your refund will be credited to your original payment method within 5-7 business days.',
   product_other_info: '',
