@@ -39,6 +39,7 @@ const ALLOWED_KEYS = new Set([
   'product_shipping_calc_text', 'product_buy_now_enabled',
   'product_special_offers_enabled', 'product_special_offers_title',
   'product_special_offers_text', 'product_special_offers_subtitle',
+  'footer_shop_links', 'footer_trending_links',
 ])
 
 const DEFAULTS: Record<string, string> = {
