@@ -1,42 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { Save, ArrowLeft, Plus, X } from 'lucide-react'
 import Link from 'next/link'
 import MultiImageUpload from './MultiImageUpload'
 import { cn } from '@/lib/utils'
-import { menMegaMenu, womenMegaMenu, accessoriesMegaMenu } from '@/lib/mega-menu-data'
-
-const COLLECTION_GROUPS: { title: string; handles: { label: string; handle: string }[] }[] = [
-  {
-    title: 'Men — Categories',
-    handles: menMegaMenu.columns[0].links.map(l => ({ label: l.label, handle: l.href.replace('/collections/', '') })),
-  },
-  {
-    title: 'Men — Collections',
-    handles: menMegaMenu.columns[1].links.map(l => ({ label: l.label, handle: l.href.replace('/collections/', '') })),
-  },
-  {
-    title: 'Women — Categories',
-    handles: womenMegaMenu.columns[0].links.map(l => ({ label: l.label, handle: l.href.replace('/collections/', '') })),
-  },
-  {
-    title: 'Women — Collections',
-    handles: womenMegaMenu.columns[1].links.map(l => ({ label: l.label, handle: l.href.replace('/collections/', '') })),
-  },
-  {
-    title: 'Accessories',
-    handles: accessoriesMegaMenu.columns[0].links.map(l => ({ label: l.label, handle: l.href.replace('/collections/', '') })),
-  },
-  {
-    title: 'General',
-    handles: [
-      { label: 'New Arrivals (legacy)', handle: 'new-arrivals' },
-      { label: 'Best Sellers (legacy)', handle: 'best-sellers' },
-    ],
-  },
-]
+import { parseMegaMenuFromSettings } from '@/lib/mega-menu-data'
+import { useSettings } from '@/components/SettingsProvider'
 
 interface ProductFormProps {
   productId?: string
@@ -44,9 +15,51 @@ interface ProductFormProps {
 
 export default function ProductForm({ productId }: ProductFormProps) {
   const router = useRouter()
+  const settings = useSettings()
   const isEdit = !!productId
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+
+  const COLLECTION_GROUPS: { title: string; handles: { label: string; handle: string }[] }[] = useMemo(() => {
+    const menus = parseMegaMenuFromSettings(settings.mega_menu)
+    const findMenu = (title: string) => menus.find(m => m.title.toLowerCase() === title.toLowerCase())
+    const men = findMenu('men')
+    const women = findMenu('women')
+    const accessories = findMenu('accessories')
+    const groups: { title: string; handles: { label: string; handle: string }[] }[] = []
+    if (men) {
+      men.columns.forEach(col => {
+        groups.push({
+          title: `Men — ${col.title}`,
+          handles: col.links.map(l => ({ label: l.label, handle: l.href.replace('/collections/', '').replace(/^\//, '') })),
+        })
+      })
+    }
+    if (women) {
+      women.columns.forEach(col => {
+        groups.push({
+          title: `Women — ${col.title}`,
+          handles: col.links.map(l => ({ label: l.label, handle: l.href.replace('/collections/', '').replace(/^\//, '') })),
+        })
+      })
+    }
+    if (accessories) {
+      accessories.columns.forEach(col => {
+        groups.push({
+          title: `Accessories — ${col.title}`,
+          handles: col.links.map(l => ({ label: l.label, handle: l.href.replace('/collections/', '').replace(/^\//, '') })),
+        })
+      })
+    }
+    groups.push({
+      title: 'General',
+      handles: [
+        { label: 'New Arrivals (legacy)', handle: 'new-arrivals' },
+        { label: 'Best Sellers (legacy)', handle: 'best-sellers' },
+      ],
+    })
+    return groups
+  }, [settings.mega_menu])
 
   const [form, setForm] = useState({
     handle: '',
