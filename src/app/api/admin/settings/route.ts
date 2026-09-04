@@ -292,14 +292,15 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: 'No valid settings provided' }, { status: 400 })
   }
 
-  for (const [key, value] of filteredEntries) {
-    const { error } = await supabase
-      .from('store_settings')
-      .upsert({ key, value: String(value) }, { onConflict: 'key' })
-    if (error) {
-      console.error(`Failed to save setting ${key}:`, error.message, error.details, error.hint)
-      return NextResponse.json({ error: `Failed to save: ${key}`, details: error.message }, { status: 500 })
-    }
+  const rows = filteredEntries.map(([key, value]) => ({ key, value: String(value) }))
+
+  const { error } = await supabase
+    .from('store_settings')
+    .upsert(rows, { onConflict: 'key' })
+
+  if (error) {
+    console.error('Failed to save settings:', error.message, error.details, error.hint)
+    return NextResponse.json({ error: 'Failed to save settings', details: error.message }, { status: 500 })
   }
 
   return NextResponse.json({ success: true })
